@@ -1,4 +1,4 @@
-This is a program I made only for me (for now) so a lot of it includes hardcoded values. 
+This is a program I made only for me (for now) so a lot of it includes hardcoded values. Also I took out a few files that have private information that I don't want public. 
 
 The purpose of the program is to capture pictures from Taiko (PS4 rhythm game) and recognize whenever I would get a new high score, and send that score to my spreadsheet (https://docs.google.com/spreadsheets/d/15qtcBVmes43LlejxgynYoWWxqf99bVK-WmQUfGZfupo) as well as send a message in my twitch chat showing how much higher the score is (twitch could also be turned off if I'm not streaming). It can also see high scores from an emulator version of Taiko, but I don't play that too often, so I don't update or use that part of the program much. 
 

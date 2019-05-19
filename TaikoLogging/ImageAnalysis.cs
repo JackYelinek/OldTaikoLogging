@@ -177,7 +177,7 @@ namespace TaikoLogging
         {
             DirectoryInfo dirInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\State Bitmaps");
             var result = dirInfo.GetFiles();
-            DirectoryInfo originalInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Originals\State Bitmaps Original");
+            DirectoryInfo originalInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\State Bitmaps Original");
             var originalResult = originalInfo.GetFiles();
             if (originalResult.Length != result.Length)
             {
@@ -193,7 +193,7 @@ namespace TaikoLogging
         }
         private void ScaleStateBitmaps()
         {
-            DirectoryInfo dirInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Originals\State Bitmaps Original");
+            DirectoryInfo dirInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\State Bitmaps Original");
             var result = dirInfo.GetFiles();
             DirectoryInfo smallBitmapsInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\State Bitmaps");
             var smallResults = smallBitmapsInfo.GetFiles();

@@ -54,6 +54,16 @@ namespace TaikoLogging
                 sheet.RemoveLastRanked();
                 SendTwitchMessage("Last ranked match removed");
             }
+            else if (e.ChatMessage.Message.StartsWith("!removeranked", StringComparison.InvariantCultureIgnoreCase) && string.Compare(e.ChatMessage.Username, "Deathblood", true) == 0)
+            {
+                sheet.RemoveLastRanked();
+                SendTwitchMessage("Last ranked match removed");
+            }
+            else if (e.ChatMessage.Message.StartsWith("!undoranked", StringComparison.InvariantCultureIgnoreCase) && string.Compare(e.ChatMessage.Username, "Deathblood", true) == 0)
+            {
+                sheet.RemoveLastRanked();
+                SendTwitchMessage("Last ranked match removed");
+            }
         }
 
         internal void Disconnect()

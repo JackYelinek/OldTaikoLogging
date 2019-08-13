@@ -25,8 +25,8 @@ namespace TaikoLogging
             {
                 rin = new RinClient(false);
             }
-            Console.WriteLine("PS4 or Emulator? PS4/Emu");
-            input = Console.ReadLine();
+            //Console.WriteLine("PS4 or Emulator? PS4/Emu");
+            //input = Console.ReadLine();
             bool PS4 = false;
             if (string.Compare("PS4", input, true) == 0)
             {
@@ -36,6 +36,8 @@ namespace TaikoLogging
 
             EmulatorLogger emulatorLogger = new EmulatorLogger();
 
+            // TODO Set this up automatically
+            PS4 = true;
 
 
             while(true)

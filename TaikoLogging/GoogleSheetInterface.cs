@@ -81,28 +81,29 @@ namespace TaikoLogging
             sendValues.Add(baseValues);
 
 
-            List<Google.Apis.Sheets.v4.Data.ValueRange> updateData = new List<Google.Apis.Sheets.v4.Data.ValueRange>();
-            var dataValueRange = new Google.Apis.Sheets.v4.Data.ValueRange();
-            dataValueRange.Range = "Ranked Logs!A" + (matchNumber - 1440).ToString() +":Q" + (matchNumber - 1440).ToString();
-            dataValueRange.Values = sendValues;
-            updateData.Add(dataValueRange);
+            SendData("Ranked Logs!A" + (matchNumber - 1440).ToString() + ":Q" + (matchNumber - 1440).ToString(), sendValues);
+            //List<Google.Apis.Sheets.v4.Data.ValueRange> updateData = new List<Google.Apis.Sheets.v4.Data.ValueRange>();
+            //var dataValueRange = new Google.Apis.Sheets.v4.Data.ValueRange();
+            //dataValueRange.Range = "Ranked Logs!A" + (matchNumber - 1440).ToString() +":Q" + (matchNumber - 1440).ToString();
+            //dataValueRange.Values = sendValues;
+            //updateData.Add(dataValueRange);
 
-            Google.Apis.Sheets.v4.Data.BatchUpdateValuesRequest requestBody = new Google.Apis.Sheets.v4.Data.BatchUpdateValuesRequest();
-            requestBody.Data = updateData;
-            requestBody.ValueInputOption = "USER_ENTERED";
+            //Google.Apis.Sheets.v4.Data.BatchUpdateValuesRequest requestBody = new Google.Apis.Sheets.v4.Data.BatchUpdateValuesRequest();
+            //requestBody.Data = updateData;
+            //requestBody.ValueInputOption = "USER_ENTERED";
 
-            var updateRequest = service.Spreadsheets.Values.BatchUpdate(requestBody, spreadsheetId);
+            //var updateRequest = service.Spreadsheets.Values.BatchUpdate(requestBody, spreadsheetId);
 
-            var updateResponse = updateRequest.Execute();
+            //var updateResponse = updateRequest.Execute();
 
             string twitchMessage = "Match " + matchNumber.ToString() + ": ";
             if (winLoss == true)
             {
-                twitchMessage += "Won "+title+" by " + (info[0] - info[6]).ToString() + " stoichBully"; 
+                twitchMessage += "Won "+title+" by " + (info[0] - info[6]).ToString() + " RinComfy"; 
             }
             else
             {
-                twitchMessage += "Lost "+title+" by " + (info[6] - info[0]).ToString() + " stoichFeels";
+                twitchMessage += "Lost "+title+" by " + (info[6] - info[0]).ToString() + " RinThump";
             }
 
 
@@ -117,21 +118,23 @@ namespace TaikoLogging
             sendValues.Add(baseValues);
 
 
-            updateData = new List<Google.Apis.Sheets.v4.Data.ValueRange>();
-            dataValueRange = new Google.Apis.Sheets.v4.Data.ValueRange();
-            dataValueRange.Range = "Ranked Logs!R" + (matchNumber - 1440).ToString();
-            dataValueRange.Values = sendValues;
-            updateData.Add(dataValueRange);
+            SendData("Ranked Logs!R" + (matchNumber - 1440).ToString(), sendValues);
 
-            requestBody = new Google.Apis.Sheets.v4.Data.BatchUpdateValuesRequest();
-            requestBody.Data = updateData;
-            requestBody.ValueInputOption = "USER_ENTERED";
+            //updateData = new List<Google.Apis.Sheets.v4.Data.ValueRange>();
+            //dataValueRange = new Google.Apis.Sheets.v4.Data.ValueRange();
+            //dataValueRange.Range = "Ranked Logs!R" + (matchNumber - 1440).ToString();
+            //dataValueRange.Values = sendValues;
+            //updateData.Add(dataValueRange);
 
-            updateRequest = service.Spreadsheets.Values.BatchUpdate(requestBody, spreadsheetId);
+            //requestBody = new Google.Apis.Sheets.v4.Data.BatchUpdateValuesRequest();
+            //requestBody.Data = updateData;
+            //requestBody.ValueInputOption = "USER_ENTERED";
 
-            updateResponse = updateRequest.Execute();
+            //updateRequest = service.Spreadsheets.Values.BatchUpdate(requestBody, spreadsheetId);
 
+            //updateResponse = updateRequest.Execute();
 
+            // NOT TESTING
             bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Ranked Logs\" + matchNumber.ToString() + ".png", ImageFormat.Png);
             Console.WriteLine("Ranked match logged");
 
@@ -155,19 +158,21 @@ namespace TaikoLogging
             List<IList<object>> sendValues = new List<IList<object>>();
             sendValues.Add(baseValues);
 
-            List<Google.Apis.Sheets.v4.Data.ValueRange> updateData = new List<Google.Apis.Sheets.v4.Data.ValueRange>();
-            var dataValueRange = new Google.Apis.Sheets.v4.Data.ValueRange();
-            dataValueRange.Range = "Ranked Logs!A" + (matchNumber - 1440).ToString() + ":R" + (matchNumber - 1440).ToString();
-            dataValueRange.Values = sendValues;
-            updateData.Add(dataValueRange);
+            SendData("Ranked Logs!A" + (matchNumber - 1440).ToString() + ":R" + (matchNumber - 1440).ToString(), sendValues);
 
-            Google.Apis.Sheets.v4.Data.BatchUpdateValuesRequest requestBody = new Google.Apis.Sheets.v4.Data.BatchUpdateValuesRequest();
-            requestBody.Data = updateData;
-            requestBody.ValueInputOption = "USER_ENTERED";
+            //List<Google.Apis.Sheets.v4.Data.ValueRange> updateData = new List<Google.Apis.Sheets.v4.Data.ValueRange>();
+            //var dataValueRange = new Google.Apis.Sheets.v4.Data.ValueRange();
+            //dataValueRange.Range = "Ranked Logs!A" + (matchNumber - 1440).ToString() + ":R" + (matchNumber - 1440).ToString();
+            //dataValueRange.Values = sendValues;
+            //updateData.Add(dataValueRange);
 
-            var updateRequest = service.Spreadsheets.Values.BatchUpdate(requestBody, spreadsheetId);
+            //Google.Apis.Sheets.v4.Data.BatchUpdateValuesRequest requestBody = new Google.Apis.Sheets.v4.Data.BatchUpdateValuesRequest();
+            //requestBody.Data = updateData;
+            //requestBody.ValueInputOption = "USER_ENTERED";
 
-            var updateResponse = updateRequest.Execute();
+            //var updateRequest = service.Spreadsheets.Values.BatchUpdate(requestBody, spreadsheetId);
+
+            //var updateResponse = updateRequest.Execute();
         }
         public void UpdatePS4HighScore(string title, int[] info, ImageAnalysis.Difficulty difficulty, Bitmap bmp)
         {
@@ -244,20 +249,20 @@ namespace TaikoLogging
             List<IList<object>> sendValues = new List<IList<object>>();
             sendValues.Add(baseValues);
 
+            SendData(difficulty.ToString() + "!F" + (songIndex + 2).ToString() + ":K" + (songIndex + 2).ToString(), sendValues);
+            //List<Google.Apis.Sheets.v4.Data.ValueRange> updateData = new List<Google.Apis.Sheets.v4.Data.ValueRange>();
+            //var dataValueRange = new Google.Apis.Sheets.v4.Data.ValueRange();
+            //dataValueRange.Range = difficulty.ToString() + "!F" + (songIndex + 2).ToString() + ":K" + (songIndex + 2).ToString();
+            //dataValueRange.Values = sendValues;
+            //updateData.Add(dataValueRange);
 
-            List<Google.Apis.Sheets.v4.Data.ValueRange> updateData = new List<Google.Apis.Sheets.v4.Data.ValueRange>();
-            var dataValueRange = new Google.Apis.Sheets.v4.Data.ValueRange();
-            dataValueRange.Range = difficulty.ToString() + "!F" + (songIndex + 2).ToString() + ":K" + (songIndex + 2).ToString();
-            dataValueRange.Values = sendValues;
-            updateData.Add(dataValueRange);
+            //Google.Apis.Sheets.v4.Data.BatchUpdateValuesRequest requestBody = new Google.Apis.Sheets.v4.Data.BatchUpdateValuesRequest();
+            //requestBody.Data = updateData;
+            //requestBody.ValueInputOption = "USER_ENTERED";
 
-            Google.Apis.Sheets.v4.Data.BatchUpdateValuesRequest requestBody = new Google.Apis.Sheets.v4.Data.BatchUpdateValuesRequest();
-            requestBody.Data = updateData;
-            requestBody.ValueInputOption = "USER_ENTERED";
+            //var updateRequest = service.Spreadsheets.Values.BatchUpdate(requestBody, spreadsheetId);
 
-            var updateRequest = service.Spreadsheets.Values.BatchUpdate(requestBody, spreadsheetId);
-
-            var updateResponse = updateRequest.Execute();
+            //var updateResponse = updateRequest.Execute();
 
             Program.rin.SendTwitchMessage("New high score! " + title + " +" + (info[0] - int.Parse(score)).ToString());
 
@@ -270,19 +275,20 @@ namespace TaikoLogging
             sendValues.Add(baseValues);
 
 
-            updateData = new List<Google.Apis.Sheets.v4.Data.ValueRange>();
-            dataValueRange = new Google.Apis.Sheets.v4.Data.ValueRange();
-            dataValueRange.Range = difficulty.ToString()+"!O" + (songIndex + 2).ToString();
-            dataValueRange.Values = sendValues;
-            updateData.Add(dataValueRange);
+            SendData(difficulty.ToString() + "!O" + (songIndex + 2).ToString(), sendValues);
+            //updateData = new List<Google.Apis.Sheets.v4.Data.ValueRange>();
+            //dataValueRange = new Google.Apis.Sheets.v4.Data.ValueRange();
+            //dataValueRange.Range = difficulty.ToString()+"!O" + (songIndex + 2).ToString();
+            //dataValueRange.Values = sendValues;
+            //updateData.Add(dataValueRange);
 
-            requestBody = new Google.Apis.Sheets.v4.Data.BatchUpdateValuesRequest();
-            requestBody.Data = updateData;
-            requestBody.ValueInputOption = "USER_ENTERED";
+            //requestBody = new Google.Apis.Sheets.v4.Data.BatchUpdateValuesRequest();
+            //requestBody.Data = updateData;
+            //requestBody.ValueInputOption = "USER_ENTERED";
 
-            updateRequest = service.Spreadsheets.Values.BatchUpdate(requestBody, spreadsheetId);
+            //updateRequest = service.Spreadsheets.Values.BatchUpdate(requestBody, spreadsheetId);
 
-            updateResponse = updateRequest.Execute();
+            //updateResponse = updateRequest.Execute();
 
 
             DirectoryInfo dirInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores");
@@ -296,6 +302,7 @@ namespace TaikoLogging
                 }
             }
 
+            // NOT TESTING
             bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores\" + title + "." + difficulty.ToString() + "." + numScreenshots.ToString() + ".png", ImageFormat.Png);
             Console.WriteLine("HighScore logged");
 
@@ -338,19 +345,23 @@ namespace TaikoLogging
             List<IList<object>> sendValues = new List<IList<object>>();
             sendValues.Add(baseValues);
 
-            List<Google.Apis.Sheets.v4.Data.ValueRange> updateData = new List<Google.Apis.Sheets.v4.Data.ValueRange>();
-            var dataValueRange = new Google.Apis.Sheets.v4.Data.ValueRange();
-            dataValueRange.Range = difficulty.ToString() + "!L" + (songIndex + 2).ToString();
-            dataValueRange.Values = sendValues;
-            updateData.Add(dataValueRange);
 
-            var requestBody = new Google.Apis.Sheets.v4.Data.BatchUpdateValuesRequest();
-            requestBody.Data = updateData;
-            requestBody.ValueInputOption = "USER_ENTERED";
+            SendData(difficulty.ToString() + "!L" + (songIndex + 2).ToString(), sendValues);
 
-            var updateRequest = service.Spreadsheets.Values.BatchUpdate(requestBody, spreadsheetId);
+            //List<Google.Apis.Sheets.v4.Data.ValueRange> updateData = new List<Google.Apis.Sheets.v4.Data.ValueRange>();
+            //var dataValueRange = new Google.Apis.Sheets.v4.Data.ValueRange();
+            //dataValueRange.Range = difficulty.ToString() + "!L" + (songIndex + 2).ToString();
+            //dataValueRange.Values = sendValues;
+            //updateData.Add(dataValueRange);
 
-            var updateResponse = updateRequest.Execute();
+            //var requestBody = new Google.Apis.Sheets.v4.Data.BatchUpdateValuesRequest();
+            //requestBody.Data = updateData;
+            //requestBody.ValueInputOption = "USER_ENTERED";
+
+            //var updateRequest = service.Spreadsheets.Values.BatchUpdate(requestBody, spreadsheetId);
+
+            //var updateResponse = updateRequest.Execute();
+
             int goodsDifference = goods - int.Parse(sheetGoods);
             string twitchMessage = string.Empty;
             if (goodsDifference == 1)
@@ -419,20 +430,20 @@ namespace TaikoLogging
             List<IList<object>> sendValues = new List<IList<object>>();
             sendValues.Add(baseValues);
 
+            SendData("Emulator" + "!F" + (songIndex + 2).ToString() + ":J" + (songIndex + 2).ToString(), sendValues);
+            //List<Google.Apis.Sheets.v4.Data.ValueRange> updateData = new List<Google.Apis.Sheets.v4.Data.ValueRange>();
+            //var dataValueRange = new Google.Apis.Sheets.v4.Data.ValueRange();
+            //dataValueRange.Range = "Emulator" + "!F" + (songIndex + 2).ToString() + ":J" + (songIndex + 2).ToString();
+            //dataValueRange.Values = sendValues;
+            //updateData.Add(dataValueRange);
 
-            List<Google.Apis.Sheets.v4.Data.ValueRange> updateData = new List<Google.Apis.Sheets.v4.Data.ValueRange>();
-            var dataValueRange = new Google.Apis.Sheets.v4.Data.ValueRange();
-            dataValueRange.Range = "Emulator" + "!F" + (songIndex + 2).ToString() + ":J" + (songIndex + 2).ToString();
-            dataValueRange.Values = sendValues;
-            updateData.Add(dataValueRange);
+            //Google.Apis.Sheets.v4.Data.BatchUpdateValuesRequest requestBody = new Google.Apis.Sheets.v4.Data.BatchUpdateValuesRequest();
+            //requestBody.Data = updateData;
+            //requestBody.ValueInputOption = "USER_ENTERED";
 
-            Google.Apis.Sheets.v4.Data.BatchUpdateValuesRequest requestBody = new Google.Apis.Sheets.v4.Data.BatchUpdateValuesRequest();
-            requestBody.Data = updateData;
-            requestBody.ValueInputOption = "USER_ENTERED";
+            //var updateRequest = service.Spreadsheets.Values.BatchUpdate(requestBody, spreadsheetId);
 
-            var updateRequest = service.Spreadsheets.Values.BatchUpdate(requestBody, spreadsheetId);
-
-            var updateResponse = updateRequest.Execute();
+            //var updateResponse = updateRequest.Execute();
 
             Program.rin.SendTwitchMessage("New high score! " + title + " +" + (int.Parse(info[0]) - int.Parse(score)).ToString());
 
@@ -444,27 +455,27 @@ namespace TaikoLogging
             sendValues = new List<IList<object>>();
             sendValues.Add(baseValues);
 
+            SendData("Emulator" + "!O" + (songIndex + 2).ToString(), sendValues);
+            //updateData = new List<Google.Apis.Sheets.v4.Data.ValueRange>();
+            //dataValueRange = new Google.Apis.Sheets.v4.Data.ValueRange();
+            //dataValueRange.Range = "Emulator" + "!O" + (songIndex + 2).ToString();
+            //dataValueRange.Values = sendValues;
+            //updateData.Add(dataValueRange);
 
-            updateData = new List<Google.Apis.Sheets.v4.Data.ValueRange>();
-            dataValueRange = new Google.Apis.Sheets.v4.Data.ValueRange();
-            dataValueRange.Range = "Emulator" + "!O" + (songIndex + 2).ToString();
-            dataValueRange.Values = sendValues;
-            updateData.Add(dataValueRange);
+            //requestBody = new Google.Apis.Sheets.v4.Data.BatchUpdateValuesRequest();
+            //requestBody.Data = updateData;
+            //requestBody.ValueInputOption = "USER_ENTERED";
 
-            requestBody = new Google.Apis.Sheets.v4.Data.BatchUpdateValuesRequest();
-            requestBody.Data = updateData;
-            requestBody.ValueInputOption = "USER_ENTERED";
+            //updateRequest = service.Spreadsheets.Values.BatchUpdate(requestBody, spreadsheetId);
 
-            updateRequest = service.Spreadsheets.Values.BatchUpdate(requestBody, spreadsheetId);
-
-            updateResponse = updateRequest.Execute();
+            //updateResponse = updateRequest.Execute();
 
 
             Console.WriteLine("HighScore logged");
 
         }
 
-        public IList<IList<Object>> GetListofEmulatorSongs()
+        public IList<IList<object>> GetListofEmulatorSongs()
         {
             string range = "Emulator" + "!B2:B";
             var request = service.Spreadsheets.Values.Get(spreadsheetId, range);
@@ -477,7 +488,56 @@ namespace TaikoLogging
             return null;
         }
 
-        static string GetColumnName(int index)
+        #region Sheet Functions
+        private IList<IList<object>> GetValues(string range)
+        {
+            var request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+            ValueRange response = request.Execute();
+            var values = response.Values;
+            return values;
+        }
+
+
+        private List<string> GetHeaders()
+        {
+            // This part would have to be updated if more headers are added
+            // I don't think it'd allow me to make it go past AG if there's no cells there
+            // Also note this is just for the Beatmaps sheet's headers
+            string range = "Oni!B1:O1";
+            var values = GetValues(range);
+            List<string> Headers = new List<string>();
+            for (int i = 0; i < values[0].Count; i++)
+            {
+                Headers.Add(values[0][i].ToString());
+            }
+            return Headers;
+        }
+
+        //public IList<IList<object>> GetSongData()
+        //{
+        //    var Headers = GetHeaders();
+        //    string range = "Beatmaps!" + GetColumnName(Headers.IndexOf("★")) + "2:" + GetColumnName(Headers.IndexOf("Acc"));
+        //    return GetValues(range);
+        //}
+
+        private void SendData(string range, IList<IList<object>> data)
+        {
+            List<Google.Apis.Sheets.v4.Data.ValueRange> updateData = new List<Google.Apis.Sheets.v4.Data.ValueRange>();
+            var dataValueRange = new Google.Apis.Sheets.v4.Data.ValueRange();
+            dataValueRange.Range = range;
+            dataValueRange.Values = data;
+            updateData.Add(dataValueRange);
+
+            var requestBody = new Google.Apis.Sheets.v4.Data.BatchUpdateValuesRequest();
+            requestBody.Data = updateData;
+            requestBody.ValueInputOption = "USER_ENTERED";
+
+            var updateRequest = service.Spreadsheets.Values.BatchUpdate(requestBody, spreadsheetId);
+
+            var updateResponse = updateRequest.Execute();
+        }
+
+        string GetColumnName(int index)
         {
             const string letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -490,5 +550,6 @@ namespace TaikoLogging
 
             return value;
         }
+        #endregion
     }
 }

@@ -9,40 +9,39 @@ namespace TaikoLoggingTests
     [TestClass]
     public class TestImageAnalysis
     {
+        string failedTestLocation = @"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Test Data\Failed Tests\";
         [TestMethod]
         public void TestFindGameWindow()
         {
             ScreenGrab screen = new ScreenGrab();
 
-            const int numBitmaps = 1;
 
             string folderPath = @"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Test Data\FindGameWindow\";
 
-            Bitmap[] bmps = new Bitmap[numBitmaps]
+            List<Bitmap> bmps = new List<Bitmap>()
             {
                 new Bitmap(folderPath + "初音ミクの消失‐劇場版‐.Ura.2.png")
             };
 
 
-            for (int i = 0; i < bmps.Length; i++)
+            for (int i = 0; i < bmps.Count; i++)
             {
-
                 screen.FindGameWindow(bmps[i]);
             }
 
-            bool[] results = new bool[numBitmaps];
-            for (int i = 0; i < results.Length; i++)
+            List<bool> results = new List<bool>();
+            for (int i = 0; i < bmps.Count; i++)
             {
-                results[i] = false;
+                results.Add(false);
             }
 
             // Top, Left, Bottom, Right
-            List<int>[] expectedResults = new List<int>[numBitmaps]
+            List<List<int>> expectedResults = new List<List<int>>()
             {
                 new List<int> {72, 20, 719, 1172 },
             };
 
-            for (int i = 0; i < results.Length; i++)
+            for (int i = 0; i < bmps.Count; i++)
             {
                 if (screen.topOffset == expectedResults[i][0] && 
                     screen.leftOffset == expectedResults[i][1] && 
@@ -60,40 +59,43 @@ namespace TaikoLoggingTests
         public void TestCheckDifficulty()
         {
             ImageAnalysis imageAnalysis = new ImageAnalysis();
-            const int numBitmaps = 5;
 
-            Bitmap[] bmps = new Bitmap[numBitmaps]
+            string folderPath = @"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Test Data\CheckDifficulty\";
+
+            List<Bitmap> bmps = new List<Bitmap>()
             {
-                new Bitmap(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Test Data\CheckDifficulty\Easy.png"),
-                new Bitmap(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Test Data\CheckDifficulty\Normal.png"),
-                new Bitmap(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Test Data\CheckDifficulty\Hard.png"),
-                new Bitmap(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Test Data\CheckDifficulty\Oni.png"),
-                new Bitmap(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Test Data\CheckDifficulty\Ura.png")
+                new Bitmap(folderPath + "Easy.png"),
+                new Bitmap(folderPath + "Normal.png"),
+                new Bitmap(folderPath + "Hard.png"),
+                new Bitmap(folderPath + "Oni.png"),
+                new Bitmap(folderPath + "Ura.png"),
+                new Bitmap(folderPath + "ナイト・オブ・ナイツ.Oni.0.png")
             };
 
-            ImageAnalysis.Difficulty[] difficulties = new ImageAnalysis.Difficulty[numBitmaps];
+            List<ImageAnalysis.Difficulty> difficulties = new List<ImageAnalysis.Difficulty>();
 
-            for (int i = 0; i < bmps.Length; i++)
+            for (int i = 0; i < bmps.Count; i++)
             {
-                difficulties[i] = imageAnalysis.CheckDifficulty(bmps[i], ImageAnalysis.Players.Single);
+                difficulties.Add(imageAnalysis.CheckDifficulty(bmps[i], ImageAnalysis.Players.Single));
             }
 
-            bool[] results = new bool[numBitmaps];
-            for (int i = 0; i < results.Length; i++)
+            List<bool> results = new List<bool>();
+            for (int i = 0; i < bmps.Count; i++)
             {
-                results[i] = false;
+                results.Add(false);
             }
 
-            ImageAnalysis.Difficulty[] expectedResults = new ImageAnalysis.Difficulty[numBitmaps]
+            List<ImageAnalysis.Difficulty> expectedResults = new List<ImageAnalysis.Difficulty>()
             {
                 ImageAnalysis.Difficulty.Easy,
                 ImageAnalysis.Difficulty.Normal,
                 ImageAnalysis.Difficulty.Hard,
                 ImageAnalysis.Difficulty.Oni,
-                ImageAnalysis.Difficulty.Ura
+                ImageAnalysis.Difficulty.Ura,
+                ImageAnalysis.Difficulty.Oni,
             };
 
-            for (int i = 0; i < results.Length; i++)
+            for (int i = 0; i < results.Count; i++)
             {
                 if (difficulties[i] == expectedResults[i])
                 {
@@ -107,24 +109,43 @@ namespace TaikoLoggingTests
         public void TestCheckSingleMods()
         {
             ImageAnalysis imageAnalysis = new ImageAnalysis();
-            const int numBitmaps = 1; // or something like that
 
-            Bitmap[] bmps = new Bitmap[numBitmaps]
+            List<Bitmap> bmps = new List<Bitmap>()
             {
                 new Bitmap(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Test Data\CheckMods\!!!カオスタイム!!!.Oni.0.png")
             };
 
-            List<List<string>> mods = new List<List<string>>();
+            List<List<string>> mods = new List<List<string>>()
+            {
+                
+            };
 
-            for (int i = 0; i < bmps.Length; i++)
+            for (int i = 0; i < bmps.Count; i++)
             {
                 mods[i] = imageAnalysis.CheckMods(bmps[i], ImageAnalysis.Players.Single);
             }
 
-            bool[] results = new bool[numBitmaps];
-            for (int i = 0; i < results.Length; i++)
+            List<bool> results = new List<bool>();
+            for (int i = 0; i < bmps.Count; i++)
             {
-                results[i] = false;
+                results.Add(false);
+            }
+
+            List<List<string>> expectedResults = new List<List<string>>()
+            {
+                new List<string>()
+                {
+                    null,
+                }
+            };
+
+            for (int i = 0; i < bmps.Count; i++)
+            {
+                if (mods[i] == expectedResults[i])
+                {
+                    results[i] = true;
+                }
+                Assert.IsTrue(results[i], "Expected " + expectedResults[i].ToString() + ", Result = '" + mods[i].ToString() + "'");
             }
         }
 
@@ -134,25 +155,26 @@ namespace TaikoLoggingTests
             // This one's gonna be a massive one, both for testing and for setting up the tests
             ImageAnalysis imageAnalysis = new ImageAnalysis();
 
-            const int numBitmaps = 1; // or something like that
 
-            Bitmap[] bmps = new Bitmap[numBitmaps]
+            string songFolder = @"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Test Data\CheckState\";
+
+            List<Bitmap> bmps = new List<Bitmap>()
             {
                 // I don't have any bitmaps to test with quite yet
-                new Bitmap(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Test Data\CheckState\!!!カオスタイム!!!.Oni.0.png")
+                new Bitmap(songFolder + "!!!カオスタイム!!!.Oni.0.png")
             };
 
-            ImageAnalysis.State[] states = new ImageAnalysis.State[numBitmaps];
+            List<ImageAnalysis.State> states = new List<ImageAnalysis.State>();
 
-            for (int i = 0; i < bmps.Length; i++)
+            for (int i = 0; i < bmps.Count; i++)
             {
-                states[i] = imageAnalysis.CheckState(bmps[i]);
+                states.Add(imageAnalysis.CheckState(bmps[i]));
             }
 
-            bool[] results = new bool[numBitmaps];
-            for (int i = 0; i < results.Length; i++)
+            List<bool> results = new List<bool>();
+            for (int i = 0; i < bmps.Count; i++)
             {
-                results[i] = false;
+                results.Add(false);
             }
         }
 
@@ -161,11 +183,9 @@ namespace TaikoLoggingTests
         {
             ImageAnalysis imageAnalysis = new ImageAnalysis();
 
-            const int numBitmaps = 11; // or something like that
-
             string folderPath = @"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Test Data\GetNumbers\";
 
-            Bitmap[] bmps = new Bitmap[numBitmaps]
+            List<Bitmap> bmps = new List<Bitmap>()
             {
                 new Bitmap(folderPath + "!!!カオスタイム!!!.Oni.0.png"),
                 new Bitmap(folderPath + "HARDCOREノ心得.Oni.1.png"),
@@ -178,22 +198,23 @@ namespace TaikoLoggingTests
                 new Bitmap(folderPath + "白鳥の湖.Ura.0.png"),
                 new Bitmap(folderPath + "竜と黒炎の姫君.Ura.5.png"),
                 new Bitmap(folderPath + "紫煌ノ乱.Oni.1.png"),
+                new Bitmap(folderPath + "ナイト・オブ・ナイツ.Oni.0.png"),
             };
 
-            int[] bads = new int[numBitmaps];
+            List<int> bads = new List<int>();
 
-            for (int i = 0; i < bmps.Length; i++)
+            for (int i = 0; i < bmps.Count; i++)
             {
-                bads[i] = imageAnalysis.GetBads(bmps[i], ImageAnalysis.Players.Single);
+                bads.Add(imageAnalysis.GetBads(bmps[i], ImageAnalysis.Players.Single));
             }
 
-            bool[] results = new bool[numBitmaps];
-            for (int i = 0; i < results.Length; i++)
+            List<bool> results = new List<bool>();
+            for (int i = 0; i < bmps.Count; i++)
             {
-                results[i] = false;
+                results.Add(false);
             }
 
-            int[] expectedResults = new int[numBitmaps]
+            List<int> expectedResults = new List<int>()
             {
                 62,
                 4,
@@ -205,10 +226,11 @@ namespace TaikoLoggingTests
                 16,
                 0,
                 0,
+                0,
                 0
             };
 
-            for (int i = 0; i < results.Length; i++)
+            for (int i = 0; i < bmps.Count; i++)
             {
                 if (bads[i] == expectedResults[i])
                 {
@@ -224,11 +246,10 @@ namespace TaikoLoggingTests
             // This one's gonna be a massive one, both for testing and for setting up the tests
             ImageAnalysis imageAnalysis = new ImageAnalysis();
 
-            const int numBitmaps = 11; // or something like that
 
             string folderPath = @"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Test Data\GetNumbers\";
 
-            Bitmap[] bmps = new Bitmap[numBitmaps]
+            List<Bitmap> bmps = new List<Bitmap>()
             {
                 new Bitmap(folderPath + "!!!カオスタイム!!!.Oni.0.png"),
                 new Bitmap(folderPath + "HARDCOREノ心得.Oni.1.png"),
@@ -241,22 +262,23 @@ namespace TaikoLoggingTests
                 new Bitmap(folderPath + "白鳥の湖.Ura.0.png"),
                 new Bitmap(folderPath + "竜と黒炎の姫君.Ura.5.png"),
                 new Bitmap(folderPath + "紫煌ノ乱.Oni.1.png"),
+                new Bitmap(folderPath + "ナイト・オブ・ナイツ.Oni.0.png"),
             };
 
-            int[] combo = new int[numBitmaps];
+            List<int> combo = new List<int>();
 
-            for (int i = 0; i < bmps.Length; i++)
+            for (int i = 0; i < bmps.Count; i++)
             {
-                combo[i] = imageAnalysis.GetCombo(bmps[i], ImageAnalysis.Players.Single);
+                combo.Add(imageAnalysis.GetCombo(bmps[i], ImageAnalysis.Players.Single));
             }
 
-            bool[] results = new bool[numBitmaps];
-            for (int i = 0; i < results.Length; i++)
+            List<bool> results = new List<bool>();
+            for (int i = 0; i < bmps.Count; i++)
             {
-                results[i] = false;
+                results.Add(false);
             }
 
-            int[] expectedResults = new int[numBitmaps]
+            List<int> expectedResults = new List<int>()
             {
                 167,
                 476,
@@ -268,10 +290,11 @@ namespace TaikoLoggingTests
                 391,
                 861,
                 932,
-                823
+                823,
+                651
             };
 
-            for (int i = 0; i < results.Length; i++)
+            for (int i = 0; i < bmps.Count; i++)
             {
                 if (combo[i] == expectedResults[i])
                 {
@@ -287,11 +310,10 @@ namespace TaikoLoggingTests
             // This one's gonna be a massive one, both for testing and for setting up the tests
             ImageAnalysis imageAnalysis = new ImageAnalysis();
 
-            const int numBitmaps = 11; // or something like that
 
             string folderPath = @"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Test Data\GetNumbers\";
 
-            Bitmap[] bmps = new Bitmap[numBitmaps]
+            List<Bitmap> bmps = new List<Bitmap>()
             {
                 new Bitmap(folderPath + "!!!カオスタイム!!!.Oni.0.png"),
                 new Bitmap(folderPath + "HARDCOREノ心得.Oni.1.png"),
@@ -304,22 +326,23 @@ namespace TaikoLoggingTests
                 new Bitmap(folderPath + "白鳥の湖.Ura.0.png"),
                 new Bitmap(folderPath + "竜と黒炎の姫君.Ura.5.png"),
                 new Bitmap(folderPath + "紫煌ノ乱.Oni.1.png"),
+                new Bitmap(folderPath + "ナイト・オブ・ナイツ.Oni.0.png"),
             };
 
-            int[] drumroll = new int[numBitmaps];
+            List<int> drumroll = new List<int>();
 
-            for (int i = 0; i < bmps.Length; i++)
+            for (int i = 0; i < bmps.Count; i++)
             {
-                drumroll[i] = imageAnalysis.GetDrumroll(bmps[i], ImageAnalysis.Players.Single);
+                drumroll.Add(imageAnalysis.GetDrumroll(bmps[i], ImageAnalysis.Players.Single));
             }
 
-            bool[] results = new bool[numBitmaps];
-            for (int i = 0; i < results.Length; i++)
+            List<bool> results = new List<bool>();
+            for (int i = 0; i < bmps.Count; i++)
             {
-                results[i] = false;
+                results.Add(false);
             }
 
-            int[] expectedResults = new int[numBitmaps]
+            List<int> expectedResults = new List<int>()
             {
                 219,
                 124,
@@ -331,10 +354,11 @@ namespace TaikoLoggingTests
                 10,
                 0,
                 77,
-                0
+                0,
+                126
             };
 
-            for (int i = 0; i < results.Length; i++)
+            for (int i = 0; i < bmps.Count; i++)
             {
                 if (drumroll[i] == expectedResults[i])
                 {
@@ -354,7 +378,7 @@ namespace TaikoLoggingTests
 
             string folderPath = @"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Test Data\GetNumbers\";
 
-            Bitmap[] bmps = new Bitmap[numBitmaps]
+            List<Bitmap> bmps = new List<Bitmap>()
             {
                 new Bitmap(folderPath + "!!!カオスタイム!!!.Oni.0.png"),
                 new Bitmap(folderPath + "HARDCOREノ心得.Oni.1.png"),
@@ -367,22 +391,23 @@ namespace TaikoLoggingTests
                 new Bitmap(folderPath + "白鳥の湖.Ura.0.png"),
                 new Bitmap(folderPath + "竜と黒炎の姫君.Ura.5.png"),
                 new Bitmap(folderPath + "紫煌ノ乱.Oni.1.png"),
+                new Bitmap(folderPath + "ナイト・オブ・ナイツ.Oni.0.png"),
             };
 
-            int[] goods = new int[numBitmaps];
+            List<int> goods = new List<int>();
 
-            for (int i = 0; i < bmps.Length; i++)
+            for (int i = 0; i < bmps.Count; i++)
             {
-                goods[i] = imageAnalysis.GetGoods(bmps[i], ImageAnalysis.Players.Single);
+                goods.Add(imageAnalysis.GetGoods(bmps[i], ImageAnalysis.Players.Single));
             }
 
-            bool[] results = new bool[numBitmaps];
-            for (int i = 0; i < results.Length; i++)
+            List<bool> results = new List<bool>();
+            for (int i = 0; i < bmps.Count; i++)
             {
-                results[i] = false;
+                results.Add(false);
             }
 
-            int[] expectedResults = new int[numBitmaps]
+            List<int> expectedResults = new List<int>()
             {
                 650,
                 763,
@@ -394,10 +419,11 @@ namespace TaikoLoggingTests
                 699,
                 781,
                 850,
-                779
+                779,
+                643
             };
 
-            for (int i = 0; i < results.Length; i++)
+            for (int i = 0; i < bmps.Count; i++)
             {
                 if (goods[i] == expectedResults[i])
                 {
@@ -413,11 +439,10 @@ namespace TaikoLoggingTests
             // This one's gonna be a massive one, both for testing and for setting up the tests
             ImageAnalysis imageAnalysis = new ImageAnalysis();
 
-            const int numBitmaps = 11; // or something like that
 
             string folderPath = @"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Test Data\GetNumbers\";
 
-            Bitmap[] bmps = new Bitmap[numBitmaps]
+            List<Bitmap> bmps = new List<Bitmap>()
             {
                 new Bitmap(folderPath + "!!!カオスタイム!!!.Oni.0.png"),
                 new Bitmap(folderPath + "HARDCOREノ心得.Oni.1.png"),
@@ -430,22 +455,23 @@ namespace TaikoLoggingTests
                 new Bitmap(folderPath + "白鳥の湖.Ura.0.png"),
                 new Bitmap(folderPath + "竜と黒炎の姫君.Ura.5.png"),
                 new Bitmap(folderPath + "紫煌ノ乱.Oni.1.png"),
+                new Bitmap(folderPath + "ナイト・オブ・ナイツ.Oni.0.png"),
             };
 
-            int[] oks = new int[numBitmaps];
+            List<int> oks = new List<int>();
 
-            for (int i = 0; i < bmps.Length; i++)
+            for (int i = 0; i < bmps.Count; i++)
             {
-                oks[i] = imageAnalysis.GetOKs(bmps[i], ImageAnalysis.Players.Single);
+                oks.Add(imageAnalysis.GetOKs(bmps[i], ImageAnalysis.Players.Single));
             }
 
-            bool[] results = new bool[numBitmaps];
-            for (int i = 0; i < results.Length; i++)
+            List<bool> results = new List<bool>();
+            for (int i = 0; i < bmps.Count; i++)
             {
-                results[i] = false;
+                results.Add(false);
             }
 
-            int[] expectedResults = new int[numBitmaps]
+            List<int> expectedResults = new List<int>()
             {
                 275,
                 118,
@@ -457,16 +483,25 @@ namespace TaikoLoggingTests
                 117,
                 80,
                 82,
-                44
+                44,
+                8
             };
 
-            for (int i = 0; i < results.Length; i++)
+            for (int i = 0; i < bmps.Count; i++)
             {
                 if (oks[i] == expectedResults[i])
                 {
                     results[i] = true;
                 }
+                else
+                {
+                    imageAnalysis.GetSmallDigits(bmps[i], failedTestLocation, "TestGetSingleOKs[" + i + "]");
+                }
+            }
+            for (int i = 0; i < bmps.Count; i++)
+            {
                 Assert.IsTrue(results[i], "Expected " + expectedResults[i].ToString() + ", Result = '" + oks[i].ToString() + "'");
+
             }
         }
 
@@ -476,11 +511,9 @@ namespace TaikoLoggingTests
             // This one's gonna be a massive one, both for testing and for setting up the tests
             ImageAnalysis imageAnalysis = new ImageAnalysis();
 
-            const int numBitmaps = 11; // or something like that
-
             string folderPath = @"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Test Data\GetNumbers\";
 
-            Bitmap[] bmps = new Bitmap[numBitmaps]
+            List<Bitmap> bmps = new List<Bitmap>()
             {
                 new Bitmap(folderPath + "!!!カオスタイム!!!.Oni.0.png"),
                 new Bitmap(folderPath + "HARDCOREノ心得.Oni.1.png"),
@@ -493,22 +526,23 @@ namespace TaikoLoggingTests
                 new Bitmap(folderPath + "白鳥の湖.Ura.0.png"),
                 new Bitmap(folderPath + "竜と黒炎の姫君.Ura.5.png"),
                 new Bitmap(folderPath + "紫煌ノ乱.Oni.1.png"),
+                new Bitmap(folderPath + "ナイト・オブ・ナイツ.Oni.0.png"),
             };
 
-            int[] scores = new int[numBitmaps];
+            List<int> scores = new List<int>();
 
-            for (int i = 0; i < bmps.Length; i++)
+            for (int i = 0; i < bmps.Count; i++)
             {
-                scores[i] = imageAnalysis.GetScore(bmps[i], ImageAnalysis.Players.Single);
+                scores.Add(imageAnalysis.GetScore(bmps[i], ImageAnalysis.Players.Single));
             }
 
-            bool[] results = new bool[numBitmaps];
-            for (int i = 0; i < results.Length; i++)
+            List<bool> results = new List<bool>();
+            for (int i = 0; i < bmps.Count; i++)
             {
-                results[i] = false;
+                results.Add(false);
             }
 
-            int[] expectedResults = new int[numBitmaps]
+            List<int> expectedResults = new List<int>()
             {
                 565590,
                 1077290,
@@ -520,10 +554,11 @@ namespace TaikoLoggingTests
                 796520,
                 1156460,
                 1164020,
-                1179040
+                1179040,
+                1109030
             };
 
-            for (int i = 0; i < results.Length; i++)
+            for (int i = 0; i < results.Count; i++)
             {
                 if (scores[i] == expectedResults[i])
                 {
@@ -541,11 +576,10 @@ namespace TaikoLoggingTests
             // I suppose there could be some titles that end up not working, but it'd add too much time to this
             ImageAnalysis imageAnalysis = new ImageAnalysis();
 
-            const int numBitmaps = 11; // or something like that
-
             string folderPath = @"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Test Data\GetTitle\";
 
-            Bitmap[] bmps = new Bitmap[numBitmaps]
+            // If adding items to bmps here, add them to expectedResults below too
+            List<Bitmap> bmps = new List<Bitmap>()
             {
                 new Bitmap(folderPath + "!!!カオスタイム!!!.Oni.0.png"),
                 new Bitmap(folderPath + "HARDCOREノ心得.Oni.1.png"),
@@ -558,22 +592,24 @@ namespace TaikoLoggingTests
                 new Bitmap(folderPath + "白鳥の湖.Ura.0.png"),
                 new Bitmap(folderPath + "竜と黒炎の姫君.Ura.5.png"),
                 new Bitmap(folderPath + "紫煌ノ乱.Oni.1.png"),
+                new Bitmap(folderPath + "Behemoth.Oni.0.png"),
+                new Bitmap(folderPath + "ナイト・オブ・ナイツ.Oni.0.png")
             };
 
-            string[] titles = new string[numBitmaps];
+            List<string> titles = new List<string>();
 
-            for (int i = 0; i < bmps.Length; i++)
+            for (int i = 0; i < bmps.Count; i++)
             {
-                titles[i] = imageAnalysis.GetTitle(bmps[i]);
+                titles.Add(imageAnalysis.GetTitle(bmps[i]));
             }
 
-            bool[] results = new bool[numBitmaps];
-            for (int i = 0; i < results.Length; i++)
+            List<bool> results = new List<bool>();
+            for (int i = 0; i < bmps.Count; i++)
             {
-                results[i] = false;
+                results.Add(false);
             }
 
-            string[] expectedResults = new string[numBitmaps]
+            List<string> expectedResults = new List<string>()
             {
                 "!!!カオスタイム!!!",
                 "HARDCOREノ心得",
@@ -585,10 +621,12 @@ namespace TaikoLoggingTests
                 "愛と浄罪の森",
                 "白鳥の湖",
                 "竜と黒炎の姫君",
-                "紫煌ノ乱"
+                "紫煌ノ乱",
+                "Behemoth",
+                "ナイト・オブ・ナイツ",
             };
 
-            for (int i = 0; i < results.Length; i++)
+            for (int i = 0; i < results.Count; i++)
             {
                 if (titles[i] == expectedResults[i])
                 {

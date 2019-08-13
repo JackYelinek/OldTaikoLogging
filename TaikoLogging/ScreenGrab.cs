@@ -78,7 +78,7 @@ namespace TaikoLogging
             Graphics graphics = Graphics.FromImage(bmp);
             graphics.CopyFromScreen(rect.left + leftOffset, rect.top + topOffset, 0, 0, new Size(rightOffset - leftOffset, bottomOffset - topOffset), CopyPixelOperation.SourceCopy);
 
-            // for testing
+            // NOT TESTING (technically testing, but this function is only for testing anyway
             bmp.Save(string.Format(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\test{0}.png", i++.ToString()), ImageFormat.Png);
             Console.WriteLine("Picture Taken");
             return bmp;
@@ -86,7 +86,8 @@ namespace TaikoLogging
 
         public void FindGameWindow(Bitmap bmp)
         {
-
+            // TESTING
+            //bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\baseWindow.png");
 
             //var outerBoxColor = Color.FromArgb(240, 240, 240);
             var middleBoxColor = Color.FromArgb(76, 76, 76);

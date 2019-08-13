@@ -204,6 +204,7 @@ namespace TaikoLogging
             for (int i = 0; i < result.Length; i++)
             {
                 var bmp = ScaleDown(new Bitmap(result[i].FullName), 38, 21);
+                // NOT TESTING
                 bmp.Save(string.Format(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\State Bitmaps\" + result[i].Name), System.Drawing.Imaging.ImageFormat.Png);
             }
         }
@@ -472,6 +473,7 @@ namespace TaikoLogging
 
                 //DirectoryInfo dirInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores");
                 //var result = dirInfo.GetFiles();
+                // NOT USED, NOT TESTING
                 //bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores\" + result.Length + ".png", ImageFormat.Png);
                 Console.WriteLine("Highscore Logged");
             }
@@ -536,6 +538,7 @@ namespace TaikoLogging
 
                 //DirectoryInfo dirInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores");
                 //var result = dirInfo.GetFiles();
+                // NOT USED, NOT TESTING
                 //bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores\" + result.Length + ".png", ImageFormat.Png);
                 //Console.WriteLine("Highscore Logged");
             }
@@ -661,6 +664,7 @@ namespace TaikoLogging
 
             //DirectoryInfo dirInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\Image Data\TaikoLogging");
             //var result = dirInfo.GetFiles();
+            // NOT USED, NOT TESTING
             //bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\TaikoLogging\" + result.Length + ".png", ImageFormat.Png);
             //Console.WriteLine("Ranked match logged\n");
         }
@@ -669,11 +673,14 @@ namespace TaikoLogging
         #region Data gathering
         public string GetTitle(Bitmap bmp)
         {
-            var titleBmp = GetBitmapArea(bmp, GetWidth(bmp, 0.390625), GetHeight(bmp, 0.0510046367), GetWidth(bmp, 0.5590277777), GetHeight(bmp, 0.043276661514));
+
+            var titleBmp = GetBitmapArea(bmp, GetWidth(bmp, 0.390625), GetHeight(bmp, 0.043276661), GetWidth(bmp, 0.5590277777), GetHeight(bmp, 0.0510046367851));
             //var titleBmp = GetBitmapArea(bmp, (int)Math.Round((bmp.Width * (0.390625))), (int)Math.Round((bmp.Height * (0.0510046367))), (int)Math.Round((bmp.Width * 0.5590277777)), (int)Math.Round((bmp.Height * 0.043276661514)));
+            // TESTING
             //titleBmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\TitleTest.png");
             titleBmp = ScaleDown(titleBmp, 450, 28);
-            titleBmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\ScaledTitleTest.png");
+            // TESTING
+            //titleBmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\ScaledTitle.png");
 
             //Bitmap titleBmp = new Bitmap(450, 28);
             //CopyRegionIntoImage(bmp, new Rectangle(644, 33, 450, 28), ref titleBmp, new Rectangle(0, 0, 450, 28));
@@ -685,9 +692,12 @@ namespace TaikoLogging
                 if (tmpInt < pixelDifferences || pixelDifferences == -1)
                 {
                     pixelDifferences = tmpInt;
+                    // TESTING
+                    //titleBitmaps[i].Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\" + tmpInt.ToString() + ".png");
                     smallestIndex = i;
                 }
             }
+            Console.WriteLine(titles[smallestIndex]);
             return titles[smallestIndex];
         }
 
@@ -698,7 +708,8 @@ namespace TaikoLogging
             //var titleBmp = GetBitmapArea(bmp, 450, 28, 644, 33);
             //Bitmap titleBmp = new Bitmap(450, 28);
             //CopyRegionIntoImage(bmp, new Rectangle(644, 33, 450, 28), ref titleBmp, new Rectangle(0, 0, 450, 28));
-            titleBmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\SingleResults.Title" + j++.ToString() + ".png", System.Drawing.Imaging.ImageFormat.Png);
+            // TESTING
+            //titleBmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\DLC Songs\SingleResults.Title" + j++.ToString() + ".png", System.Drawing.Imaging.ImageFormat.Png);
         }
 
         public bool IsHighScore(Bitmap bmp)
@@ -739,7 +750,7 @@ namespace TaikoLogging
             for (int i = 0; i < scoreBitmaps.Length; i++)
             {
                 scoreBitmaps[i] = ScaleDown(scoreBitmaps[i], 26, 36);
-                scoreBitmaps[i].Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\scoreBitmaps." + i.ToString() + ".png");
+                //scoreBitmaps[i].Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\scoreBitmaps." + i.ToString() + ".png");
             }
 
             //scoreBitmaps[0] = new Bitmap(660 - 634, 382 - 346);
@@ -814,7 +825,7 @@ namespace TaikoLogging
             for (int i = 0; i < goodBitmaps.Length; i++)
             {
                 goodBitmaps[i] = ScaleDown(goodBitmaps[i], 18, 27);
-                goodBitmaps[i].Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\goodBitmaps." + i.ToString() + ".png");
+                //goodBitmaps[i].Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\goodBitmaps." + i.ToString() + ".png");
             }
 
 
@@ -867,7 +878,7 @@ namespace TaikoLogging
             for (int i = 0; i < okBitmaps.Length; i++)
             {
                 okBitmaps[i] = ScaleDown(okBitmaps[i], 18, 27);
-                okBitmaps[i].Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\okBitmaps." + i.ToString() + ".png");
+                //okBitmaps[i].Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\okBitmaps." + i.ToString() + ".png");
             }
 
             //okBitmaps[0] = new Bitmap(859 - 841, 380 - 353);
@@ -926,7 +937,7 @@ namespace TaikoLogging
             for (int i = 0; i < badBitmaps.Length; i++)
             {
                 badBitmaps[i] = ScaleDown(badBitmaps[i], 18, 27);
-                badBitmaps[i].Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\badBitmaps." + i.ToString() + ".png");
+                //badBitmaps[i].Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\badBitmaps." + i.ToString() + ".png");
             }
 
             //badBitmaps[0] = new Bitmap(859 - 841, 417 - 390);
@@ -985,7 +996,7 @@ namespace TaikoLogging
             for (int i = 0; i < comboBitmaps.Length; i++)
             {
                 comboBitmaps[i] = ScaleDown(comboBitmaps[i], 18, 27);
-                comboBitmaps[i].Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\comboBitmaps." + i.ToString() + ".png");
+                //comboBitmaps[i].Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\comboBitmaps." + i.ToString() + ".png");
             }
 
             //comboBitmaps[0] = new Bitmap(1079 - 1061, 342 - 315);
@@ -1044,7 +1055,7 @@ namespace TaikoLogging
             for (int i = 0; i < drumrollBitmaps.Length; i++)
             {
                 drumrollBitmaps[i] = ScaleDown(drumrollBitmaps[i], 18, 27);
-                drumrollBitmaps[i].Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\drumrollBitmaps." + i.ToString() + ".png");
+                //drumrollBitmaps[i].Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\drumrollBitmaps." + i.ToString() + ".png");
             }
 
             //drumrollBitmaps[0] = new Bitmap(1079 - 1061, 380 - 353);
@@ -1223,101 +1234,125 @@ namespace TaikoLogging
 
 
         // These were for getting the bitmaps, just here for future reference and in case they'd be needed in the future
-        private void GetSmallDigits(Bitmap bmp)
+        // Hey it's the future and they're needed
+        // I'm using these to see what the failed tests are seeing, or at least it should work that way if it isn't broken which it is
+        public void GetSmallDigits(Bitmap bmp, string folderLocation, string baseFileName)
         {
             //Bitmap bmp = screen.CaptureApplication();
 
-            Bitmap good0Bmp = new Bitmap(859 - 841, 342 - 315);
-            CopyRegionIntoImage(bmp, new Rectangle(841, 315, 859 - 841, 342 - 315), ref good0Bmp, new Rectangle(0, 0, 859 - 841, 342 - 315));
-            Bitmap good1Bmp = new Bitmap(841 - 823, 342 - 315);
-            CopyRegionIntoImage(bmp, new Rectangle(823, 315, 841 - 823, 342 - 315), ref good1Bmp, new Rectangle(0, 0, 841 - 823, 342 - 315));
-            Bitmap good2Bmp = new Bitmap(823 - 805, 342 - 315);
-            CopyRegionIntoImage(bmp, new Rectangle(805, 315, 823 - 805, 342 - 315), ref good2Bmp, new Rectangle(0, 0, 823 - 805, 342 - 315));
-            Bitmap good3Bmp = new Bitmap(805 - 787, 342 - 315);
-            CopyRegionIntoImage(bmp, new Rectangle(787, 315, 805 - 787, 342 - 315), ref good3Bmp, new Rectangle(0, 0, 805 - 787, 342 - 315));
-            good0Bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\SingleResults.good0Bmp.png");
-            good1Bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\SingleResults.good1Bmp.png");
-            good2Bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\SingleResults.good2Bmp.png");
-            good3Bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\SingleResults.good3Bmp.png");
+            // Old folder location was D:\My Stuff\My Programs\Taiko\Image Data\Test Data\
+            Bitmap[] goodBitmaps = new Bitmap[4];
 
-            Bitmap ok0Bmp = new Bitmap(859 - 841, 380 - 353);
-            CopyRegionIntoImage(bmp, new Rectangle(841, 353, 859 - 841, 380 - 353), ref ok0Bmp, new Rectangle(0, 0, 859 - 841, 380 - 353));
-            Bitmap ok1Bmp = new Bitmap(841 - 823, 380 - 353);
-            CopyRegionIntoImage(bmp, new Rectangle(823, 353, 841 - 823, 380 - 353), ref ok1Bmp, new Rectangle(0, 0, 841 - 823, 380 - 353));
-            Bitmap ok2Bmp = new Bitmap(823 - 805, 380 - 353);
-            CopyRegionIntoImage(bmp, new Rectangle(805, 353, 823 - 805, 380 - 353), ref ok2Bmp, new Rectangle(0, 0, 823 - 805, 380 - 353));
-            Bitmap ok3Bmp = new Bitmap(805 - 787, 380 - 353);
-            CopyRegionIntoImage(bmp, new Rectangle(787, 353, 805 - 787, 380 - 353), ref ok3Bmp, new Rectangle(0, 0, 805 - 787, 380 - 353));
-            ok0Bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\SingleResults.ok0Bmp.png");
-            ok1Bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\SingleResults.ok1Bmp.png");
-            ok2Bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\SingleResults.ok2Bmp.png");
-            ok3Bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\SingleResults.ok3Bmp.png");
+            int sizeX = GetWidth(bmp, 0.015625);
+            int sizeY = GetHeight(bmp, 0.0417310664605);
+            int height = GetHeight(bmp, 0.4868624420401);
 
-            Bitmap bad0Bmp = new Bitmap(859 - 841, 417 - 390);
-            CopyRegionIntoImage(bmp, new Rectangle(841, 390, 859 - 841, 417 - 390), ref bad0Bmp, new Rectangle(0, 0, 859 - 841, 417 - 390));
-            Bitmap bad1Bmp = new Bitmap(841 - 823, 417 - 390);
-            CopyRegionIntoImage(bmp, new Rectangle(823, 390, 841 - 823, 417 - 390), ref bad1Bmp, new Rectangle(0, 0, 841 - 823, 417 - 390));
-            Bitmap bad2Bmp = new Bitmap(823 - 805, 417 - 390);
-            CopyRegionIntoImage(bmp, new Rectangle(805, 390, 823 - 805, 417 - 390), ref bad2Bmp, new Rectangle(0, 0, 823 - 805, 417 - 390));
-            Bitmap bad3Bmp = new Bitmap(805 - 787, 417 - 390);
-            CopyRegionIntoImage(bmp, new Rectangle(787, 390, 805 - 787, 417 - 390), ref bad3Bmp, new Rectangle(0, 0, 805 - 787, 417 - 390));
-            bad0Bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\SingleResults.bad0Bmp.png");
-            bad1Bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\SingleResults.bad1Bmp.png");
-            bad2Bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\SingleResults.bad2Bmp.png");
-            bad3Bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\SingleResults.bad3Bmp.png");
+            goodBitmaps[0] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.7300347222), height);
+            goodBitmaps[1] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.7144097222), height);
+            goodBitmaps[2] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.6987847222), height);
+            goodBitmaps[3] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.6831597222), height);
 
-            Bitmap combo0Bmp = new Bitmap(1079 - 1061, 342 - 315);
-            CopyRegionIntoImage(bmp, new Rectangle(1061, 315, 1079 - 1061, 342 - 315), ref combo0Bmp, new Rectangle(0, 0, 1079 - 1061, 342 - 315));
-            Bitmap combo1Bmp = new Bitmap(1061 - 1043, 342 - 315);
-            CopyRegionIntoImage(bmp, new Rectangle(1043, 315, 1061 - 1043, 342 - 315), ref combo1Bmp, new Rectangle(0, 0, 1061 - 1043, 342 - 315));
-            Bitmap combo2Bmp = new Bitmap(1043 - 1025, 342 - 315);
-            CopyRegionIntoImage(bmp, new Rectangle(1025, 315, 1043 - 1025, 342 - 315), ref combo2Bmp, new Rectangle(0, 0, 1043 - 1025, 342 - 315));
-            Bitmap combo3Bmp = new Bitmap(1025 - 1007, 342 - 315);
-            CopyRegionIntoImage(bmp, new Rectangle(1007, 315, 1025 - 1007, 342 - 315), ref combo3Bmp, new Rectangle(0, 0, 1025 - 1007, 342 - 315));
-            combo0Bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\SingleResults.combo0Bmp.png");
-            combo1Bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\SingleResults.combo1Bmp.png");
-            combo2Bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\SingleResults.combo2Bmp.png");
-            combo3Bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\SingleResults.combo3Bmp.png");
+            for (int i = 0; i < goodBitmaps.Length; i++)
+            {
+                goodBitmaps[i] = ScaleDown(goodBitmaps[i], 18, 27);
+                goodBitmaps[i].Save(folderLocation + baseFileName + ".goods." + i.ToString() + ".png");
+            }
 
-            Bitmap drumroll0Bmp = new Bitmap(1079 - 1061, 378 - 351);
-            CopyRegionIntoImage(bmp, new Rectangle(1061, 353, 1079 - 1061, 378 - 351), ref drumroll0Bmp, new Rectangle(0, 0, 1079 - 1061, 378 - 351));
-            Bitmap drumroll1Bmp = new Bitmap(1061 - 1043, 378 - 351);
-            CopyRegionIntoImage(bmp, new Rectangle(1043, 353, 1061 - 1043, 378 - 351), ref drumroll1Bmp, new Rectangle(0, 0, 1061 - 1043, 378 - 351));
-            Bitmap drumroll2Bmp = new Bitmap(1043 - 1025, 378 - 351);
-            CopyRegionIntoImage(bmp, new Rectangle(1025, 353, 1043 - 1025, 378 - 351), ref drumroll2Bmp, new Rectangle(0, 0, 1043 - 1025, 378 - 351));
-            Bitmap drumroll3Bmp = new Bitmap(1025 - 1007, 378 - 351);
-            CopyRegionIntoImage(bmp, new Rectangle(1007, 353, 1025 - 1007, 378 - 351), ref drumroll3Bmp, new Rectangle(0, 0, 1025 - 1007, 378 - 351));
-            drumroll0Bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\SingleResults.drumroll0Bmp.png");
-            drumroll1Bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\SingleResults.drumroll1Bmp.png");
-            drumroll2Bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\SingleResults.drumroll2Bmp.png");
-            drumroll3Bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\SingleResults.drumroll3Bmp.png");
+
+            Bitmap[] okBitmaps = new Bitmap[4];
+
+            sizeX = GetWidth(bmp, 0.015625);
+            sizeY = GetHeight(bmp, 0.0417310664);
+            height = GetHeight(bmp, 0.545595054);
+
+            okBitmaps[0] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.7300347222), height);
+            okBitmaps[1] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.7144097222), height);
+            okBitmaps[2] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.6987847222), height);
+            okBitmaps[3] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.6831597222), height);
+
+            for (int i = 0; i < okBitmaps.Length; i++)
+            {
+                okBitmaps[i] = ScaleDown(okBitmaps[i], 18, 27);
+                okBitmaps[i].Save(folderLocation + baseFileName + ".oks." + i.ToString() + ".png");
+            }
+
+            Bitmap[] badBitmaps = new Bitmap[4];
+
+            sizeX = GetWidth(bmp, 0.015625);
+            sizeY = GetHeight(bmp, 0.0417310664605);
+            height = GetHeight(bmp, 0.602782071);
+
+            badBitmaps[0] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.7300347222), height);
+            badBitmaps[1] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.7144097222), height);
+            badBitmaps[2] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.6987847222), height);
+            badBitmaps[3] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.6831597222), height);
+
+            for (int i = 0; i < badBitmaps.Length; i++)
+            {
+                badBitmaps[i] = ScaleDown(badBitmaps[i], 18, 27);
+                badBitmaps[i].Save(folderLocation + baseFileName + ".bads." + i.ToString() + ".png");
+            }
+
+            Bitmap[] comboBitmaps = new Bitmap[4];
+
+            sizeX = GetWidth(bmp, 0.015625);
+            sizeY = GetHeight(bmp, 0.0417310664605);
+            height = GetHeight(bmp, 0.4868624420401);
+
+            comboBitmaps[0] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.9210069444), height);
+            comboBitmaps[1] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.9053819444), height);
+            comboBitmaps[2] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.8897569444), height);
+            comboBitmaps[3] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.8741319444), height);
+
+            for (int i = 0; i < comboBitmaps.Length; i++)
+            {
+                comboBitmaps[i] = ScaleDown(comboBitmaps[i], 18, 27);
+                comboBitmaps[i].Save(folderLocation + baseFileName + ".combos." + i.ToString() + ".png");
+            }
+
+            Bitmap[] drumrollBitmaps = new Bitmap[4];
+
+            sizeX = GetWidth(bmp, 0.015625);
+            sizeY = GetHeight(bmp, 0.0417310664605);
+            height = GetHeight(bmp, 0.545595054095);
+
+            drumrollBitmaps[0] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.92013888), height);
+            drumrollBitmaps[1] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.90451388), height);
+            drumrollBitmaps[2] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.88888888), height);
+            drumrollBitmaps[3] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.87326388), height);
+
+            for (int i = 0; i < drumrollBitmaps.Length; i++)
+            {
+                drumrollBitmaps[i] = ScaleDown(drumrollBitmaps[i], 18, 27);
+                drumrollBitmaps[i].Save(folderLocation + baseFileName + ".drumrolls." + i.ToString() + ".png");
+            }
         }
-        private void GetBigDigits(Bitmap bmp)
+        public void GetBigDigits(Bitmap bmp, string folderLocation, string baseFileName)
         {
             //Bitmap bmp = screen.CaptureApplication();
 
-            Bitmap score0Bmp = new Bitmap(660 - 634, 382 - 346);
-            CopyRegionIntoImage(bmp, new Rectangle(634, 346, 660 - 634, 382 - 346), ref score0Bmp, new Rectangle(0, 0, 660 - 634, 382 - 346));
-            Bitmap score1Bmp = new Bitmap(634 - 608, 382 - 346);
-            CopyRegionIntoImage(bmp, new Rectangle(608, 346, 634 - 608, 382 - 346), ref score1Bmp, new Rectangle(0, 0, 634 - 608, 382 - 346));
-            Bitmap score2Bmp = new Bitmap(608 - 582, 382 - 346);
-            CopyRegionIntoImage(bmp, new Rectangle(582, 346, 608 - 582, 382 - 346), ref score2Bmp, new Rectangle(0, 0, 608 - 582, 382 - 346));
-            Bitmap score3Bmp = new Bitmap(582 - 556, 382 - 346);
-            CopyRegionIntoImage(bmp, new Rectangle(556, 346, 582 - 556, 382 - 346), ref score3Bmp, new Rectangle(0, 0, 582 - 556, 382 - 346));
-            Bitmap score4Bmp = new Bitmap(556 - 530, 382 - 346);
-            CopyRegionIntoImage(bmp, new Rectangle(530, 346, 556 - 530, 382 - 346), ref score4Bmp, new Rectangle(0, 0, 556 - 530, 382 - 346));
-            Bitmap score5Bmp = new Bitmap(530 - 504, 382 - 346);
-            CopyRegionIntoImage(bmp, new Rectangle(504, 346, 530 - 504, 382 - 346), ref score5Bmp, new Rectangle(0, 0, 530 - 504, 382 - 346));
-            Bitmap score6Bmp = new Bitmap(504 - 478, 382 - 346);
-            CopyRegionIntoImage(bmp, new Rectangle(478, 346, 504 - 478, 382 - 346), ref score6Bmp, new Rectangle(0, 0, 504 - 478, 382 - 346));
+            Bitmap[] scoreBitmaps = new Bitmap[7];
 
-            score0Bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\SingleResults.score0Bmp.png");
-            score1Bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\SingleResults.score1Bmp.png");
-            score2Bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\SingleResults.score2Bmp.png");
-            score3Bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\SingleResults.score3Bmp.png");
-            score4Bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\SingleResults.score4Bmp.png");
-            score5Bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\SingleResults.score5Bmp.png");
-            score6Bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\SingleResults.score6Bmp.png");
+            int sizeX = GetWidth(bmp, 0.0225694444);
+            int sizeY = GetHeight(bmp, 0.0556414219);
+            int height = GetHeight(bmp, 0.53477588871);
+
+            scoreBitmaps[0] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.5503472222), height);
+            scoreBitmaps[1] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.5277777777), height);
+            scoreBitmaps[2] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.5052083333), height);
+            scoreBitmaps[3] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.4826388888), height);
+            scoreBitmaps[4] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.4600694444), height);
+            scoreBitmaps[5] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.4375), height);
+            scoreBitmaps[6] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.4149305555), height);
+
+            for (int i = 0; i < scoreBitmaps.Length; i++)
+            {
+                scoreBitmaps[i] = ScaleDown(scoreBitmaps[i], 26, 36);
+                scoreBitmaps[i].Save(folderLocation + baseFileName + ".scores." + i.ToString() + ".png");
+            }
+
+            // Old folder location was D:\My Stuff\My Programs\Taiko\Image Data\Test Data\
+
 
 
         }

@@ -414,6 +414,9 @@ namespace TaikoLogging
         {
             Bitmap bmp = screen.CaptureApplication();
 
+            List<object> info = new List<object>();
+            List<string> headers = new List<string>();
+
             if (IsDeathblood(bmp, Players.Single) == false)
             {
                 // I think it's safe to say that if it isn't my main account, I don't care to check the rest
@@ -421,8 +424,8 @@ namespace TaikoLogging
                 return;
             }
             var mods = CheckMods(bmp, Players.Single);
-            var difficulty = CheckDifficulty(bmp, Players.Single);
-
+            info.Add(CheckDifficulty(bmp, Players.Single));
+            headers.Add("Difficulty");
             for (int i = 0; i < mods.Count; i++)
             {
                 if (mods.ElementAt(i) == "Shin-uchi")
@@ -431,7 +434,7 @@ namespace TaikoLogging
                     return;
                 }
             }
-            if (difficulty == Difficulty.Easy || difficulty == Difficulty.Normal)
+            if ((Difficulty)info[headers.IndexOf("Difficulty")] == Difficulty.Easy || (Difficulty)info[headers.IndexOf("Difficulty")] == Difficulty.Normal)
             {
                 // I don't care about easy or normal for my sheet
                 // I don't really care about hard either, but I have the sheet anyway, so might as well save it if I get it
@@ -449,27 +452,33 @@ namespace TaikoLogging
                 players = Players.Single;
             }
 
-            string title = GetTitle(bmp);
-            bool highScore = IsHighScore(bmp);
-            int score = GetScore(bmp, players);
-            int goods = GetGoods(bmp, players);
-            int oks = GetOKs(bmp, players);
-            int bads = GetBads(bmp, players);
-            int combo = GetCombo(bmp, players);
-            int drumroll = GetDrumroll(bmp, players);
 
-            int[] info = new int[6]
-            {
-                score, goods, oks, bads, combo, drumroll
-            };
-            if (score % 10 != 0)
+            info.Add(GetTitle(bmp));
+            headers.Add("Title");
+
+            info.Add(GetScore(bmp, players));
+            headers.Add("Score");
+
+            info.Add(GetGoods(bmp, players));
+            headers.Add("GOOD");
+            info.Add(GetOKs(bmp, players));
+            headers.Add("OK");
+            info.Add(GetBads(bmp, players));
+            headers.Add("BAD");
+            info.Add(GetCombo(bmp, players));
+            headers.Add("MAX Combo");
+            info.Add(GetDrumroll(bmp, players));
+            headers.Add("Drumroll");
+
+            if ((int)info[headers.IndexOf("Score")] % 10 != 0)
             {
                 return;
             }
-            sheet.UpdatePS4BestGoods(title, goods, difficulty);
+            bool highScore = IsHighScore(bmp);
+            sheet.UpdatePS4BestGoods(info, headers);
             if (highScore == true)
             {
-                sheet.UpdatePS4HighScore(title, info, difficulty, bmp);
+                sheet.UpdatePS4HighScore(info, headers, bmp);
 
                 //DirectoryInfo dirInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores");
                 //var result = dirInfo.GetFiles();
@@ -547,6 +556,9 @@ namespace TaikoLogging
         public void GetRankedResults()
         {
             Bitmap bmp = screen.CaptureApplication();
+            List<object> info = new List<object>();
+            List<string> headers = new List<string>();
+
             bool account = IsDeathblood(bmp, Players.RankedTop);
             if (account == false)
             {
@@ -554,52 +566,51 @@ namespace TaikoLogging
                 return;
             }
 
-            string title = GetTitle(bmp);
-            Difficulty difficulty = CheckDifficulty(bmp, Players.RankedTop);
-            int topScore = GetScore(bmp, Players.RankedTop);
-            int topGoods = GetGoods(bmp, Players.RankedTop);
-            int topOks = GetOKs(bmp, Players.RankedTop);
-            int topBads = GetBads(bmp, Players.RankedTop);
-            int topCombo = GetCombo(bmp, Players.RankedTop);
-            int topDrumroll = GetDrumroll(bmp, Players.RankedTop);
+            // Song Data
+            info.Add(GetTitle(bmp));
+            headers.Add("Song");
+            info.Add(CheckDifficulty(bmp, Players.RankedTop));
+            headers.Add("Difficulty");
 
-            //Console.WriteLine(title);
-            //Console.WriteLine(topScore);
-            //Console.WriteLine(topGoods);
-            //Console.WriteLine(topOks);
-            //Console.WriteLine(topBads);
-            //Console.WriteLine(topCombo);
-            //Console.WriteLine(topDrumroll);
-            //Console.WriteLine("");
+            // Top Player Data
+            info.Add(GetScore(bmp, Players.RankedTop));
+            headers.Add("My Score");
+            info.Add(GetGoods(bmp, Players.RankedTop));
+            headers.Add("My Goods");
+            info.Add(GetOKs(bmp, Players.RankedTop));
+            headers.Add("My OKs");
+            info.Add(GetBads(bmp, Players.RankedTop));
+            headers.Add("My Bads");
+            info.Add(GetCombo(bmp, Players.RankedTop));
+            headers.Add("My Combo");
+            info.Add(GetDrumroll(bmp, Players.RankedTop));
+            headers.Add("My Drumroll");
 
-            int bottomScore = GetScore(bmp, Players.RankedBottom);
-            int bottomGoods = GetGoods(bmp, Players.RankedBottom);
-            int bottomOks = GetOKs(bmp, Players.RankedBottom);
-            int bottomBads = GetBads(bmp, Players.RankedBottom);
-            int bottomCombo = GetCombo(bmp, Players.RankedBottom);
-            int bottomDrumroll = GetDrumroll(bmp, Players.RankedBottom);
+            // Bottom Player Data
+            info.Add(GetScore(bmp, Players.RankedBottom));
+            headers.Add("Opp Score");
+            info.Add(GetGoods(bmp, Players.RankedBottom));
+            headers.Add("Opp Goods");
+            info.Add(GetOKs(bmp, Players.RankedBottom));
+            headers.Add("Opp OKs");
+            info.Add(GetBads(bmp, Players.RankedBottom));
+            headers.Add("Opp Bads");
+            info.Add(GetCombo(bmp, Players.RankedBottom));
+            headers.Add("Opp Combo");
+            info.Add(GetDrumroll(bmp, Players.RankedBottom));
+            headers.Add("Opp Drumroll");
 
-            //Console.WriteLine(bottomScore);
-            //Console.WriteLine(bottomGoods);
-            //Console.WriteLine(bottomOks);
-            //Console.WriteLine(bottomBads);
-            //Console.WriteLine(bottomCombo);
-            //Console.WriteLine(bottomDrumroll);
-            //Console.WriteLine("");
+            // Result Data
+            info.Add(RankedWinLoss(bmp));
+            headers.Add("Win/Loss");
 
-            bool winLoss = RankedWinLoss(bmp);
-            int[] info = new int[12]
-            {
-                topScore, topGoods, topOks, topBads, topCombo, topDrumroll, bottomScore, bottomGoods, bottomOks, bottomBads, bottomCombo, bottomDrumroll
-            };
-            if (topScore % 10 != 0 || bottomScore % 10 != 0)
+            // Check to see if the scores are possible, they must always end with a 0
+            if ((int)info[headers.IndexOf("My Score")] % 10 != 0 || (int)info[headers.IndexOf("Opp Score")] % 10 != 0)
             {
                 return;
             }
-            sheet.AddRankedEntry(title, info, difficulty, winLoss, bmp);
-            sheet.UpdatePS4BestGoods(title, topGoods, difficulty);
-
-
+            sheet.AddRankedEntry(info, headers, bmp);
+            sheet.UpdatePS4BestGoods(info, headers);
         }
 
 

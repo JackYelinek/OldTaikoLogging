@@ -81,9 +81,19 @@ namespace TaikoLogging
             IList<object> baseValues = new List<object>();
             for (int i = 0; i < Headers.Count; i++)
             {
-                if (Headers[i] == headers[i])
+                bool headerFound = false;
+                for (int j = 0; j < headers.Count; j++)
                 {
-                    baseValues.Add(info[i]);
+                    if (Headers[i] == headers[j])
+                    {
+                        baseValues.Add(info[i]);
+                        headerFound = true;
+                        break;
+                    }
+                }
+                if (headerFound == false)
+                {
+                    baseValues.Add(null);
                 }
             }
 
@@ -187,55 +197,32 @@ namespace TaikoLogging
                 Program.rin.SendTwitchMessage("New high score! " + info[headers.IndexOf("Title")] + " +" + ((int)info[headers.IndexOf("Score")] - int.Parse(score)).ToString());
             }
 
-
+            info.Add(DateTime.Now.ToString("MM/dd/yyyy"));
+            headers.Add("DateTime");
 
             //send all the information onto the sheet in the correct spots
+            IList<object> baseValues = new List<object>();
+            for (int i = 0; i < Headers.Count; i++)
+            {
+                bool headerFound = false;
+                for (int j = 0; j < headers.Count; j++)
+                {
+                    if (Headers[i] == headers[j])
+                    {
+                        baseValues.Add(info[i]);
+                        headerFound = true;
+                        break;
+                    }
+                }
+                if (headerFound == false)
+                {
+                    baseValues.Add(null);
+                }
+            }
+
             List<IList<object>> sendValues = new List<IList<object>>();
-            IList<object> baseValues = new List<object>
-            {
-                info[0], info[1], info[2], info[3], info[4], info[5]
-            };
-            sendValues.Add(baseValues);
-
             SendData(info[headers.IndexOf("Difficulty")].ToString() + "!F" + (songIndex + 2).ToString() + ":K" + (songIndex + 2).ToString(), sendValues);
-            //List<Google.Apis.Sheets.v4.Data.ValueRange> updateData = new List<Google.Apis.Sheets.v4.Data.ValueRange>();
-            //var dataValueRange = new Google.Apis.Sheets.v4.Data.ValueRange();
-            //dataValueRange.Range = difficulty.ToString() + "!F" + (songIndex + 2).ToString() + ":K" + (songIndex + 2).ToString();
-            //dataValueRange.Values = sendValues;
-            //updateData.Add(dataValueRange);
 
-            //Google.Apis.Sheets.v4.Data.BatchUpdateValuesRequest requestBody = new Google.Apis.Sheets.v4.Data.BatchUpdateValuesRequest();
-            //requestBody.Data = updateData;
-            //requestBody.ValueInputOption = "USER_ENTERED";
-
-            //var updateRequest = service.Spreadsheets.Values.BatchUpdate(requestBody, spreadsheetId);
-
-            //var updateResponse = updateRequest.Execute();
-
-
-
-            baseValues = new List<object>
-            {
-                DateTime.Now.ToString("MM/dd/yyyy")
-            };
-            sendValues = new List<IList<object>>();
-            sendValues.Add(baseValues);
-
-
-            SendData(info[headers.IndexOf("Difficulty")].ToString() + "!O" + (songIndex + 2).ToString(), sendValues);
-            //updateData = new List<Google.Apis.Sheets.v4.Data.ValueRange>();
-            //dataValueRange = new Google.Apis.Sheets.v4.Data.ValueRange();
-            //dataValueRange.Range = difficulty.ToString()+"!O" + (songIndex + 2).ToString();
-            //dataValueRange.Values = sendValues;
-            //updateData.Add(dataValueRange);
-
-            //requestBody = new Google.Apis.Sheets.v4.Data.BatchUpdateValuesRequest();
-            //requestBody.Data = updateData;
-            //requestBody.ValueInputOption = "USER_ENTERED";
-
-            //updateRequest = service.Spreadsheets.Values.BatchUpdate(requestBody, spreadsheetId);
-
-            //updateResponse = updateRequest.Execute();
 
 
             DirectoryInfo dirInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores");
@@ -266,7 +253,7 @@ namespace TaikoLogging
             {
                 foreach (var row in values)
                 {
-                    if (row[0].ToString() == info[headers.IndexOf("Title")])
+                    if (row[0].ToString() == (string)info[headers.IndexOf("Title")])
                     {
                         songIndex = values.IndexOf(row);
                     }

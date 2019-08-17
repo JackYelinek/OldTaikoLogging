@@ -12,6 +12,7 @@ using System.IO;
 using System.Threading;
 using System.Drawing;
 using System.Drawing.Imaging;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace TaikoLogging
 {
@@ -21,7 +22,7 @@ namespace TaikoLogging
         string[] Scopes = { SheetsService.Scope.Spreadsheets };
         string ApplicationName = "Ranked Logs";
 
-        string spreadsheetId = "15qtcBVmes43LlejxgynYoWWxqf99bVK-WmQUfGZfupo";
+        public string spreadsheetId = "15qtcBVmes43LlejxgynYoWWxqf99bVK-WmQUfGZfupo";
 
         SheetsService service;
 
@@ -100,7 +101,9 @@ namespace TaikoLogging
             List<IList<object>> sendValues = new List<IList<object>>();
             sendValues.Add(baseValues);
 
-            SendData("Ranked Logs!A" + ((int)info[headers.IndexOf("Match")] - 1440).ToString() + ":Q" + ((int)info[headers.IndexOf("Match")] - 1440).ToString(), sendValues);
+            string range = "'Ranked Logs'!A" + ((int)info[headers.IndexOf("Match")] - 1440) + ":" + GetColumnName(Headers.Count) + ((int)info[headers.IndexOf("Match")] - 1440);
+
+            SendData(range, sendValues);
 
 
             string twitchMessage = "Match " + info[headers.IndexOf("Match")].ToString() + ": ";
@@ -142,7 +145,7 @@ namespace TaikoLogging
             List<IList<object>> sendValues = new List<IList<object>>();
             sendValues.Add(baseValues);
 
-            SendData("Ranked Logs!A" + (matchNumber - 1440).ToString() + ":R" + (matchNumber - 1440).ToString(), sendValues);
+            SendData("Ranked Logs!A" + (matchNumber - 1440).ToString() + ":" + GetColumnName(Headers.Count) + (matchNumber - 1440).ToString(), sendValues);
 
         }
         public void UpdatePS4HighScore(List<object> info, List<string> headers, Bitmap bmp)
@@ -150,7 +153,7 @@ namespace TaikoLogging
             var Headers = GetHeaders("Oni");
 
             // Find the song in the spreadsheet
-            string range = info[headers.IndexOf("Difficulty")].ToString()+"!B2:F";
+            string range = info[headers.IndexOf("Difficulty")].ToString()+"!"+ GetColumnName(Headers.IndexOf("Title")) + "2:" + GetColumnName(Headers.IndexOf("Score"));
             var values = GetValues(range);
             int songIndex = -1;
             if (values != null && values.Count > 0)
@@ -169,9 +172,12 @@ namespace TaikoLogging
             {
                 // something got fucked up
                 // probably a good idea to set up some form of logging for this sort of thing, but meh
+                Console.WriteLine("Couldn't find \"" + info[headers.IndexOf("Title")] + "\" in the sheet");
                 return;
             }
 
+            // This isn't very fluid
+            // If something gets changed in the spreadsheet, this breaks
             string score = values.ElementAt(songIndex).ElementAt(4).ToString();
             while(true)
             {
@@ -221,7 +227,8 @@ namespace TaikoLogging
             }
 
             List<IList<object>> sendValues = new List<IList<object>>();
-            SendData(info[headers.IndexOf("Difficulty")].ToString() + "!F" + (songIndex + 2).ToString() + ":K" + (songIndex + 2).ToString(), sendValues);
+            SendData(info[headers.IndexOf("Difficulty")].ToString() + "!" + GetColumnName(Headers.IndexOf("Score")) + (songIndex + 2).ToString() + ":"
+                + GetColumnName(Headers.IndexOf("Drumroll")) + (songIndex + 2).ToString(), sendValues);
 
 
 
@@ -244,7 +251,8 @@ namespace TaikoLogging
 
         public void UpdatePS4BestGoods(List<object> info, List<string> headers)
         {
-            string range = info[headers.IndexOf("Difficulty")].ToString() + "!B2:L";
+            var Headers = GetHeaders(info[headers.IndexOf("Difficulty")].ToString());
+            string range = info[headers.IndexOf("Difficulty")].ToString() + "!"+ GetColumnName(Headers.IndexOf("Title")) + "2:" + GetColumnName(Headers.IndexOf("Best Goods"));
             var request = service.Spreadsheets.Values.Get(spreadsheetId, range);
             ValueRange response = request.Execute();
             var values = response.Values;
@@ -280,7 +288,7 @@ namespace TaikoLogging
             sendValues.Add(baseValues);
 
 
-            SendData(info[headers.IndexOf("Difficulty")].ToString() + "!L" + (songIndex + 2).ToString(), sendValues);
+            SendData(info[headers.IndexOf("Difficulty")].ToString() + "!" + GetColumnName(Headers.IndexOf("Best Goods")) + (songIndex + 2).ToString(), sendValues);
 
             //List<Google.Apis.Sheets.v4.Data.ValueRange> updateData = new List<Google.Apis.Sheets.v4.Data.ValueRange>();
             //var dataValueRange = new Google.Apis.Sheets.v4.Data.ValueRange();
@@ -423,7 +431,7 @@ namespace TaikoLogging
         }
 
         #region Sheet Functions
-        private IList<IList<object>> GetValues(string range)
+        public IList<IList<object>> GetValues(string range)
         {
             var request = service.Spreadsheets.Values.Get(spreadsheetId, range);
             ValueRange response = request.Execute();
@@ -432,7 +440,7 @@ namespace TaikoLogging
         }
 
 
-        private List<string> GetHeaders(string sheet)
+        public List<string> GetHeaders(string sheet)
         {
             // This part would have to be updated if more headers are added
             // I don't think it'd allow me to make it go past AG if there's no cells there
@@ -454,7 +462,7 @@ namespace TaikoLogging
         //    return GetValues(range);
         //}
 
-        private void SendData(string range, IList<IList<object>> data)
+        public void SendData(string range, IList<IList<object>> data)
         {
             List<Google.Apis.Sheets.v4.Data.ValueRange> updateData = new List<Google.Apis.Sheets.v4.Data.ValueRange>();
             var dataValueRange = new Google.Apis.Sheets.v4.Data.ValueRange();

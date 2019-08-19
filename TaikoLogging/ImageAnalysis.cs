@@ -68,41 +68,42 @@ namespace TaikoLogging
 
         public void StandardLoop()
         {
-            var bmp = Program.screen.CaptureApplication();
-            currentState = CheckState(bmp);
-            if (previousState != currentState)
+            using (Bitmap bmp = Program.screen.CaptureApplication())
             {
-                // names each file based on the number it was made in, then by the state it thought it was
-                // It saves every time it changes the state
-                if (currentState == State.SingleSongEnd)
+                currentState = CheckState(bmp);
+                if (previousState != currentState)
                 {
-                    TestingScreenshot();
-                    Thread.Sleep(3500);
-                    currentState = CheckState(Program.screen.CaptureApplication());
-                    if (currentState == State.SingleResults)
+                    // names each file based on the number it was made in, then by the state it thought it was
+                    // It saves every time it changes the state
+                    if (currentState == State.SingleSongEnd)
+                    {
+                        TestingScreenshot();
+                        Thread.Sleep(3500);
+                        currentState = CheckState(Program.screen.CaptureApplication());
+                        if (currentState == State.SingleResults)
+                        {
+                            TestingScreenshot();
+
+                            GetSingleResults(false);
+                        }
+                        else if (currentState == State.SingleSessionResults)
+                        {
+                            TestingScreenshot();
+
+                            GetSingleResults(true);
+                        }
+                    }
+                    else if (currentState == State.RankedResults)
                     {
                         TestingScreenshot();
 
-                        GetSingleResults(false);
-                    }
-                    else if (currentState == State.SingleSessionResults)
-                    {
+                        Thread.Sleep(4000);
                         TestingScreenshot();
 
-                        GetSingleResults(true);
+                        GetRankedResults();
                     }
-                }
-                else if (currentState == State.RankedResults)
-                {
-                    TestingScreenshot();
-
-                    Thread.Sleep(4000);
-                    TestingScreenshot();
-
-                    GetRankedResults();
                 }
             }
-
             System.GC.Collect();
         }
 

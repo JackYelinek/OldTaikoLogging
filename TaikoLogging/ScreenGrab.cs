@@ -183,7 +183,26 @@ namespace TaikoLogging
             // x: rect.Right - (rect.Right-1137)
             // y: bottomOffset + 726-666
             int x = bmp.Width - 21;
-            int y = bottomOffset + 60;
+            // y is wrong, it can vary relative to the bottomOffset
+            // exit can be found at 827
+            // y would be at 726
+            // y is -101 compared to exit
+            // -101 is the only number I need to know to find y
+
+            int y = bmp.Height - 1;
+            for (; y >= 0; y--)
+            {
+                var exitPixel = bmp.GetPixel(x, y);
+                if (CompareColors(Color.FromArgb(exitPixel.R, exitPixel.G, exitPixel.B), Color.FromArgb(76, 76, 76)))
+                {
+                    y -= 101;
+                    break;
+                }
+            }
+
+
+
+
 
             // Color if not streaming = (76, 76, 76)
             // Color if streaming = (122,121,122)

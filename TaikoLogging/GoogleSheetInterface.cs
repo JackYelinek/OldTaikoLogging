@@ -59,9 +59,9 @@ namespace TaikoLogging
         {
             var Headers = GetHeaders("'Ranked Logs'");
             // Check the sheet to see the match #
-            var values = GetValues("Ranked Logs!A2:A");
+            var values = GetValues("Ranked Logs!A2");
 
-            info.Add(int.Parse(values.ElementAt(values.Count - 1)[0].ToString()) + 1);
+            info.Add(int.Parse(values[0][0].ToString()) + 1);
             headers.Add("Match");
 
             if ((bool)info[headers.IndexOf("Win/Loss")] == true)
@@ -78,7 +78,9 @@ namespace TaikoLogging
 
             info.Add(DateTime.Now.ToString("MM/dd/yyyy"));
             headers.Add("DateTime");
-
+            // Might need to be Headers.Count-1, might not actually matter
+            values = GetValues("Ranked Logs!A2:" + GetColumnName(Headers.Count));
+            List<IList<object>> sendValues = new List<IList<object>>();
             IList<object> baseValues = new List<object>();
             for (int i = 0; i < Headers.Count; i++)
             {
@@ -97,11 +99,15 @@ namespace TaikoLogging
                     baseValues.Add(null);
                 }
             }
-
-            List<IList<object>> sendValues = new List<IList<object>>();
             sendValues.Add(baseValues);
+            for (int i = 0; i < values.Count; i++)
+            {
+                sendValues.Add(values[i]);
+            }
+            
 
-            string range = "'Ranked Logs'!A" + ((int)info[headers.IndexOf("Match")] - 1440) + ":" + GetColumnName(Headers.Count) + ((int)info[headers.IndexOf("Match")] - 1440);
+
+            string range = "'Ranked Logs'!A2:" + GetColumnName(Headers.Count);
 
             SendData(range, sendValues);
 
@@ -125,32 +131,33 @@ namespace TaikoLogging
                 bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Ranked Logs\" + info[headers.IndexOf("Match")] + ".png", ImageFormat.Png);
                 Console.WriteLine("Ranked match logged");
             }
-
-
         }
 
         public void RemoveLastRanked()
         {
             // Check the sheet to see the match #
-            string range = "Ranked Logs!A2:A";
+            string range = "Ranked Logs!A2:R";
             var values = GetValues(range);
 
-            int matchNumber = int.Parse(values.ElementAt(values.Count - 1)[0].ToString());
+            //int matchNumber = int.Parse(values.ElementAt(values.Count - 1)[0].ToString());
 
             var Headers = GetHeaders("'Ranked Logs'");
 
+
+            List<IList<object>> sendValues = new List<IList<object>>();
+            for (int i = 1; i < values.Count; i++)
+            {   
+                sendValues.Add(values[i]);
+            }
             IList<object> baseValues = new List<object>();
 
             for (int i = 0; i < Headers.Count; i++)
             {
                 baseValues.Add("");
             }
-
-            List<IList<object>> sendValues = new List<IList<object>>();
             sendValues.Add(baseValues);
 
-            SendData("Ranked Logs!A" + (matchNumber - 1440).ToString() + ":" + GetColumnName(Headers.Count) + (matchNumber - 1440).ToString(), sendValues);
-
+            SendData("Ranked Logs!A2:" + GetColumnName(Headers.Count), sendValues);
         }
         public void UpdatePS4HighScore(List<object> info, List<string> headers, Bitmap bmp)
         {

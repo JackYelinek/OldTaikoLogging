@@ -49,7 +49,7 @@ namespace TaikoLoggingTests
 
             List<string> headers = new List<string>
             {
-                "Song",
+                "Title",
                 "Difficulty",
                 "Win/Loss",
                 "My Score",
@@ -73,13 +73,13 @@ namespace TaikoLoggingTests
 
             var Headers = sheet.GetHeaders("'Ranked Logs'");
             var values = sheet.GetValues("Ranked Logs!A2:A");
-            values = sheet.GetValues("Ranked Logs!" + sheet.GetColumnName(Headers.IndexOf("Match")) + (values.Count + 1) + ":" +sheet.GetColumnName(Headers.IndexOf("DateTime")) + (values.Count + 1));
+            values = sheet.GetValues("Ranked Logs!" + sheet.GetColumnName(Headers.IndexOf("Match")) +"2:" +sheet.GetColumnName(Headers.IndexOf("DateTime")));
 
             // I didn't do this correctly
             // Should make it dynamic with the Headers, which is why I grabbed the Headers up above
             List<object> expectedInfo = new List<object>
             {
-                "1793",
+                "1792",
                 "Day by Day!",
                 "Oni",
                 "Win",
@@ -96,7 +96,7 @@ namespace TaikoLoggingTests
                 "1",
                 "603",
                 "94",
-                DateTime.Today.ToString(),
+                DateTime.Now.ToString("MM/dd/yyyy"),
             };
             List<bool> results = new List<bool>();
             
@@ -104,17 +104,56 @@ namespace TaikoLoggingTests
             for (int i = 0; i < values[0].Count; i++)
             {
                 results.Add(false);
-                if (values[0][i] == expectedInfo[i])
+                if (string.Compare(values[0][i].ToString(), expectedInfo[i].ToString()) == 0)
                 {
                     results[i] = true;
                     continue;
                 }
             }
 
+
             for (int i = 0; i < results.Count; i++)
             {
                 Assert.IsTrue(results[i], Headers[i] + " resulted in " + values[0][i] + ", should've been " + expectedInfo[i]);
             }
+
+            sheet.RemoveLastRanked();
+
+            List<object> valuesAfterRemove = new List<object>
+            {
+                "1791",
+                "ヒカリノカナタヘ -Long Ver.-",
+                "Oni",
+                "Win",
+                "141470",
+                "981800",
+                "915",
+                "46",
+                "0",
+                "961",
+                "249",
+                "840330",
+                "673",
+                "228",
+                "60",
+                "418",
+                "249",
+                "08/12/2019"
+            };
+
+            var removedValues = sheet.GetValues("Ranked Logs!A2:R2");
+            bool finalResult = true;
+            for (int i = 0; i < valuesAfterRemove.Count; i++)
+            {
+                if (string.Compare(valuesAfterRemove[i].ToString(), removedValues[0][i].ToString()) != 0)
+                {
+                    finalResult = false;
+                    break;
+                }
+            }
+            Assert.IsTrue(finalResult, "Failed on removal");
+
+
         }
 
     }

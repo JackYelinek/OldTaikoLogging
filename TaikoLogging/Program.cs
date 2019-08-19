@@ -28,7 +28,6 @@ namespace TaikoLogging
 
             while(true)
             {
-                screen.CheckTwitch();
                 // I'm not sure if this is the best way to check for it, maybe i could just have it check every 10 loops, or 100
                 // Events would be nice to set up, but I'm not sure if I could do that, or how I'd do that
                 // This isn't a bad way of doing things without events though I think
@@ -40,6 +39,7 @@ namespace TaikoLogging
                 }
                 else
                 {
+                    screen.CheckTwitch();
                     // This isn't technically accurate
                     PS4 = true;
                 }

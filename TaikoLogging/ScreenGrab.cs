@@ -15,7 +15,7 @@ namespace TaikoLogging
     {
         public int i = 0;
         Process proc;
-        User32.Rect rect;
+        User32.Rect rect = new User32.Rect();
 
         public int topOffset = 0;
         public int leftOffset = 0;
@@ -41,20 +41,22 @@ namespace TaikoLogging
         // I am a literal god
         private void Setup()
         {
-            try
-            {
-                proc = Process.GetProcessesByName("obs64")[0];
-            }
-            catch
+            var processes = Process.GetProcessesByName("obs64");
+            if (processes.Length == 0)
             {
                 return;
             }
-            rect = new User32.Rect();
+            else
+            {
+                proc = processes[0];
+            }
             // I probably don't need to care about the outer box, just the middle box
             User32.GetWindowRect(proc.MainWindowHandle, ref rect);
             var bmp = new Bitmap(rect.right - rect.left, rect.bottom - rect.top, PixelFormat.Format32bppArgb);
             Graphics graphics = Graphics.FromImage(bmp);
-            graphics.CopyFromScreen(rect.left + leftOffset, rect.top + topOffset, 0, 0, new Size(rect.right - rect.left, rect.bottom - rect.top), CopyPixelOperation.SourceCopy);
+            // I had rect.left = leftOffset, rect.top + topOffset here
+            // That's wrong because when setting up, I need to check things from before it has any offsets
+            graphics.CopyFromScreen(rect.left, rect.top, 0, 0, new Size(rect.right - rect.left, rect.bottom - rect.top), CopyPixelOperation.SourceCopy);
             FindGameWindow(bmp);
         }
 
@@ -66,17 +68,13 @@ namespace TaikoLogging
             var bmp = new Bitmap(rightOffset - leftOffset, bottomOffset - topOffset, PixelFormat.Format32bppArgb);
             Graphics graphics = Graphics.FromImage(bmp);
             graphics.CopyFromScreen(rect.left + leftOffset, rect.top + topOffset, 0, 0, new Size(rightOffset - leftOffset, bottomOffset - topOffset), CopyPixelOperation.SourceCopy);
-
             return bmp;
         }
 
         // Put any bool in order to save the bitmap
         public Bitmap CaptureApplication(bool Testing)
         {
-            User32.GetWindowRect(proc.MainWindowHandle, ref rect);
-            var bmp = new Bitmap(rightOffset - leftOffset, bottomOffset - topOffset, PixelFormat.Format32bppArgb);
-            Graphics graphics = Graphics.FromImage(bmp);
-            graphics.CopyFromScreen(rect.left + leftOffset, rect.top + topOffset, 0, 0, new Size(rightOffset - leftOffset, bottomOffset - topOffset), CopyPixelOperation.SourceCopy);
+            Bitmap bmp = CaptureApplication();
 
             // NOT TESTING (technically testing, but this function is only for testing anyway
             bmp.Save(string.Format(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\test{0}.png", i++.ToString()), ImageFormat.Png);
@@ -172,8 +170,34 @@ namespace TaikoLogging
             {
                 return false;
             }
-
         }
+
+        public bool CheckTwitch()
+        {
+            User32.GetWindowRect(proc.MainWindowHandle, ref rect);
+            var bmp = new Bitmap(rect.right - rect.left, rect.bottom - rect.top, PixelFormat.Format32bppArgb);
+            Graphics graphics = Graphics.FromImage(bmp);
+            graphics.CopyFromScreen(rect.left, rect.top, 0, 0, new Size(rect.right - rect.left, rect.bottom - rect.top), CopyPixelOperation.SourceCopy);
+
+            // Pixel location of "Start Streaming" button:
+            // x: rect.Right - (rect.Right-1137)
+            // y: bottomOffset + 726-666
+            int x = bmp.Width - 21;
+            int y = bottomOffset + 60;
+
+            // Color if not streaming = (76, 76, 76)
+            // Color if streaming = (122,121,122)
+            var pixel = bmp.GetPixel(x, y);
+            bool streaming = CompareColors(Color.FromArgb(pixel.R, pixel.G, pixel.B), Color.FromArgb(122, 121, 122));
+
+            var thing = proc.MainWindowTitle;
+            if (thing.IndexOf("- Profile: Twitch -") != -1 && streaming == true)
+            {
+                return true;
+            }
+            return false;
+        }
+
         private class User32
         {
             [StructLayout(LayoutKind.Sequential)]

@@ -16,12 +16,10 @@ namespace TaikoLogging
     {
         readonly ConnectionCredentials credentials = new ConnectionCredentials(TwitchInfo.BotUsername, TwitchInfo.BotToken);
         TwitchClient client;
-        bool twitchOn;
         GoogleSheetInterface sheet;
 
-        public RinClient(bool twitchOn)
+        public RinClient()
         {
-            this.twitchOn = twitchOn;
             sheet = new GoogleSheetInterface();
             Connect();
         }
@@ -73,7 +71,7 @@ namespace TaikoLogging
 
         public void SendTwitchMessage(string message)
         {
-            if (twitchOn == true)
+            if (Program.twitchOn == true)
             {
                 client.SendMessage(TwitchInfo.ChannelName, message);
             }

@@ -13,7 +13,6 @@ namespace TaikoLogging
 {
     class ImageAnalysis
     {
-        ScreenGrab screen;
         GoogleSheetInterface sheet;
         public enum State {CustomizeRoom, DifficultySelect, EventPage, MainMenu, MainMenuSettings, MenuLoading, PracticePause, PracticeSelect, PracticeSong,
             RankedEndSong, RankedLeaderboards, RankedMidSong, RankedPause, RankedPointsGain, RankedResults, RankedSelect, RankedSongFound, RankedStats,
@@ -48,14 +47,11 @@ namespace TaikoLogging
 
         private int j = 0;
         private int numStatesSaved = 0;
-        private bool obsOpen = false;
         public ImageAnalysis()
         {
             // expert level programming right here
             try
             {
-                screen = new ScreenGrab();
-                obsOpen = true;
                 sheet = new GoogleSheetInterface();
             }
             catch
@@ -72,7 +68,7 @@ namespace TaikoLogging
 
         public void StandardLoop()
         {
-            var bmp = screen.CaptureApplication();
+            var bmp = Program.screen.CaptureApplication();
             currentState = CheckState(bmp);
             if (previousState != currentState)
             {
@@ -82,7 +78,7 @@ namespace TaikoLogging
                 {
                     TestingScreenshot();
                     Thread.Sleep(3500);
-                    currentState = CheckState(screen.CaptureApplication());
+                    currentState = CheckState(Program.screen.CaptureApplication());
                     if (currentState == State.SingleResults)
                     {
                         TestingScreenshot();
@@ -112,7 +108,7 @@ namespace TaikoLogging
 
         public void NotStandardLoop()
         {
-            var bmp = screen.CaptureApplication();
+            var bmp = Program.screen.CaptureApplication();
             currentState = CheckState(bmp);
             GetSingleResults(false);
 
@@ -127,12 +123,12 @@ namespace TaikoLogging
 
         private void TestingScreenshot()
         {
-            screen.CaptureApplication().Save(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Test Data\" + numStatesSaved++.ToString() + "." + currentState.ToString() + ".png", ImageFormat.Png);
+            Program.screen.CaptureApplication().Save(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Test Data\" + numStatesSaved++.ToString() + "." + currentState.ToString() + ".png", ImageFormat.Png);
         }
 
         public void GetDLCSongs()
         {
-            var bmp = screen.CaptureApplication();
+            var bmp = Program.screen.CaptureApplication();
             currentState = CheckState(bmp);
             if (previousState != currentState)
             {
@@ -142,14 +138,14 @@ namespace TaikoLogging
                 {
                     TestingScreenshot();
                     Thread.Sleep(3500);
-                    currentState = CheckState(screen.CaptureApplication());
+                    currentState = CheckState(Program.screen.CaptureApplication());
                     if (currentState == State.SingleResults)
                     {
-                        GetTitleBitmap(true, screen.CaptureApplication());
+                        GetTitleBitmap(true, Program.screen.CaptureApplication());
                     }
                     else if (currentState == State.SingleSessionResults)
                     {
-                        GetTitleBitmap(true, screen.CaptureApplication());
+                        GetTitleBitmap(true, Program.screen.CaptureApplication());
                     }
                 }
             }
@@ -412,7 +408,7 @@ namespace TaikoLogging
 
         public void GetSingleResults(bool isSession)
         {
-            Bitmap bmp = screen.CaptureApplication();
+            Bitmap bmp = Program.screen.CaptureApplication();
 
             List<object> info = new List<object>();
             List<string> headers = new List<string>();
@@ -489,7 +485,7 @@ namespace TaikoLogging
         }
         private void GetSingleResults(Bitmap bmp, bool Testing)
         {
-            //Bitmap bmp = screen.CaptureApplication();
+            //Bitmap bmp = Program.screen.CaptureApplication();
 
             if (IsDeathblood(bmp, Players.Single) == false)
             {
@@ -555,7 +551,7 @@ namespace TaikoLogging
 
         public void GetRankedResults()
         {
-            Bitmap bmp = screen.CaptureApplication();
+            Bitmap bmp = Program.screen.CaptureApplication();
             List<object> info = new List<object>();
             List<string> headers = new List<string>();
 
@@ -616,7 +612,7 @@ namespace TaikoLogging
 
         private void GetRankedResults(Bitmap bmp, bool Testing)
         {
-            //Bitmap bmp = screen.CaptureApplication();
+            //Bitmap bmp = Program.Program.screen.CaptureApplication();
             bool account = IsDeathblood(bmp, Players.RankedTop);
             if (account == false)
             {
@@ -1249,7 +1245,7 @@ namespace TaikoLogging
         // I'm using these to see what the failed tests are seeing, or at least it should work that way if it isn't broken which it is
         public void GetSmallDigits(Bitmap bmp, string folderLocation, string baseFileName)
         {
-            //Bitmap bmp = screen.CaptureApplication();
+            //Bitmap bmp = Program.Program.screen.CaptureApplication();
 
             // Old folder location was D:\My Stuff\My Programs\Taiko\Image Data\Test Data\
             Bitmap[] goodBitmaps = new Bitmap[4];
@@ -1340,7 +1336,7 @@ namespace TaikoLogging
         }
         public void GetBigDigits(Bitmap bmp, string folderLocation, string baseFileName)
         {
-            //Bitmap bmp = screen.CaptureApplication();
+            //Bitmap bmp = Program.Program.screen.CaptureApplication();
 
             Bitmap[] scoreBitmaps = new Bitmap[7];
 

@@ -568,7 +568,7 @@ namespace TaikoLogging
 
             // Song Data
             info.Add(GetTitle(bmp));
-            headers.Add("Song");
+            headers.Add("Title");
             info.Add(CheckDifficulty(bmp, Players.RankedTop));
             headers.Add("Difficulty");
 

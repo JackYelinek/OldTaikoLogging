@@ -26,7 +26,7 @@ namespace TaikoLogging
 
         SheetsService service;
 
-
+        public bool test = false;
 
         public GoogleSheetInterface()
         {
@@ -60,7 +60,7 @@ namespace TaikoLogging
             var Headers = GetHeaders("'Ranked Logs'");
             // Check the sheet to see the match #
             var values = GetValues("Ranked Logs!A2:A");
-            
+
             info.Add(int.Parse(values.ElementAt(values.Count - 1)[0].ToString()) + 1);
             headers.Add("Match");
 
@@ -87,7 +87,7 @@ namespace TaikoLogging
                 {
                     if (Headers[i] == headers[j])
                     {
-                        baseValues.Add(info[i]);
+                        baseValues.Add(info[j].ToString());
                         headerFound = true;
                         break;
                     }
@@ -109,19 +109,23 @@ namespace TaikoLogging
             string twitchMessage = "Match " + info[headers.IndexOf("Match")].ToString() + ": ";
             if ((string)info[headers.IndexOf("Win/Loss")] == "Win")
             {
-                twitchMessage += "Won "+ info[headers.IndexOf("Song")] + " by " + info[headers.IndexOf("Difference")] + " RinComfy"; 
+                twitchMessage += "Won " + info[headers.IndexOf("Title")] + " by " + info[headers.IndexOf("Difference")] + " RinComfy";
             }
             else
             {
-                twitchMessage += "Lost "+ info[headers.IndexOf("Song")] + " by " + info[headers.IndexOf("Difference")] + " RinThump";
+                twitchMessage += "Lost " + info[headers.IndexOf("Title")] + " by " + info[headers.IndexOf("Difference")] + " RinThump";
             }
 
 
-            Program.rin.SendTwitchMessage(twitchMessage);
+            if (test == false)
+            {
+                Program.rin.SendTwitchMessage(twitchMessage);
 
-            // NOT TESTING
-            bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Ranked Logs\" + info[headers.IndexOf("Match")] + ".png", ImageFormat.Png);
-            Console.WriteLine("Ranked match logged");
+                // NOT TESTING
+                bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Ranked Logs\" + info[headers.IndexOf("Match")] + ".png", ImageFormat.Png);
+                Console.WriteLine("Ranked match logged");
+            }
+
 
         }
 
@@ -153,12 +157,12 @@ namespace TaikoLogging
             var Headers = GetHeaders("Oni");
 
             // Find the song in the spreadsheet
-            string range = info[headers.IndexOf("Difficulty")].ToString()+"!"+ GetColumnName(Headers.IndexOf("Title")) + "2:" + GetColumnName(Headers.IndexOf("Score"));
+            string range = info[headers.IndexOf("Difficulty")].ToString() + "!" + GetColumnName(Headers.IndexOf("Title")) + "2:" + GetColumnName(Headers.IndexOf("Score"));
             var values = GetValues(range);
             int songIndex = -1;
             if (values != null && values.Count > 0)
             {
-                foreach(var row in values)
+                foreach (var row in values)
                 {
                     if (row[0].ToString() == info[headers.IndexOf("Title")].ToString())
                     {
@@ -179,7 +183,7 @@ namespace TaikoLogging
             // This isn't very fluid
             // If something gets changed in the spreadsheet, this breaks
             string score = values.ElementAt(songIndex).ElementAt(4).ToString();
-            while(true)
+            while (true)
             {
                 if (score.IndexOf(',') == -1)
                 {
@@ -196,11 +200,14 @@ namespace TaikoLogging
             }
             else
             {
-                if (int.Parse(score) == (int)info[headers.IndexOf("Score")])
+                if (test == false)
                 {
-                    Program.rin.SendTwitchMessage("Tied high score! " + info[headers.IndexOf("Title")] + " = " + ((int)info[headers.IndexOf("Score")] - int.Parse(score)).ToString());
+                    if (int.Parse(score) == (int)info[headers.IndexOf("Score")])
+                    {
+                        Program.rin.SendTwitchMessage("Tied high score! " + info[headers.IndexOf("Title")] + " = " + ((int)info[headers.IndexOf("Score")] - int.Parse(score)).ToString());
+                    }
+                    Program.rin.SendTwitchMessage("New high score! " + info[headers.IndexOf("Title")] + " +" + ((int)info[headers.IndexOf("Score")] - int.Parse(score)).ToString());
                 }
-                Program.rin.SendTwitchMessage("New high score! " + info[headers.IndexOf("Title")] + " +" + ((int)info[headers.IndexOf("Score")] - int.Parse(score)).ToString());
             }
 
             info.Add(DateTime.Now.ToString("MM/dd/yyyy"));
@@ -215,7 +222,7 @@ namespace TaikoLogging
                 {
                     if (Headers[i] == headers[j])
                     {
-                        baseValues.Add(info[i]);
+                        baseValues.Add(info[j].ToString());
                         headerFound = true;
                         break;
                     }
@@ -243,16 +250,20 @@ namespace TaikoLogging
                 }
             }
 
-            // NOT TESTING
-            bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores\" + info[headers.IndexOf("Title")] + "." + info[headers.IndexOf("Difficulty")].ToString() + "." + numScreenshots.ToString() + ".png", ImageFormat.Png);
-            Console.WriteLine("HighScore logged");
+            if (test == false)
+            {
+                // NOT TESTING
+                bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores\" + info[headers.IndexOf("Title")] + "." + info[headers.IndexOf("Difficulty")].ToString() + "." + numScreenshots.ToString() + ".png", ImageFormat.Png);
+                Console.WriteLine("HighScore logged");
+
+            }
 
         }
 
         public void UpdatePS4BestGoods(List<object> info, List<string> headers)
         {
             var Headers = GetHeaders(info[headers.IndexOf("Difficulty")].ToString());
-            string range = info[headers.IndexOf("Difficulty")].ToString() + "!"+ GetColumnName(Headers.IndexOf("Title")) + "2:" + GetColumnName(Headers.IndexOf("Best Goods"));
+            string range = info[headers.IndexOf("Difficulty")].ToString() + "!" + GetColumnName(Headers.IndexOf("Title")) + "2:" + GetColumnName(Headers.IndexOf("Best Goods"));
             var request = service.Spreadsheets.Values.Get(spreadsheetId, range);
             ValueRange response = request.Execute();
             var values = response.Values;
@@ -267,6 +278,10 @@ namespace TaikoLogging
                     }
                 }
             }
+            if (headers.IndexOf("GOOD") == -1)
+            {
+                headers[headers.IndexOf("My Goods")] = "GOOD";
+            }
 
             if (songIndex == -1)
             {
@@ -276,6 +291,7 @@ namespace TaikoLogging
             }
 
             string sheetGoods = values.ElementAt(songIndex)[10].ToString();
+
             if ((int)info[headers.IndexOf("GOOD")] < int.Parse(sheetGoods))
             {
                 return;
@@ -290,34 +306,25 @@ namespace TaikoLogging
 
             SendData(info[headers.IndexOf("Difficulty")].ToString() + "!" + GetColumnName(Headers.IndexOf("Best Goods")) + (songIndex + 2).ToString(), sendValues);
 
-            //List<Google.Apis.Sheets.v4.Data.ValueRange> updateData = new List<Google.Apis.Sheets.v4.Data.ValueRange>();
-            //var dataValueRange = new Google.Apis.Sheets.v4.Data.ValueRange();
-            //dataValueRange.Range = difficulty.ToString() + "!L" + (songIndex + 2).ToString();
-            //dataValueRange.Values = sendValues;
-            //updateData.Add(dataValueRange);
-
-            //var requestBody = new Google.Apis.Sheets.v4.Data.BatchUpdateValuesRequest();
-            //requestBody.Data = updateData;
-            //requestBody.ValueInputOption = "USER_ENTERED";
-
-            //var updateRequest = service.Spreadsheets.Values.BatchUpdate(requestBody, spreadsheetId);
-
-            //var updateResponse = updateRequest.Execute();
-
-            int goodsDifference = (int)info[headers.IndexOf("GOOD")] - int.Parse(sheetGoods);
-            string twitchMessage = string.Empty;
-            if (goodsDifference == 1)
+            if (test == false)
             {
-                twitchMessage += "New best accuracy on " + info[headers.IndexOf("Title")] + ", " + goodsDifference.ToString() + " more good!";
+
+                int goodsDifference = (int)info[headers.IndexOf("GOOD")] - int.Parse(sheetGoods);
+                string twitchMessage = string.Empty;
+                if (goodsDifference == 1)
+                {
+                    twitchMessage += "New best accuracy on " + info[headers.IndexOf("Title")] + ", " + goodsDifference.ToString() + " more good!";
+                }
+                else
+                {
+                    twitchMessage += "New best accuracy on " + info[headers.IndexOf("Title")] + ", " + goodsDifference.ToString() + " more goods!";
+                }
+                Program.rin.SendTwitchMessage(twitchMessage);
             }
-            else
-            {
-                twitchMessage += "New best accuracy on " + info[headers.IndexOf("Title")] + ", " + goodsDifference.ToString() + " more goods!";
-            }
-            Program.rin.SendTwitchMessage(twitchMessage);
 
         }
 
+        #region Emulator functions
         public void UpdateEmulatorHighScore(string title, string[] info)
         {
             // Find the song in the spreadsheet
@@ -429,6 +436,7 @@ namespace TaikoLogging
             }
             return null;
         }
+        #endregion
 
         #region Sheet Functions
         public IList<IList<object>> GetValues(string range)
@@ -479,7 +487,7 @@ namespace TaikoLogging
             var updateResponse = updateRequest.Execute();
         }
 
-        string GetColumnName(int index)
+        public string GetColumnName(int index)
         {
             const string letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 

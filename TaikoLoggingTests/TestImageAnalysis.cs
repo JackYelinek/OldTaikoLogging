@@ -57,6 +57,8 @@ namespace TaikoLoggingTests
         [TestMethod]
         public void TestAnalyzeTwitch()
         {
+            // I made this test because I thought the function was broken
+            // Turns out I'm just a little stupid
             ScreenGrab screen = new ScreenGrab();
 
 
@@ -64,33 +66,33 @@ namespace TaikoLoggingTests
 
             List<Bitmap> bmps = new List<Bitmap>()
             {
-                new Bitmap(folderPath + "初音ミクの消失‐劇場版‐.Ura.2.png")
+                new Bitmap(folderPath + "NotStreaming.0.png"),
+                new Bitmap(folderPath + "Streaming.0.png"),
             };
 
-
+            List<bool> checkIsStreaming = new List<bool>();
             for (int i = 0; i < bmps.Count; i++)
             {
-                screen.FindGameWindow(bmps[i]);
+                checkIsStreaming.Add(screen.AnalyzeTwitch(bmps[i]));
+                bmps[i].Dispose();
             }
 
             List<bool> results = new List<bool>();
-            for (int i = 0; i < bmps.Count; i++)
+            for (int i = 0; i < checkIsStreaming.Count; i++)
             {
                 results.Add(false);
             }
 
             // Top, Left, Bottom, Right
-            List<List<int>> expectedResults = new List<List<int>>()
+            List<bool> expectedResults = new List<bool>()
             {
-                new List<int> {72, 20, 719, 1172 },
+                false,
+                true,
             };
 
-            for (int i = 0; i < bmps.Count; i++)
+            for (int i = 0; i < expectedResults.Count; i++)
             {
-                if (screen.topOffset == expectedResults[i][0] &&
-                    screen.leftOffset == expectedResults[i][1] &&
-                    screen.bottomOffset == expectedResults[i][2] &&
-                    screen.rightOffset == expectedResults[i][3])
+                if (checkIsStreaming[i] == expectedResults[i])
                 {
                     results[i] = true;
                 }

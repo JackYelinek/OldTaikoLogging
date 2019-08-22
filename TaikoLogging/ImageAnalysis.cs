@@ -77,29 +77,20 @@ namespace TaikoLogging
                     // It saves every time it changes the state
                     if (currentState == State.SingleSongEnd)
                     {
-                        TestingScreenshot();
                         Thread.Sleep(3500);
                         currentState = CheckState(Program.screen.CaptureApplication());
                         if (currentState == State.SingleResults)
                         {
-                            TestingScreenshot();
-
                             GetSingleResults(false);
                         }
                         else if (currentState == State.SingleSessionResults)
                         {
-                            TestingScreenshot();
-
                             GetSingleResults(true);
                         }
                     }
                     else if (currentState == State.RankedResults)
                     {
-                        TestingScreenshot();
-
                         Thread.Sleep(4000);
-                        TestingScreenshot();
-
                         GetRankedResults();
                     }
                 }
@@ -717,7 +708,7 @@ namespace TaikoLogging
             //Bitmap titleBmp = new Bitmap(450, 28);
             //CopyRegionIntoImage(bmp, new Rectangle(644, 33, 450, 28), ref titleBmp, new Rectangle(0, 0, 450, 28));
             // TESTING
-            //titleBmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\DLC Songs\SingleResults.Title" + j++.ToString() + ".png", System.Drawing.Imaging.ImageFormat.Png);
+            titleBmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\DLC Songs\SingleResults.Title" + j++.ToString() + ".png", System.Drawing.Imaging.ImageFormat.Png);
         }
 
         public bool IsHighScore(Bitmap bmp)

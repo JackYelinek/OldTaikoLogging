@@ -39,7 +39,7 @@ namespace TaikoLogging
                 }
                 else
                 {
-                    screen.CheckTwitch();
+                    twitchOn = screen.CheckTwitch();
                     // This isn't technically accurate
                     PS4 = true;
                 }

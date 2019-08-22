@@ -179,6 +179,15 @@ namespace TaikoLogging
             Graphics graphics = Graphics.FromImage(bmp);
             graphics.CopyFromScreen(rect.left, rect.top, 0, 0, new Size(rect.right - rect.left, rect.bottom - rect.top), CopyPixelOperation.SourceCopy);
 
+            return AnalyzeTwitch(bmp);
+        }
+
+        // I'm literally the worst at naming functions...
+        public bool AnalyzeTwitch(Bitmap bmp)
+        {
+            // TESTING
+            //bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\" + i++.ToString() + ".png");
+
             // Pixel location of "Start Streaming" button:
             // x: rect.Right - (rect.Right-1137)
             // y: bottomOffset + 726-666
@@ -199,9 +208,6 @@ namespace TaikoLogging
                     break;
                 }
             }
-
-
-
 
 
             // Color if not streaming = (76, 76, 76)

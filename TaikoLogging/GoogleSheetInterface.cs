@@ -135,13 +135,13 @@ namespace TaikoLogging
 
         public void RemoveLastRanked()
         {
+            var Headers = GetHeaders("'Ranked Logs'");
             // Check the sheet to see the match #
-            string range = "Ranked Logs!A2:R";
+            string range = "Ranked Logs!A2:" + GetColumnName(Headers.Count);
             var values = GetValues(range);
 
             //int matchNumber = int.Parse(values.ElementAt(values.Count - 1)[0].ToString());
 
-            var Headers = GetHeaders("'Ranked Logs'");
 
 
             List<IList<object>> sendValues = new List<IList<object>>();
@@ -222,7 +222,7 @@ namespace TaikoLogging
 
             //send all the information onto the sheet in the correct spots
             IList<object> baseValues = new List<object>();
-            for (int i = 0; i < Headers.Count; i++)
+            for (int i = Headers.IndexOf("Score"); i < Headers.Count; i++)
             {
                 bool headerFound = false;
                 for (int j = 0; j < headers.Count; j++)
@@ -241,8 +241,9 @@ namespace TaikoLogging
             }
 
             List<IList<object>> sendValues = new List<IList<object>>();
+            sendValues.Add(baseValues);
             SendData(info[headers.IndexOf("Difficulty")].ToString() + "!" + GetColumnName(Headers.IndexOf("Score")) + (songIndex + 2).ToString() + ":"
-                + GetColumnName(Headers.IndexOf("Drumroll")) + (songIndex + 2).ToString(), sendValues);
+                + GetColumnName(Headers.IndexOf("DateTime")) + (songIndex + 2).ToString(), sendValues);
 
 
 

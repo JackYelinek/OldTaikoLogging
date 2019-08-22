@@ -98,26 +98,52 @@ namespace TaikoLoggingTests
                 "94",
                 DateTime.Now.ToString("MM/dd/yyyy"),
             };
+            List<string> expectedInfoHeaders = new List<string>
+            {
+                "Match",
+                "Title",
+                "Difficulty",
+                "Win/Loss",
+                "My Score",
+                "My Goods",
+                "My OKs",
+                "My Bads",
+                "My Combo",
+                "My Drumroll",
+                "Opp Score",
+                "Opp Goods",
+                "Opp OKs",
+                "Opp Bads",
+                "Opp Combo",
+                "Opp Drumroll",
+                "DateTime"
+            };
             List<bool> results = new List<bool>();
             
 
-            for (int i = 0; i < values[0].Count; i++)
+            for (int i = 0; i < expectedInfoHeaders.Count; i++)
             {
                 results.Add(false);
-                if (string.Compare(values[0][i].ToString(), expectedInfo[i].ToString()) == 0)
+                for (int j = 0; j < Headers.Count; j++)
                 {
-                    results[i] = true;
-                    continue;
+                    if (Headers[j] == expectedInfoHeaders[i])
+                    {
+                        if (string.Compare(values[0][j].ToString(), expectedInfo[i].ToString()) == 0)
+                        {
+                            results[i] = true;
+                            break;
+                        }
+                    }
                 }
             }
 
+            sheet.RemoveLastRanked();
 
             for (int i = 0; i < results.Count; i++)
             {
                 Assert.IsTrue(results[i], Headers[i] + " resulted in " + values[0][i] + ", should've been " + expectedInfo[i]);
             }
 
-            sheet.RemoveLastRanked();
 
             List<object> valuesAfterRemove = new List<object>
             {

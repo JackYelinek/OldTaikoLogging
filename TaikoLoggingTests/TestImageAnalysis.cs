@@ -54,6 +54,50 @@ namespace TaikoLoggingTests
             }
             GC.Collect();
         }
+        [TestMethod]
+        public void TestAnalyzeTwitch()
+        {
+            ScreenGrab screen = new ScreenGrab();
+
+
+            string folderPath = @"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Test Data\FindGameWindow\";
+
+            List<Bitmap> bmps = new List<Bitmap>()
+            {
+                new Bitmap(folderPath + "初音ミクの消失‐劇場版‐.Ura.2.png")
+            };
+
+
+            for (int i = 0; i < bmps.Count; i++)
+            {
+                screen.FindGameWindow(bmps[i]);
+            }
+
+            List<bool> results = new List<bool>();
+            for (int i = 0; i < bmps.Count; i++)
+            {
+                results.Add(false);
+            }
+
+            // Top, Left, Bottom, Right
+            List<List<int>> expectedResults = new List<List<int>>()
+            {
+                new List<int> {72, 20, 719, 1172 },
+            };
+
+            for (int i = 0; i < bmps.Count; i++)
+            {
+                if (screen.topOffset == expectedResults[i][0] &&
+                    screen.leftOffset == expectedResults[i][1] &&
+                    screen.bottomOffset == expectedResults[i][2] &&
+                    screen.rightOffset == expectedResults[i][3])
+                {
+                    results[i] = true;
+                }
+                Assert.IsTrue(results[i]);//, "Expected " + expectedResults[i].ToString() + ", Result = '" + difficulties[i].ToString() + "'");
+            }
+            GC.Collect();
+        }
 
         [TestMethod]
         public void TestCheckSingleDifficulty()

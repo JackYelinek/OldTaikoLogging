@@ -133,11 +133,11 @@ namespace TaikoLogging
                     currentState = CheckState(Program.screen.CaptureApplication());
                     if (currentState == State.SingleResults)
                     {
-                        GetTitleBitmap(true, Program.screen.CaptureApplication());
+                        GetTitleBitmap(Program.screen.CaptureApplication());
                     }
                     else if (currentState == State.SingleSessionResults)
                     {
-                        GetTitleBitmap(true, Program.screen.CaptureApplication());
+                        GetTitleBitmap(Program.screen.CaptureApplication());
                     }
                 }
             }
@@ -475,71 +475,7 @@ namespace TaikoLogging
                 Console.WriteLine("Highscore Logged");
             }
         }
-        private void GetSingleResults(Bitmap bmp, bool Testing)
-        {
-            //Bitmap bmp = Program.screen.CaptureApplication();
 
-            if (IsDeathblood(bmp, Players.Single) == false)
-            {
-                // I think it's safe to say that if it isn't my main account, I don't care to check the rest
-                // I could eventually make a messy sheet, in which case I'd send everything to that if this is my alt
-                return;
-            }
-            var mods = CheckMods(bmp, Players.Single);
-            var difficulty = CheckDifficulty(bmp, Players.Single);
-
-            for (int i = 0; i < mods.Count; i++)
-            {
-                if (mods.ElementAt(i) == "Shin-uchi")
-                {
-                    // I don't want to save any shin-uchi scores
-                    return;
-                }
-            }
-            if (difficulty == Difficulty.Easy || difficulty == Difficulty.Normal)
-            {
-                // I don't care about easy or normal for my sheet
-                // I don't really care about hard either, but I have the sheet anyway, so might as well save it if I get it
-                return;
-            }
-
-            string title = GetTitle(bmp);
-            bool highScore = IsHighScore(bmp);
-            int score = GetScore(bmp, Players.Single);
-            int goods = GetGoods(bmp, Players.Single);
-            int oks = GetOKs(bmp, Players.Single);
-            int bads = GetBads(bmp, Players.Single);
-            int combo = GetCombo(bmp, Players.Single);
-            int drumroll = GetDrumroll(bmp, Players.Single);
-
-            Console.WriteLine(title);
-            Console.WriteLine(highScore);
-            Console.WriteLine(score);
-            Console.WriteLine(goods);
-            Console.WriteLine(oks);
-            Console.WriteLine(bads);
-            Console.WriteLine(combo);
-            Console.WriteLine(drumroll);
-
-            int[] info = new int[6]
-            {
-                score, goods, oks, bads, combo, drumroll
-            };
-            if (score % 10 != 0)
-            {
-                return;
-            }
-            if (highScore == true)
-            {
-                //sheet.UpdateHighScore(title, info, difficulty);
-
-                //DirectoryInfo dirInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores");
-                //var result = dirInfo.GetFiles();
-                // NOT USED, NOT TESTING
-                //bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores\" + result.Length + ".png", ImageFormat.Png);
-                //Console.WriteLine("Highscore Logged");
-            }
-        }
 
         public void GetRankedResults()
         {
@@ -601,115 +537,183 @@ namespace TaikoLogging
             sheet.UpdatePS4BestGoods(info, headers);
         }
 
+        //private void GetSingleResults(Bitmap bmp, bool Testing)
+        //{
+        //    //Bitmap bmp = Program.screen.CaptureApplication();
 
-        private void GetRankedResults(Bitmap bmp, bool Testing)
-        {
-            //Bitmap bmp = Program.Program.screen.CaptureApplication();
-            bool account = IsDeathblood(bmp, Players.RankedTop);
-            if (account == false)
-            {
-                // I don't care if it's ranked on my alt
-                return;
-            }
+        //    if (IsDeathblood(bmp, Players.Single) == false)
+        //    {
+        //        // I think it's safe to say that if it isn't my main account, I don't care to check the rest
+        //        // I could eventually make a messy sheet, in which case I'd send everything to that if this is my alt
+        //        return;
+        //    }
+        //    var mods = CheckMods(bmp, Players.Single);
+        //    var difficulty = CheckDifficulty(bmp, Players.Single);
 
-            string title = GetTitle(bmp);
-            Difficulty difficulty = CheckDifficulty(bmp, Players.RankedTop);
-            int topScore = GetScore(bmp, Players.RankedTop);
-            int topGoods = GetGoods(bmp, Players.RankedTop);
-            int topOks = GetOKs(bmp, Players.RankedTop);
-            int topBads = GetBads(bmp, Players.RankedTop);
-            int topCombo = GetCombo(bmp, Players.RankedTop);
-            int topDrumroll = GetDrumroll(bmp, Players.RankedTop);
-            bool winLoss = RankedWinLoss(bmp);
+        //    for (int i = 0; i < mods.Count; i++)
+        //    {
+        //        if (mods.ElementAt(i) == "Shin-uchi")
+        //        {
+        //            // I don't want to save any shin-uchi scores
+        //            return;
+        //        }
+        //    }
+        //    if (difficulty == Difficulty.Easy || difficulty == Difficulty.Normal)
+        //    {
+        //        // I don't care about easy or normal for my sheet
+        //        // I don't really care about hard either, but I have the sheet anyway, so might as well save it if I get it
+        //        return;
+        //    }
 
-            Console.WriteLine(title);
-            if (winLoss == true)
-            {
-                Console.WriteLine("Win");
-            }
-            else
-            {
-                Console.WriteLine("Lose");
-            }
-            Console.WriteLine(topScore);
-            Console.WriteLine(topGoods);
-            Console.WriteLine(topOks);
-            Console.WriteLine(topBads);
-            Console.WriteLine(topCombo);
-            Console.WriteLine(topDrumroll);
-            Console.WriteLine("");
+        //    string title = GetTitle(bmp);
+        //    bool highScore = IsHighScore(bmp);
+        //    int score = GetScore(bmp, Players.Single);
+        //    int goods = GetGoods(bmp, Players.Single);
+        //    int oks = GetOKs(bmp, Players.Single);
+        //    int bads = GetBads(bmp, Players.Single);
+        //    int combo = GetCombo(bmp, Players.Single);
+        //    int drumroll = GetDrumroll(bmp, Players.Single);
 
-            int bottomScore = GetScore(bmp, Players.RankedBottom);
-            int bottomGoods = GetGoods(bmp, Players.RankedBottom);
-            int bottomOks = GetOKs(bmp, Players.RankedBottom);
-            int bottomBads = GetBads(bmp, Players.RankedBottom);
-            int bottomCombo = GetCombo(bmp, Players.RankedBottom);
-            int bottomDrumroll = GetDrumroll(bmp, Players.RankedBottom);
+        //    Console.WriteLine(title);
+        //    Console.WriteLine(highScore);
+        //    Console.WriteLine(score);
+        //    Console.WriteLine(goods);
+        //    Console.WriteLine(oks);
+        //    Console.WriteLine(bads);
+        //    Console.WriteLine(combo);
+        //    Console.WriteLine(drumroll);
 
-            Console.WriteLine(bottomScore);
-            Console.WriteLine(bottomGoods);
-            Console.WriteLine(bottomOks);
-            Console.WriteLine(bottomBads);
-            Console.WriteLine(bottomCombo);
-            Console.WriteLine(bottomDrumroll);
-            Console.WriteLine("");
+        //    int[] info = new int[6]
+        //    {
+        //        score, goods, oks, bads, combo, drumroll
+        //    };
+        //    if (score % 10 != 0)
+        //    {
+        //        return;
+        //    }
+        //    if (highScore == true)
+        //    {
+        //        //sheet.UpdateHighScore(title, info, difficulty);
 
-            int[] info = new int[12]
-            {
-                topScore, topGoods, topOks, topBads, topCombo, topDrumroll, bottomScore, bottomGoods, bottomOks, bottomBads, bottomCombo, bottomDrumroll
-            };
+        //        //DirectoryInfo dirInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores");
+        //        //var result = dirInfo.GetFiles();
+        //        // NOT USED, NOT TESTING
+        //        //bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores\" + result.Length + ".png", ImageFormat.Png);
+        //        //Console.WriteLine("Highscore Logged");
+        //    }
+        //}
 
-            //sheet.AddRankedEntry(title, info, difficulty, winLoss);
+        //private void GetRankedResults(Bitmap bmp, bool Testing)
+        //{
+        //    //Bitmap bmp = Program.Program.screen.CaptureApplication();
+        //    bool account = IsDeathblood(bmp, Players.RankedTop);
+        //    if (account == false)
+        //    {
+        //        // I don't care if it's ranked on my alt
+        //        return;
+        //    }
 
-            //DirectoryInfo dirInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\Image Data\TaikoLogging");
-            //var result = dirInfo.GetFiles();
-            // NOT USED, NOT TESTING
-            //bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\TaikoLogging\" + result.Length + ".png", ImageFormat.Png);
-            //Console.WriteLine("Ranked match logged\n");
-        }
+        //    string title = GetTitle(bmp);
+        //    Difficulty difficulty = CheckDifficulty(bmp, Players.RankedTop);
+        //    int topScore = GetScore(bmp, Players.RankedTop);
+        //    int topGoods = GetGoods(bmp, Players.RankedTop);
+        //    int topOks = GetOKs(bmp, Players.RankedTop);
+        //    int topBads = GetBads(bmp, Players.RankedTop);
+        //    int topCombo = GetCombo(bmp, Players.RankedTop);
+        //    int topDrumroll = GetDrumroll(bmp, Players.RankedTop);
+        //    bool winLoss = RankedWinLoss(bmp);
+
+        //    Console.WriteLine(title);
+        //    if (winLoss == true)
+        //    {
+        //        Console.WriteLine("Win");
+        //    }
+        //    else
+        //    {
+        //        Console.WriteLine("Lose");
+        //    }
+        //    Console.WriteLine(topScore);
+        //    Console.WriteLine(topGoods);
+        //    Console.WriteLine(topOks);
+        //    Console.WriteLine(topBads);
+        //    Console.WriteLine(topCombo);
+        //    Console.WriteLine(topDrumroll);
+        //    Console.WriteLine("");
+
+        //    int bottomScore = GetScore(bmp, Players.RankedBottom);
+        //    int bottomGoods = GetGoods(bmp, Players.RankedBottom);
+        //    int bottomOks = GetOKs(bmp, Players.RankedBottom);
+        //    int bottomBads = GetBads(bmp, Players.RankedBottom);
+        //    int bottomCombo = GetCombo(bmp, Players.RankedBottom);
+        //    int bottomDrumroll = GetDrumroll(bmp, Players.RankedBottom);
+
+        //    Console.WriteLine(bottomScore);
+        //    Console.WriteLine(bottomGoods);
+        //    Console.WriteLine(bottomOks);
+        //    Console.WriteLine(bottomBads);
+        //    Console.WriteLine(bottomCombo);
+        //    Console.WriteLine(bottomDrumroll);
+        //    Console.WriteLine("");
+
+        //    int[] info = new int[12]
+        //    {
+        //        topScore, topGoods, topOks, topBads, topCombo, topDrumroll, bottomScore, bottomGoods, bottomOks, bottomBads, bottomCombo, bottomDrumroll
+        //    };
+
+        //    //sheet.AddRankedEntry(title, info, difficulty, winLoss);
+
+        //    //DirectoryInfo dirInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\Image Data\TaikoLogging");
+        //    //var result = dirInfo.GetFiles();
+        //    // NOT USED, NOT TESTING
+        //    //bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\TaikoLogging\" + result.Length + ".png", ImageFormat.Png);
+        //    //Console.WriteLine("Ranked match logged\n");
+        //}
 
 
         #region Data gathering
-        public string GetTitle(Bitmap bmp)
-        {
+        //public string GetTitle(Bitmap bmp)
+        //{
+        //    // I have a sheet on my test taiko spreadsheet that shows how I got these values, although it's a bit of a mess
+        //    // These are Relative...     Width         Height            X              Y
+        //    float[] relativeValues = { 0.390625f, 0.04327666151f, 0.5590277778f, 0.05100463679f };
 
-            var titleBmp = GetBitmapArea(bmp, GetWidth(bmp, 0.390625), GetHeight(bmp, 0.043276661), GetWidth(bmp, 0.5590277777), GetHeight(bmp, 0.0510046367851));
-            //var titleBmp = GetBitmapArea(bmp, (int)Math.Round((bmp.Width * (0.390625))), (int)Math.Round((bmp.Height * (0.0510046367))), (int)Math.Round((bmp.Width * 0.5590277777)), (int)Math.Round((bmp.Height * 0.043276661514)));
-            // TESTING
-            //titleBmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\TitleTest.png");
-            titleBmp = ScaleDown(titleBmp, 450, 28);
-            // TESTING
-            //titleBmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\ScaledTitle.png");
+        //    var titleBmp = GetBitmapArea(bmp, GetWidth(bmp, relativeValues[0]), GetHeight(bmp, relativeValues[1]), GetWidth(bmp, relativeValues[2]), GetHeight(bmp, relativeValues[3]));
+        //    //var titleBmp = GetBitmapArea(bmp, (int)Math.Round((bmp.Width * (0.390625))), (int)Math.Round((bmp.Height * (0.0510046367))), (int)Math.Round((bmp.Width * 0.5590277777)), (int)Math.Round((bmp.Height * 0.043276661514)));
+        //    // TESTING
+        //    //titleBmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\TitleTest.png");
+        //    titleBmp = ScaleDown(titleBmp, 450, 28);
+        //    // TESTING
+        //    //titleBmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\ScaledTitle.png");
 
-            //Bitmap titleBmp = new Bitmap(450, 28);
-            //CopyRegionIntoImage(bmp, new Rectangle(644, 33, 450, 28), ref titleBmp, new Rectangle(0, 0, 450, 28));
-            int pixelDifferences = -1;
-            int smallestIndex = 0;
-            for (int i = 0; i < titleBitmaps.Count; i++)
-            {
-                var tmpInt = CompareBitmaps(titleBmp, titleBitmaps[i]);
-                if (tmpInt < pixelDifferences || pixelDifferences == -1)
-                {
-                    pixelDifferences = tmpInt;
-                    // TESTING
-                    //titleBitmaps[i].Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\" + tmpInt.ToString() + ".png");
-                    smallestIndex = i;
-                }
-            }
-            Console.WriteLine(titles[smallestIndex]);
-            return titles[smallestIndex];
-        }
+        //    //Bitmap titleBmp = new Bitmap(450, 28);
+        //    //CopyRegionIntoImage(bmp, new Rectangle(644, 33, 450, 28), ref titleBmp, new Rectangle(0, 0, 450, 28));
+        //    int pixelDifferences = -1;
+        //    int smallestIndex = 0;
+        //    for (int i = 0; i < titleBitmaps.Count; i++)
+        //    {
+        //        var tmpInt = CompareBitmaps(titleBmp, titleBitmaps[i]);
+        //        if (tmpInt < pixelDifferences || pixelDifferences == -1)
+        //        {
+        //            pixelDifferences = tmpInt;
+        //            // TESTING
+        //            //titleBitmaps[i].Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\" + tmpInt.ToString() + ".png");
+        //            smallestIndex = i;
+        //        }
+        //    }
+        //    Console.WriteLine(titles[smallestIndex]);
+        //    return titles[smallestIndex];
+        //}
 
-        private void GetTitleBitmap(bool Testing, Bitmap bmp)
-        {
-            var titleBmp = GetBitmapArea(bmp, GetWidth(bmp, 0.390625), GetHeight(bmp, 0.043276661), GetWidth(bmp, 0.55902777777777), GetHeight(bmp, 0.0510046367851));
-            titleBmp = ScaleDown(titleBmp, 450, 28);
-            //var titleBmp = GetBitmapArea(bmp, 450, 28, 644, 33);
-            //Bitmap titleBmp = new Bitmap(450, 28);
-            //CopyRegionIntoImage(bmp, new Rectangle(644, 33, 450, 28), ref titleBmp, new Rectangle(0, 0, 450, 28));
-            // TESTING
-            titleBmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\DLC Songs\SingleResults.Title" + j++.ToString() + ".png", System.Drawing.Imaging.ImageFormat.Png);
-        }
+        //private void GetTitleBitmap(Bitmap bmp)
+        //{
+        //    var titleBmp = GetBitmapArea(bmp, GetWidth(bmp, 0.390625), GetHeight(bmp, 0.043276661), GetWidth(bmp, 0.55902777777777), GetHeight(bmp, 0.0510046367851));
+        //    titleBmp = ScaleDown(titleBmp, 450, 28);
+        //    //var titleBmp = GetBitmapArea(bmp, 450, 28, 644, 33);
+        //    //Bitmap titleBmp = new Bitmap(450, 28);
+        //    //CopyRegionIntoImage(bmp, new Rectangle(644, 33, 450, 28), ref titleBmp, new Rectangle(0, 0, 450, 28));
+        //    // TESTING
+        //    titleBmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\DLC Songs\SingleResults.Title" + j++.ToString() + ".png", System.Drawing.Imaging.ImageFormat.Png);
+        //}
 
         public bool IsHighScore(Bitmap bmp)
         {
@@ -721,373 +725,373 @@ namespace TaikoLogging
             return CompareBitmaps(highScoreBmp, highScoreBitmaps[0]) < CompareBitmaps(highScoreBmp, highScoreBitmaps[1]);
         }
 
-        public int GetScore(Bitmap bmp, Players players)
-        {
-            double offset = 0;
-            if (players == Players.RankedTop)
-            {
-                offset = -0.15610510;
-            }
-            else if (players == Players.RankedBottom)
-            {
-                offset = 0.241112828;
-            }
-            Bitmap[] scoreBitmaps = new Bitmap[7];
+        //public int GetScore(Bitmap bmp, Players players)
+        //{
+        //    double offset = 0;
+        //    if (players == Players.RankedTop)
+        //    {
+        //        offset = -0.15610510;
+        //    }
+        //    else if (players == Players.RankedBottom)
+        //    {
+        //        offset = 0.241112828;
+        //    }
+        //    Bitmap[] scoreBitmaps = new Bitmap[7];
 
-            int sizeX = GetWidth(bmp, 0.0225694444);
-            int sizeY = GetHeight(bmp, 0.0556414219);
-            int height = GetHeight(bmp, 0.53477588871 + offset);
+        //    int sizeX = GetWidth(bmp, 0.0225694444);
+        //    int sizeY = GetHeight(bmp, 0.0556414219);
+        //    int height = GetHeight(bmp, 0.53477588871 + offset);
 
-            scoreBitmaps[0] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.5503472222), height);
-            scoreBitmaps[1] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.5277777777), height);
-            scoreBitmaps[2] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.5052083333), height);
-            scoreBitmaps[3] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.4826388888), height);
-            scoreBitmaps[4] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.4600694444), height);
-            scoreBitmaps[5] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.4375), height);
-            scoreBitmaps[6] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.4149305555), height);
+        //    scoreBitmaps[0] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.5503472222), height);
+        //    scoreBitmaps[1] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.5277777777), height);
+        //    scoreBitmaps[2] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.5052083333), height);
+        //    scoreBitmaps[3] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.4826388888), height);
+        //    scoreBitmaps[4] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.4600694444), height);
+        //    scoreBitmaps[5] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.4375), height);
+        //    scoreBitmaps[6] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.4149305555), height);
 
-            for (int i = 0; i < scoreBitmaps.Length; i++)
-            {
-                scoreBitmaps[i] = ScaleDown(scoreBitmaps[i], 26, 36);
-                //scoreBitmaps[i].Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\scoreBitmaps." + i.ToString() + ".png");
-            }
+        //    for (int i = 0; i < scoreBitmaps.Length; i++)
+        //    {
+        //        scoreBitmaps[i] = ScaleDown(scoreBitmaps[i], 26, 36);
+        //        //scoreBitmaps[i].Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\scoreBitmaps." + i.ToString() + ".png");
+        //    }
 
-            //scoreBitmaps[0] = new Bitmap(660 - 634, 382 - 346);
-            //CopyRegionIntoImage(bmp, new Rectangle(634, 346 + offset, 660 - 634, 382 - 346), ref scoreBitmaps[0], new Rectangle(0, 0, 660 - 634, 382 - 346));
-            //scoreBitmaps[1] = new Bitmap(634 - 608, 382 - 346);
-            //CopyRegionIntoImage(bmp, new Rectangle(608, 346 + offset, 634 - 608, 382 - 346), ref scoreBitmaps[1], new Rectangle(0, 0, 634 - 608, 382 - 346));
-            //scoreBitmaps[2] = new Bitmap(608 - 582, 382 - 346);
-            //CopyRegionIntoImage(bmp, new Rectangle(582, 346 + offset, 608 - 582, 382 - 346), ref scoreBitmaps[2], new Rectangle(0, 0, 608 - 582, 382 - 346));
-            //scoreBitmaps[3] = new Bitmap(582 - 556, 382 - 346);
-            //CopyRegionIntoImage(bmp, new Rectangle(556, 346 + offset, 582 - 556, 382 - 346), ref scoreBitmaps[3], new Rectangle(0, 0, 582 - 556, 382 - 346));
-            //scoreBitmaps[4] = new Bitmap(556 - 530, 382 - 346);
-            //CopyRegionIntoImage(bmp, new Rectangle(530, 346 + offset, 556 - 530, 382 - 346), ref scoreBitmaps[4], new Rectangle(0, 0, 556 - 530, 382 - 346));
-            //scoreBitmaps[5] = new Bitmap(530 - 504, 382 - 346);
-            //CopyRegionIntoImage(bmp, new Rectangle(504, 346 + offset, 530 - 504, 382 - 346), ref scoreBitmaps[5], new Rectangle(0, 0, 530 - 504, 382 - 346));
-            //scoreBitmaps[6] = new Bitmap(504 - 478, 382 - 346);
-            //CopyRegionIntoImage(bmp, new Rectangle(478, 346 + offset, 504 - 478, 382 - 346), ref scoreBitmaps[6], new Rectangle(0, 0, 504 - 478, 382 - 346));
+        //    //scoreBitmaps[0] = new Bitmap(660 - 634, 382 - 346);
+        //    //CopyRegionIntoImage(bmp, new Rectangle(634, 346 + offset, 660 - 634, 382 - 346), ref scoreBitmaps[0], new Rectangle(0, 0, 660 - 634, 382 - 346));
+        //    //scoreBitmaps[1] = new Bitmap(634 - 608, 382 - 346);
+        //    //CopyRegionIntoImage(bmp, new Rectangle(608, 346 + offset, 634 - 608, 382 - 346), ref scoreBitmaps[1], new Rectangle(0, 0, 634 - 608, 382 - 346));
+        //    //scoreBitmaps[2] = new Bitmap(608 - 582, 382 - 346);
+        //    //CopyRegionIntoImage(bmp, new Rectangle(582, 346 + offset, 608 - 582, 382 - 346), ref scoreBitmaps[2], new Rectangle(0, 0, 608 - 582, 382 - 346));
+        //    //scoreBitmaps[3] = new Bitmap(582 - 556, 382 - 346);
+        //    //CopyRegionIntoImage(bmp, new Rectangle(556, 346 + offset, 582 - 556, 382 - 346), ref scoreBitmaps[3], new Rectangle(0, 0, 582 - 556, 382 - 346));
+        //    //scoreBitmaps[4] = new Bitmap(556 - 530, 382 - 346);
+        //    //CopyRegionIntoImage(bmp, new Rectangle(530, 346 + offset, 556 - 530, 382 - 346), ref scoreBitmaps[4], new Rectangle(0, 0, 556 - 530, 382 - 346));
+        //    //scoreBitmaps[5] = new Bitmap(530 - 504, 382 - 346);
+        //    //CopyRegionIntoImage(bmp, new Rectangle(504, 346 + offset, 530 - 504, 382 - 346), ref scoreBitmaps[5], new Rectangle(0, 0, 530 - 504, 382 - 346));
+        //    //scoreBitmaps[6] = new Bitmap(504 - 478, 382 - 346);
+        //    //CopyRegionIntoImage(bmp, new Rectangle(478, 346 + offset, 504 - 478, 382 - 346), ref scoreBitmaps[6], new Rectangle(0, 0, 504 - 478, 382 - 346));
 
-            int score = 0;
-            for (int i = 0; i < scoreBitmaps.Length; i++)
-            {
-                int pixelDifferences = -1;
-                int smallestIndex = 0;
-                for (int j = 0; j < bigNumberBitmaps.Count; j++)
-                {
-                    var tmpInt = CompareBitmaps(scoreBitmaps[i], bigNumberBitmaps[j]);
-                    if (tmpInt < pixelDifferences || pixelDifferences == -1)
-                    {
-                        pixelDifferences = tmpInt;
-                        smallestIndex = j;
-                    }
-                }
-                if (bigNumbers[smallestIndex] == "null")
-                {
-                    return score;
-                }
-                score += int.Parse(bigNumbers[smallestIndex]) * ((int)Math.Pow(10, i));
-            }
-            return score;
-        }
+        //    int score = 0;
+        //    for (int i = 0; i < scoreBitmaps.Length; i++)
+        //    {
+        //        int pixelDifferences = -1;
+        //        int smallestIndex = 0;
+        //        for (int j = 0; j < bigNumberBitmaps.Count; j++)
+        //        {
+        //            var tmpInt = CompareBitmaps(scoreBitmaps[i], bigNumberBitmaps[j]);
+        //            if (tmpInt < pixelDifferences || pixelDifferences == -1)
+        //            {
+        //                pixelDifferences = tmpInt;
+        //                smallestIndex = j;
+        //            }
+        //        }
+        //        if (bigNumbers[smallestIndex] == "null")
+        //        {
+        //            return score;
+        //        }
+        //        score += int.Parse(bigNumbers[smallestIndex]) * ((int)Math.Pow(10, i));
+        //    }
+        //    return score;
+        //}
 
-        public int GetGoods(Bitmap bmp, Players players)
-        {
-            double offset = 0;
-            if (players == Players.RankedTop)
-            {
-                offset = -0.156105100;
-            }
-            else if (players == Players.RankedBottom)
-            {
-                offset = 0.241112828;
-            }
-            Bitmap[] goodBitmaps = new Bitmap[4];
+        //public int GetGoods(Bitmap bmp, Players players)
+        //{
+        //    double offset = 0;
+        //    if (players == Players.RankedTop)
+        //    {
+        //        offset = -0.156105100;
+        //    }
+        //    else if (players == Players.RankedBottom)
+        //    {
+        //        offset = 0.241112828;
+        //    }
+        //    Bitmap[] goodBitmaps = new Bitmap[4];
 
-            int sizeX = GetWidth(bmp, 0.015625);
-            int sizeY = GetHeight(bmp, 0.0417310664605);
-            int height = GetHeight(bmp, 0.4868624420401 + offset);
+        //    int sizeX = GetWidth(bmp, 0.015625);
+        //    int sizeY = GetHeight(bmp, 0.0417310664605);
+        //    int height = GetHeight(bmp, 0.4868624420401 + offset);
 
-            goodBitmaps[0] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.7300347222), height);
-            goodBitmaps[1] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.7144097222), height);
-            goodBitmaps[2] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.6987847222), height);
-            goodBitmaps[3] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.6831597222), height);
+        //    goodBitmaps[0] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.7300347222), height);
+        //    goodBitmaps[1] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.7144097222), height);
+        //    goodBitmaps[2] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.6987847222), height);
+        //    goodBitmaps[3] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.6831597222), height);
 
-            //goodBitmaps[0] = new Bitmap(859 - 841, 342 - 315);
-            //CopyRegionIntoImage(bmp, new Rectangle(841, 315 + offset, 859 - 841, 342 - 315), ref goodBitmaps[0], new Rectangle(0, 0, 859 - 841, 342 - 315));
-            //goodBitmaps[1] = new Bitmap(841 - 823, 342 - 315);
-            //CopyRegionIntoImage(bmp, new Rectangle(823, 315 + offset, 841 - 823, 342 - 315), ref goodBitmaps[1], new Rectangle(0, 0, 841 - 823, 342 - 315));
-            //goodBitmaps[2] = new Bitmap(823 - 805, 342 - 315);
-            //CopyRegionIntoImage(bmp, new Rectangle(805, 315 + offset, 823 - 805, 342 - 315), ref goodBitmaps[2], new Rectangle(0, 0, 823 - 805, 342 - 315));
-            //goodBitmaps[3] = new Bitmap(805 - 787, 342 - 315);
-            //CopyRegionIntoImage(bmp, new Rectangle(787, 315 + offset, 805 - 787, 342 - 315), ref goodBitmaps[3], new Rectangle(0, 0, 805 - 787, 342 - 315));
+        //    //goodBitmaps[0] = new Bitmap(859 - 841, 342 - 315);
+        //    //CopyRegionIntoImage(bmp, new Rectangle(841, 315 + offset, 859 - 841, 342 - 315), ref goodBitmaps[0], new Rectangle(0, 0, 859 - 841, 342 - 315));
+        //    //goodBitmaps[1] = new Bitmap(841 - 823, 342 - 315);
+        //    //CopyRegionIntoImage(bmp, new Rectangle(823, 315 + offset, 841 - 823, 342 - 315), ref goodBitmaps[1], new Rectangle(0, 0, 841 - 823, 342 - 315));
+        //    //goodBitmaps[2] = new Bitmap(823 - 805, 342 - 315);
+        //    //CopyRegionIntoImage(bmp, new Rectangle(805, 315 + offset, 823 - 805, 342 - 315), ref goodBitmaps[2], new Rectangle(0, 0, 823 - 805, 342 - 315));
+        //    //goodBitmaps[3] = new Bitmap(805 - 787, 342 - 315);
+        //    //CopyRegionIntoImage(bmp, new Rectangle(787, 315 + offset, 805 - 787, 342 - 315), ref goodBitmaps[3], new Rectangle(0, 0, 805 - 787, 342 - 315));
 
-            for (int i = 0; i < goodBitmaps.Length; i++)
-            {
-                goodBitmaps[i] = ScaleDown(goodBitmaps[i], 18, 27);
-                //goodBitmaps[i].Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\goodBitmaps." + i.ToString() + ".png");
-            }
-
-
-
-            int goods = 0;
-            for (int i = 0; i < goodBitmaps.Length; i++)
-            {
-                int pixelDifferences = -1;
-                int smallestIndex = 0;
-                for (int j = 0; j < smallNumberBitmaps.Count; j++)
-                {
-                    var tmpInt = CompareBitmaps(goodBitmaps[i], smallNumberBitmaps[j]);
-                    if (tmpInt < pixelDifferences || pixelDifferences == -1)
-                    {
-                        pixelDifferences = tmpInt;
-                        smallestIndex = j;
-                    }
-                }
-                if (smallNumbers[smallestIndex] == "null")
-                {
-                    return goods;
-                }
-                goods += int.Parse(smallNumbers[smallestIndex]) * ((int)Math.Pow(10, i));
-            }
-            return goods;
-        }
-        public int GetOKs(Bitmap bmp, Players players)
-        {
-            double offset = 0;
-            if (players == Players.RankedTop)
-            {
-                offset = -0.156105100;
-            }
-            else if (players == Players.RankedBottom)
-            {
-                offset = 0.241112828;
-            }
-            Bitmap[] okBitmaps = new Bitmap[4];
-
-            int sizeX = GetWidth(bmp, 0.015625);
-            int sizeY = GetHeight(bmp, 0.0417310664);
-            int height = GetHeight(bmp, 0.545595054 + offset);
+        //    for (int i = 0; i < goodBitmaps.Length; i++)
+        //    {
+        //        goodBitmaps[i] = ScaleDown(goodBitmaps[i], 18, 27);
+        //        //goodBitmaps[i].Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\goodBitmaps." + i.ToString() + ".png");
+        //    }
 
 
-            okBitmaps[0] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.7300347222), height);
-            okBitmaps[1] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.7144097222), height);
-            okBitmaps[2] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.6987847222), height);
-            okBitmaps[3] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.6831597222), height);
 
-            for (int i = 0; i < okBitmaps.Length; i++)
-            {
-                okBitmaps[i] = ScaleDown(okBitmaps[i], 18, 27);
-                //okBitmaps[i].Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\okBitmaps." + i.ToString() + ".png");
-            }
+        //    int goods = 0;
+        //    for (int i = 0; i < goodBitmaps.Length; i++)
+        //    {
+        //        int pixelDifferences = -1;
+        //        int smallestIndex = 0;
+        //        for (int j = 0; j < smallNumberBitmaps.Count; j++)
+        //        {
+        //            var tmpInt = CompareBitmaps(goodBitmaps[i], smallNumberBitmaps[j]);
+        //            if (tmpInt < pixelDifferences || pixelDifferences == -1)
+        //            {
+        //                pixelDifferences = tmpInt;
+        //                smallestIndex = j;
+        //            }
+        //        }
+        //        if (smallNumbers[smallestIndex] == "null")
+        //        {
+        //            return goods;
+        //        }
+        //        goods += int.Parse(smallNumbers[smallestIndex]) * ((int)Math.Pow(10, i));
+        //    }
+        //    return goods;
+        //}
+        //public int GetOKs(Bitmap bmp, Players players)
+        //{
+        //    double offset = 0;
+        //    if (players == Players.RankedTop)
+        //    {
+        //        offset = -0.156105100;
+        //    }
+        //    else if (players == Players.RankedBottom)
+        //    {
+        //        offset = 0.241112828;
+        //    }
+        //    Bitmap[] okBitmaps = new Bitmap[4];
 
-            //okBitmaps[0] = new Bitmap(859 - 841, 380 - 353);
-            //CopyRegionIntoImage(bmp, new Rectangle(841, 353 + offset, 859 - 841, 380 - 353), ref okBitmaps[0], new Rectangle(0, 0, 859 - 841, 380 - 353));
-            //okBitmaps[1] = new Bitmap(841 - 823, 380 - 353);
-            //CopyRegionIntoImage(bmp, new Rectangle(823, 353 + offset, 841 - 823, 380 - 353), ref okBitmaps[1], new Rectangle(0, 0, 841 - 823, 380 - 353));
-            //okBitmaps[2] = new Bitmap(823 - 805, 380 - 353);
-            //CopyRegionIntoImage(bmp, new Rectangle(805, 353 + offset, 823 - 805, 380 - 353), ref okBitmaps[2], new Rectangle(0, 0, 823 - 805, 380 - 353));
-            //okBitmaps[3] = new Bitmap(805 - 787, 380 - 353);
-            //CopyRegionIntoImage(bmp, new Rectangle(787, 353 + offset, 805 - 787, 380 - 353), ref okBitmaps[3], new Rectangle(0, 0, 805 - 787, 380 - 353));
+        //    int sizeX = GetWidth(bmp, 0.015625);
+        //    int sizeY = GetHeight(bmp, 0.0417310664);
+        //    int height = GetHeight(bmp, 0.545595054 + offset);
 
-            int oks = 0;
-            for (int i = 0; i < okBitmaps.Length; i++)
-            {
-                int pixelDifferences = -1;
-                int smallestIndex = 0;
-                for (int j = 0; j < smallNumberBitmaps.Count; j++)
-                {
-                    var tmpInt = CompareBitmaps(okBitmaps[i], smallNumberBitmaps[j]);
-                    if (tmpInt < pixelDifferences || pixelDifferences == -1)
-                    {
-                        pixelDifferences = tmpInt;
-                        smallestIndex = j;
-                    }
-                }
-                if (smallNumbers[smallestIndex] == "null")
-                {
-                    return oks;
-                }
-                oks += int.Parse(smallNumbers[smallestIndex]) * ((int)Math.Pow(10, i));
-            }
-            return oks;
-        }
-        public int GetBads(Bitmap bmp, Players players)
-        {
-            double offset = 0;
-            if (players == Players.RankedTop)
-            {
-                offset = -0.156105100;
-            }
-            else if (players == Players.RankedBottom)
-            {
-                offset = 0.241112828;
-            }
-            Bitmap[] badBitmaps = new Bitmap[4];
 
-            int sizeX = GetWidth(bmp, 0.015625);
-            int sizeY = GetHeight(bmp, 0.04173106);
-            int height = GetHeight(bmp, 0.602782071 + offset);
+        //    okBitmaps[0] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.7300347222), height);
+        //    okBitmaps[1] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.7144097222), height);
+        //    okBitmaps[2] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.6987847222), height);
+        //    okBitmaps[3] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.6831597222), height);
 
-            badBitmaps[0] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.730034722222), height);
-            badBitmaps[1] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.714409722222), height);
-            badBitmaps[2] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.698784722222), height);
-            badBitmaps[3] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.683159722222), height);
+        //    for (int i = 0; i < okBitmaps.Length; i++)
+        //    {
+        //        okBitmaps[i] = ScaleDown(okBitmaps[i], 18, 27);
+        //        //okBitmaps[i].Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\okBitmaps." + i.ToString() + ".png");
+        //    }
 
-            for (int i = 0; i < badBitmaps.Length; i++)
-            {
-                badBitmaps[i] = ScaleDown(badBitmaps[i], 18, 27);
-                //badBitmaps[i].Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\badBitmaps." + i.ToString() + ".png");
-            }
+        //    //okBitmaps[0] = new Bitmap(859 - 841, 380 - 353);
+        //    //CopyRegionIntoImage(bmp, new Rectangle(841, 353 + offset, 859 - 841, 380 - 353), ref okBitmaps[0], new Rectangle(0, 0, 859 - 841, 380 - 353));
+        //    //okBitmaps[1] = new Bitmap(841 - 823, 380 - 353);
+        //    //CopyRegionIntoImage(bmp, new Rectangle(823, 353 + offset, 841 - 823, 380 - 353), ref okBitmaps[1], new Rectangle(0, 0, 841 - 823, 380 - 353));
+        //    //okBitmaps[2] = new Bitmap(823 - 805, 380 - 353);
+        //    //CopyRegionIntoImage(bmp, new Rectangle(805, 353 + offset, 823 - 805, 380 - 353), ref okBitmaps[2], new Rectangle(0, 0, 823 - 805, 380 - 353));
+        //    //okBitmaps[3] = new Bitmap(805 - 787, 380 - 353);
+        //    //CopyRegionIntoImage(bmp, new Rectangle(787, 353 + offset, 805 - 787, 380 - 353), ref okBitmaps[3], new Rectangle(0, 0, 805 - 787, 380 - 353));
 
-            //badBitmaps[0] = new Bitmap(859 - 841, 417 - 390);
-            //CopyRegionIntoImage(bmp, new Rectangle(841, 390 + offset, 859 - 841, 417 - 390), ref badBitmaps[0], new Rectangle(0, 0, 859 - 841, 417 - 390));
-            //badBitmaps[1] = new Bitmap(841 - 823, 417 - 390);
-            //CopyRegionIntoImage(bmp, new Rectangle(823, 390 + offset, 841 - 823, 417 - 390), ref badBitmaps[1], new Rectangle(0, 0, 841 - 823, 417 - 390));
-            //badBitmaps[2] = new Bitmap(823 - 805, 417 - 390);
-            //CopyRegionIntoImage(bmp, new Rectangle(805, 390 + offset, 823 - 805, 417 - 390), ref badBitmaps[2], new Rectangle(0, 0, 823 - 805, 417 - 390));
-            //badBitmaps[3] = new Bitmap(805 - 787, 417 - 390);
-            //CopyRegionIntoImage(bmp, new Rectangle(787, 390 + offset, 805 - 787, 417 - 390), ref badBitmaps[3], new Rectangle(0, 0, 805 - 787, 417 - 390));
+        //    int oks = 0;
+        //    for (int i = 0; i < okBitmaps.Length; i++)
+        //    {
+        //        int pixelDifferences = -1;
+        //        int smallestIndex = 0;
+        //        for (int j = 0; j < smallNumberBitmaps.Count; j++)
+        //        {
+        //            var tmpInt = CompareBitmaps(okBitmaps[i], smallNumberBitmaps[j]);
+        //            if (tmpInt < pixelDifferences || pixelDifferences == -1)
+        //            {
+        //                pixelDifferences = tmpInt;
+        //                smallestIndex = j;
+        //            }
+        //        }
+        //        if (smallNumbers[smallestIndex] == "null")
+        //        {
+        //            return oks;
+        //        }
+        //        oks += int.Parse(smallNumbers[smallestIndex]) * ((int)Math.Pow(10, i));
+        //    }
+        //    return oks;
+        //}
+        //public int GetBads(Bitmap bmp, Players players)
+        //{
+        //    double offset = 0;
+        //    if (players == Players.RankedTop)
+        //    {
+        //        offset = -0.156105100;
+        //    }
+        //    else if (players == Players.RankedBottom)
+        //    {
+        //        offset = 0.241112828;
+        //    }
+        //    Bitmap[] badBitmaps = new Bitmap[4];
 
-            int bads = 0;
-            for (int i = 0; i < badBitmaps.Length; i++)
-            {
-                int pixelDifferences = -1;
-                int smallestIndex = 0;
-                for (int j = 0; j < smallNumberBitmaps.Count; j++)
-                {
-                    var tmpInt = CompareBitmaps(badBitmaps[i], smallNumberBitmaps[j]);
-                    if (tmpInt < pixelDifferences || pixelDifferences == -1)
-                    {
-                        pixelDifferences = tmpInt;
-                        smallestIndex = j;
-                    }
-                }
-                if (smallNumbers[smallestIndex] == "null")
-                {
-                    return bads;
-                }
-                bads += int.Parse(smallNumbers[smallestIndex]) * ((int)Math.Pow(10, i));
-            }
-            return bads;
-        }
-        public int GetCombo(Bitmap bmp, Players players)
-        {
-            double offset = 0;
-            if (players == Players.RankedTop)
-            {
-                offset = -0.156105100;
-            }
-            else if (players == Players.RankedBottom)
-            {
-                offset = 0.241112828;
-            }
-            Bitmap[] comboBitmaps = new Bitmap[4];
+        //    int sizeX = GetWidth(bmp, 0.015625);
+        //    int sizeY = GetHeight(bmp, 0.04173106);
+        //    int height = GetHeight(bmp, 0.602782071 + offset);
 
-            int sizeX = GetWidth(bmp, 0.015625);
-            int sizeY = GetHeight(bmp, 0.0417310664);
-            int height = GetHeight(bmp, 0.4868624420 + offset);
+        //    badBitmaps[0] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.730034722222), height);
+        //    badBitmaps[1] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.714409722222), height);
+        //    badBitmaps[2] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.698784722222), height);
+        //    badBitmaps[3] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.683159722222), height);
 
-            comboBitmaps[0] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.9210069444), height);
-            comboBitmaps[1] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.9053819444), height);
-            comboBitmaps[2] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.8897569444), height);
-            comboBitmaps[3] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.8741319444), height);
+        //    for (int i = 0; i < badBitmaps.Length; i++)
+        //    {
+        //        badBitmaps[i] = ScaleDown(badBitmaps[i], 18, 27);
+        //        //badBitmaps[i].Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\badBitmaps." + i.ToString() + ".png");
+        //    }
 
-            for (int i = 0; i < comboBitmaps.Length; i++)
-            {
-                comboBitmaps[i] = ScaleDown(comboBitmaps[i], 18, 27);
-                //comboBitmaps[i].Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\comboBitmaps." + i.ToString() + ".png");
-            }
+        //    //badBitmaps[0] = new Bitmap(859 - 841, 417 - 390);
+        //    //CopyRegionIntoImage(bmp, new Rectangle(841, 390 + offset, 859 - 841, 417 - 390), ref badBitmaps[0], new Rectangle(0, 0, 859 - 841, 417 - 390));
+        //    //badBitmaps[1] = new Bitmap(841 - 823, 417 - 390);
+        //    //CopyRegionIntoImage(bmp, new Rectangle(823, 390 + offset, 841 - 823, 417 - 390), ref badBitmaps[1], new Rectangle(0, 0, 841 - 823, 417 - 390));
+        //    //badBitmaps[2] = new Bitmap(823 - 805, 417 - 390);
+        //    //CopyRegionIntoImage(bmp, new Rectangle(805, 390 + offset, 823 - 805, 417 - 390), ref badBitmaps[2], new Rectangle(0, 0, 823 - 805, 417 - 390));
+        //    //badBitmaps[3] = new Bitmap(805 - 787, 417 - 390);
+        //    //CopyRegionIntoImage(bmp, new Rectangle(787, 390 + offset, 805 - 787, 417 - 390), ref badBitmaps[3], new Rectangle(0, 0, 805 - 787, 417 - 390));
 
-            //comboBitmaps[0] = new Bitmap(1079 - 1061, 342 - 315);
-            //CopyRegionIntoImage(bmp, new Rectangle(1061, 315 + offset, 1079 - 1061, 342 - 315), ref comboBitmaps[0], new Rectangle(0, 0, 1079 - 1061, 342 - 315));
-            //comboBitmaps[1] = new Bitmap(1061 - 1043, 342 - 315);
-            //CopyRegionIntoImage(bmp, new Rectangle(1043, 315 + offset, 1061 - 1043, 342 - 315), ref comboBitmaps[1], new Rectangle(0, 0, 1061 - 1043, 342 - 315));
-            //comboBitmaps[2] = new Bitmap(1043 - 1025, 342 - 315);
-            //CopyRegionIntoImage(bmp, new Rectangle(1025, 315 + offset, 1043 - 1025, 342 - 315), ref comboBitmaps[2], new Rectangle(0, 0, 1043 - 1025, 342 - 315));
-            //comboBitmaps[3] = new Bitmap(1025 - 1007, 342 - 315);
-            //CopyRegionIntoImage(bmp, new Rectangle(1007, 315 + offset, 1025 - 1007, 342 - 315), ref comboBitmaps[3], new Rectangle(0, 0, 1025 - 1007, 342 - 315));
+        //    int bads = 0;
+        //    for (int i = 0; i < badBitmaps.Length; i++)
+        //    {
+        //        int pixelDifferences = -1;
+        //        int smallestIndex = 0;
+        //        for (int j = 0; j < smallNumberBitmaps.Count; j++)
+        //        {
+        //            var tmpInt = CompareBitmaps(badBitmaps[i], smallNumberBitmaps[j]);
+        //            if (tmpInt < pixelDifferences || pixelDifferences == -1)
+        //            {
+        //                pixelDifferences = tmpInt;
+        //                smallestIndex = j;
+        //            }
+        //        }
+        //        if (smallNumbers[smallestIndex] == "null")
+        //        {
+        //            return bads;
+        //        }
+        //        bads += int.Parse(smallNumbers[smallestIndex]) * ((int)Math.Pow(10, i));
+        //    }
+        //    return bads;
+        //}
+        //public int GetCombo(Bitmap bmp, Players players)
+        //{
+        //    double offset = 0;
+        //    if (players == Players.RankedTop)
+        //    {
+        //        offset = -0.156105100;
+        //    }
+        //    else if (players == Players.RankedBottom)
+        //    {
+        //        offset = 0.241112828;
+        //    }
+        //    Bitmap[] comboBitmaps = new Bitmap[4];
 
-            int combo = 0;
-            for (int i = 0; i < comboBitmaps.Length; i++)
-            {
-                int pixelDifferences = -1;
-                int smallestIndex = 0;
-                for (int j = 0; j < smallNumberBitmaps.Count; j++)
-                {
-                    var tmpInt = CompareBitmaps(comboBitmaps[i], smallNumberBitmaps[j]);
-                    if (tmpInt < pixelDifferences || pixelDifferences == -1)
-                    {
-                        pixelDifferences = tmpInt;
-                        smallestIndex = j;
-                    }
-                }
-                if (smallNumbers[smallestIndex] == "null")
-                {
-                    return combo;
-                }
-                combo += int.Parse(smallNumbers[smallestIndex]) * ((int)Math.Pow(10, i));
-            }
-            return combo;
-        }
-        public int GetDrumroll(Bitmap bmp, Players players)
-        {
-            double offset = 0;
-            if (players == Players.RankedTop)
-            {
-                offset = -0.156105100;
-            }
-            else if (players == Players.RankedBottom)
-            {
-                offset = 0.241112828;
-            }
-            Bitmap[] drumrollBitmaps = new Bitmap[4];
+        //    int sizeX = GetWidth(bmp, 0.015625);
+        //    int sizeY = GetHeight(bmp, 0.0417310664);
+        //    int height = GetHeight(bmp, 0.4868624420 + offset);
 
-            int sizeX = GetWidth(bmp, 0.015625);
-            int sizeY = GetHeight(bmp, 0.04173106646);
-            int height = GetHeight(bmp, 0.545595054095 + offset);
+        //    comboBitmaps[0] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.9210069444), height);
+        //    comboBitmaps[1] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.9053819444), height);
+        //    comboBitmaps[2] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.8897569444), height);
+        //    comboBitmaps[3] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.8741319444), height);
 
-            drumrollBitmaps[0] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.92013888), height);
-            drumrollBitmaps[1] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.90451388), height);
-            drumrollBitmaps[2] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.88888888), height);
-            drumrollBitmaps[3] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.87326388), height);
+        //    for (int i = 0; i < comboBitmaps.Length; i++)
+        //    {
+        //        comboBitmaps[i] = ScaleDown(comboBitmaps[i], 18, 27);
+        //        //comboBitmaps[i].Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\comboBitmaps." + i.ToString() + ".png");
+        //    }
 
-            for (int i = 0; i < drumrollBitmaps.Length; i++)
-            {
-                drumrollBitmaps[i] = ScaleDown(drumrollBitmaps[i], 18, 27);
-                //drumrollBitmaps[i].Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\drumrollBitmaps." + i.ToString() + ".png");
-            }
+        //    //comboBitmaps[0] = new Bitmap(1079 - 1061, 342 - 315);
+        //    //CopyRegionIntoImage(bmp, new Rectangle(1061, 315 + offset, 1079 - 1061, 342 - 315), ref comboBitmaps[0], new Rectangle(0, 0, 1079 - 1061, 342 - 315));
+        //    //comboBitmaps[1] = new Bitmap(1061 - 1043, 342 - 315);
+        //    //CopyRegionIntoImage(bmp, new Rectangle(1043, 315 + offset, 1061 - 1043, 342 - 315), ref comboBitmaps[1], new Rectangle(0, 0, 1061 - 1043, 342 - 315));
+        //    //comboBitmaps[2] = new Bitmap(1043 - 1025, 342 - 315);
+        //    //CopyRegionIntoImage(bmp, new Rectangle(1025, 315 + offset, 1043 - 1025, 342 - 315), ref comboBitmaps[2], new Rectangle(0, 0, 1043 - 1025, 342 - 315));
+        //    //comboBitmaps[3] = new Bitmap(1025 - 1007, 342 - 315);
+        //    //CopyRegionIntoImage(bmp, new Rectangle(1007, 315 + offset, 1025 - 1007, 342 - 315), ref comboBitmaps[3], new Rectangle(0, 0, 1025 - 1007, 342 - 315));
 
-            //drumrollBitmaps[0] = new Bitmap(1079 - 1061, 380 - 353);
-            //CopyRegionIntoImage(bmp, new Rectangle(1060, 353 + offset, 1079 - 1061, 380 - 353), ref drumrollBitmaps[0], new Rectangle(0, 0, 1079 - 1061, 380 - 353));
-            //drumrollBitmaps[1] = new Bitmap(1061 - 1043, 380 - 353);
-            //CopyRegionIntoImage(bmp, new Rectangle(1042, 353 + offset, 1061 - 1043, 380 - 353), ref drumrollBitmaps[1], new Rectangle(0, 0, 1061 - 1043, 380 - 353));
-            //drumrollBitmaps[2] = new Bitmap(1043 - 1025, 380 - 353);
-            //CopyRegionIntoImage(bmp, new Rectangle(1024, 353 + offset, 1043 - 1025, 380 - 353), ref drumrollBitmaps[2], new Rectangle(0, 0, 1043 - 1025, 380 - 353));
-            //drumrollBitmaps[3] = new Bitmap(1025 - 1007, 380 - 353);
-            //CopyRegionIntoImage(bmp, new Rectangle(1006, 353 + offset, 1025 - 1007, 380 - 353), ref drumrollBitmaps[3], new Rectangle(0, 0, 1025 - 1007, 380 - 353));
+        //    int combo = 0;
+        //    for (int i = 0; i < comboBitmaps.Length; i++)
+        //    {
+        //        int pixelDifferences = -1;
+        //        int smallestIndex = 0;
+        //        for (int j = 0; j < smallNumberBitmaps.Count; j++)
+        //        {
+        //            var tmpInt = CompareBitmaps(comboBitmaps[i], smallNumberBitmaps[j]);
+        //            if (tmpInt < pixelDifferences || pixelDifferences == -1)
+        //            {
+        //                pixelDifferences = tmpInt;
+        //                smallestIndex = j;
+        //            }
+        //        }
+        //        if (smallNumbers[smallestIndex] == "null")
+        //        {
+        //            return combo;
+        //        }
+        //        combo += int.Parse(smallNumbers[smallestIndex]) * ((int)Math.Pow(10, i));
+        //    }
+        //    return combo;
+        //}
+        //public int GetDrumroll(Bitmap bmp, Players players)
+        //{
+        //    double offset = 0;
+        //    if (players == Players.RankedTop)
+        //    {
+        //        offset = -0.156105100;
+        //    }
+        //    else if (players == Players.RankedBottom)
+        //    {
+        //        offset = 0.241112828;
+        //    }
+        //    Bitmap[] drumrollBitmaps = new Bitmap[4];
 
-            int drumroll = 0;
-            for (int i = 0; i < drumrollBitmaps.Length; i++)
-            {
-                int pixelDifferences = -1;
-                int smallestIndex = 0;
-                for (int j = 0; j < smallNumberBitmaps.Count; j++)
-                {
-                    var tmpInt = CompareBitmaps(drumrollBitmaps[i], smallNumberBitmaps[j]);
-                    if (tmpInt < pixelDifferences || pixelDifferences == -1)
-                    {
-                        pixelDifferences = tmpInt;
-                        smallestIndex = j;
-                    }
-                }
-                if (smallNumbers[smallestIndex] == "null")
-                {
-                    return drumroll;
-                }
-                drumroll += int.Parse(smallNumbers[smallestIndex]) * ((int)Math.Pow(10, i));
-            }
-            return drumroll;
-        }
+        //    int sizeX = GetWidth(bmp, 0.015625);
+        //    int sizeY = GetHeight(bmp, 0.04173106646);
+        //    int height = GetHeight(bmp, 0.545595054095 + offset);
+
+        //    drumrollBitmaps[0] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.92013888), height);
+        //    drumrollBitmaps[1] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.90451388), height);
+        //    drumrollBitmaps[2] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.88888888), height);
+        //    drumrollBitmaps[3] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.87326388), height);
+
+        //    for (int i = 0; i < drumrollBitmaps.Length; i++)
+        //    {
+        //        drumrollBitmaps[i] = ScaleDown(drumrollBitmaps[i], 18, 27);
+        //        //drumrollBitmaps[i].Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\drumrollBitmaps." + i.ToString() + ".png");
+        //    }
+
+        //    //drumrollBitmaps[0] = new Bitmap(1079 - 1061, 380 - 353);
+        //    //CopyRegionIntoImage(bmp, new Rectangle(1060, 353 + offset, 1079 - 1061, 380 - 353), ref drumrollBitmaps[0], new Rectangle(0, 0, 1079 - 1061, 380 - 353));
+        //    //drumrollBitmaps[1] = new Bitmap(1061 - 1043, 380 - 353);
+        //    //CopyRegionIntoImage(bmp, new Rectangle(1042, 353 + offset, 1061 - 1043, 380 - 353), ref drumrollBitmaps[1], new Rectangle(0, 0, 1061 - 1043, 380 - 353));
+        //    //drumrollBitmaps[2] = new Bitmap(1043 - 1025, 380 - 353);
+        //    //CopyRegionIntoImage(bmp, new Rectangle(1024, 353 + offset, 1043 - 1025, 380 - 353), ref drumrollBitmaps[2], new Rectangle(0, 0, 1043 - 1025, 380 - 353));
+        //    //drumrollBitmaps[3] = new Bitmap(1025 - 1007, 380 - 353);
+        //    //CopyRegionIntoImage(bmp, new Rectangle(1006, 353 + offset, 1025 - 1007, 380 - 353), ref drumrollBitmaps[3], new Rectangle(0, 0, 1025 - 1007, 380 - 353));
+
+        //    int drumroll = 0;
+        //    for (int i = 0; i < drumrollBitmaps.Length; i++)
+        //    {
+        //        int pixelDifferences = -1;
+        //        int smallestIndex = 0;
+        //        for (int j = 0; j < smallNumberBitmaps.Count; j++)
+        //        {
+        //            var tmpInt = CompareBitmaps(drumrollBitmaps[i], smallNumberBitmaps[j]);
+        //            if (tmpInt < pixelDifferences || pixelDifferences == -1)
+        //            {
+        //                pixelDifferences = tmpInt;
+        //                smallestIndex = j;
+        //            }
+        //        }
+        //        if (smallNumbers[smallestIndex] == "null")
+        //        {
+        //            return drumroll;
+        //        }
+        //        drumroll += int.Parse(smallNumbers[smallestIndex]) * ((int)Math.Pow(10, i));
+        //    }
+        //    return drumroll;
+        //}
 
         public Difficulty CheckDifficulty(Bitmap bmp, Players players)
         {
@@ -1229,22 +1233,279 @@ namespace TaikoLogging
 
         #endregion
 
+        #region Refactored Data Gathering
+        public string GetTitle(Bitmap bmp)
+        {
+            // bmp in this case would be the full game screen
+
+            // First: Get a bitmap of just the title area that will be compared
+            using (Bitmap titleBmp = GetTitleBitmap(bmp))
+            {
+                // Second: Compare that bitmap to the List of bitmaps to find the closest match
+                int index = CompareBitmapToList(titleBmp, titleBitmaps);
+                // Third: Return the string in the index of the closest match
+                return titles[index];
+            }
+        }
+        public Bitmap GetTitleBitmap(Bitmap bmp)
+        {
+            // I have a sheet on my test taiko spreadsheet that shows how I got these values, although it's a bit of a mess
+            // These are Relative...     Width         Height            X              Y
+            float[] relativeValues = { 0.390625f, 0.04327666151f, 0.5590277778f, 0.05100463679f };
+
+            var titleBmp = GetBitmapArea(bmp, GetWidth(bmp, relativeValues[0]), GetHeight(bmp, relativeValues[1]), GetWidth(bmp, relativeValues[2]), GetHeight(bmp, relativeValues[3]));
+            return ScaleDown(titleBmp, 450, 28);
+        }
+
+        public int GetScore(Bitmap bmp, Players player)
+        {
+            List<Bitmap> scoreBitmaps = GetScoreBitmaps(bmp, player);
+
+            int score = 0;
+            for (int i = 0; i < 7; i++)
+            {
+                int index = CompareBitmapToList(scoreBitmaps[i], bigNumberBitmaps);
+                if (bigNumbers[index] == "null")
+                {
+                    return score;
+                }
+                score += int.Parse(bigNumbers[index]) * ((int)Math.Pow(10, i));
+            }
+            return score;
+        }
+        public List<Bitmap> GetScoreBitmaps(Bitmap bmp, Players player)
+        {
+            double offset = 0;
+            if (player == Players.RankedTop)
+            {
+                offset = -0.15610510;
+            }
+            else if (player == Players.RankedBottom)
+            {
+                offset = 0.241112828;
+            }
+
+            int width = GetWidth(bmp, 0.02256944444);
+            int height = GetHeight(bmp, 0.05564142195);
+            int y = GetHeight(bmp, 0.5347758887 + offset);
+
+            float[] relativeX = { 0.5503472222f, 0.5286458333f, 0.5052083333f, 0.4826388889f, 0.4600694444f, 0.4375f, 0.4149305556f };
+
+            List<Bitmap> scoreBitmaps = new List<Bitmap>();
+            for (int i = 0; i < 7; i++)
+            {
+                scoreBitmaps.Add(ScaleDown(GetBitmapArea(bmp, width, height, GetWidth(bmp, relativeX[i]), y), 26, 36));
+            }
+            return scoreBitmaps;
+        }
+        public int GetGoods(Bitmap bmp, Players player)
+        {
+            return GetNumbers(bmp, player, GetGoodsBitmaps);
+        }
+        public int GetOKs(Bitmap bmp, Players player)
+        {
+            return GetNumbers(bmp, player, GetOKsBitmaps);
+        }
+        public int GetBads(Bitmap bmp, Players player)
+        {
+            return GetNumbers(bmp, player, GetBadsBitmaps);
+        }
+        public int GetCombo(Bitmap bmp, Players player)
+        {
+            return GetNumbers(bmp, player, GetComboBitmaps);
+        }
+        public int GetDrumroll(Bitmap bmp, Players player)
+        {
+            return GetNumbers(bmp, player, GetDrumrollBitmaps);
+        }
+        public delegate List<Bitmap> GetNumberBitmaps(Bitmap bmp, Players player);
+        public int GetNumbers(Bitmap bmp, Players player, GetNumberBitmaps function)
+        {
+            List<Bitmap> bitmaps = function(bmp, player);
+
+            int number = 0;
+            for (int i = 0; i < bitmaps.Count; i++)
+            {
+                int index = CompareBitmapToList(bitmaps[i], smallNumberBitmaps);
+                if (smallNumbers[index] == "null")
+                {
+                    return number;
+                }
+                number += int.Parse(smallNumbers[index]) * ((int)Math.Pow(10, i));
+            }
+            return number;
+        }
+        public List<Bitmap> GetGoodsBitmaps(Bitmap bmp, Players player)
+        {
+            double offset = 0;
+            if (player == Players.RankedTop)
+            {
+                offset = -0.15610510;
+            }
+            else if (player == Players.RankedBottom)
+            {
+                offset = 0.241112828;
+            }
+
+            int width = GetWidth(bmp, 0.015625);
+            int height = GetHeight(bmp, 0.04173106646);
+            int y = GetHeight(bmp, 0.486862442 + offset);
+
+            float[] relativeX = { 0.7300347222f, 0.7144097222f, 0.6987847222f, 0.6831597222f };
+
+            List<Bitmap> scoreBitmaps = new List<Bitmap>();
+            for (int i = 0; i < 4; i++)
+            {
+                scoreBitmaps.Add(ScaleDown(GetBitmapArea(bmp, width, height, GetWidth(bmp, relativeX[i]), y), 18, 27));
+            }
+            return scoreBitmaps;
+        }
+        public List<Bitmap> GetOKsBitmaps(Bitmap bmp, Players player)
+        {
+            double offset = 0;
+            if (player == Players.RankedTop)
+            {
+                offset = -0.15610510;
+            }
+            else if (player == Players.RankedBottom)
+            {
+                offset = 0.241112828;
+            }
+
+            int width = GetWidth(bmp, 0.015625);
+            int height = GetHeight(bmp, 0.04173106646);
+            int y = GetHeight(bmp, 0.5455950541 + offset);
+
+            float[] relativeX = { 0.7300347222f, 0.7144097222f, 0.6987847222f, 0.6831597222f };
+
+            List<Bitmap> scoreBitmaps = new List<Bitmap>();
+            for (int i = 0; i < 4; i++)
+            {
+                scoreBitmaps.Add(ScaleDown(GetBitmapArea(bmp, width, height, GetWidth(bmp, relativeX[i]), y), 18, 27));
+            }
+            return scoreBitmaps;
+        }
+        public List<Bitmap> GetBadsBitmaps(Bitmap bmp, Players player)
+        {
+            double offset = 0;
+            if (player == Players.RankedTop)
+            {
+                offset = -0.15610510;
+            }
+            else if (player == Players.RankedBottom)
+            {
+                offset = 0.241112828;
+            }
+
+            int width = GetWidth(bmp, 0.015625);
+            int height = GetHeight(bmp, 0.04173106646);
+            int y = GetHeight(bmp, 0.6027820711 + offset);
+
+            float[] relativeX = { 0.7300347222f, 0.7144097222f, 0.6987847222f, 0.6831597222f };
+
+            List<Bitmap> scoreBitmaps = new List<Bitmap>();
+            for (int i = 0; i < 4; i++)
+            {
+                scoreBitmaps.Add(ScaleDown(GetBitmapArea(bmp, width, height, GetWidth(bmp, relativeX[i]), y), 18, 27));
+            }
+            return scoreBitmaps;
+        }
+        public List<Bitmap> GetComboBitmaps(Bitmap bmp, Players player)
+        {
+            double offset = 0;
+            if (player == Players.RankedTop)
+            {
+                offset = -0.15610510;
+            }
+            else if (player == Players.RankedBottom)
+            {
+                offset = 0.241112828;
+            }
+
+            int width = GetWidth(bmp, 0.015625);
+            int height = GetHeight(bmp, 0.04173106646);
+            int y = GetHeight(bmp, 0.486862442 + offset);
+
+            float[] relativeX = { 0.9210069444f, 0.9053819444f, 0.8897569444f, 0.8741319444f };
+
+            List<Bitmap> scoreBitmaps = new List<Bitmap>();
+            for (int i = 0; i < 4; i++)
+            {
+                scoreBitmaps.Add(ScaleDown(GetBitmapArea(bmp, width, height, GetWidth(bmp, relativeX[i]), y), 18, 27));
+            }
+            return scoreBitmaps;
+        }
+        public List<Bitmap> GetDrumrollBitmaps(Bitmap bmp, Players player)
+        {
+            double offset = 0;
+            if (player == Players.RankedTop)
+            {
+                offset = -0.15610510;
+            }
+            else if (player == Players.RankedBottom)
+            {
+                offset = 0.241112828;
+            }
+
+            int width = GetWidth(bmp, 0.015625);
+            int height = GetHeight(bmp, 0.04173106646);
+            int y = GetHeight(bmp, 0.5455950541 + offset);
+
+            float[] relativeX = { 0.9192708333f, 0.9036458333f, 0.8897569444f, 0.8741319444f };
+
+            List<Bitmap> scoreBitmaps = new List<Bitmap>();
+            for (int i = 0; i < 4; i++)
+            {
+                scoreBitmaps.Add(ScaleDown(GetBitmapArea(bmp, width, height, GetWidth(bmp, relativeX[i]), y), 18, 27));
+            }
+            return scoreBitmaps;
+        }
 
 
+        public int CompareBitmapToList(Bitmap bmp, List<Bitmap> bitmaps)
+        {
+            int pixelDifferences = -1;
+            int smallestIndex = 0;
+            for (int i = 0; i < bitmaps.Count; i++)
+            {
+                var tmpInt = CompareBitmaps(bmp, bitmaps[i]);
+                if (tmpInt < pixelDifferences || pixelDifferences == -1)
+                {
+                    pixelDifferences = tmpInt;
+                    smallestIndex = i;
+                }
+            }
+            return smallestIndex;
+        }
+
+
+        #endregion
 
         // These were for getting the bitmaps, just here for future reference and in case they'd be needed in the future
         // Hey it's the future and they're needed
         // I'm using these to see what the failed tests are seeing, or at least it should work that way if it isn't broken which it is
-        public void GetSmallDigits(Bitmap bmp, string folderLocation, string baseFileName)
+
+        // I'm aiming to phase these out
+        public void GetSmallDigits(Bitmap bmp, Players players, string folderLocation, string baseFileName)
         {
             //Bitmap bmp = Program.Program.screen.CaptureApplication();
 
             // Old folder location was D:\My Stuff\My Programs\Taiko\Image Data\Test Data\
             Bitmap[] goodBitmaps = new Bitmap[4];
 
+            double offset = 0;
+            if (players == Players.RankedTop)
+            {
+                offset = -0.156105100;
+            }
+            else if (players == Players.RankedBottom)
+            {
+                offset = 0.241112828;
+            }
+
             int sizeX = GetWidth(bmp, 0.015625);
             int sizeY = GetHeight(bmp, 0.0417310664605);
-            int height = GetHeight(bmp, 0.4868624420401);
+            int height = GetHeight(bmp, 0.4868624420401 + offset);
 
             goodBitmaps[0] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.7300347222), height);
             goodBitmaps[1] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.7144097222), height);
@@ -1260,9 +1521,19 @@ namespace TaikoLogging
 
             Bitmap[] okBitmaps = new Bitmap[4];
 
+            offset = 0;
+            if (players == Players.RankedTop)
+            {
+                offset = -0.156105100;
+            }
+            else if (players == Players.RankedBottom)
+            {
+                offset = 0.241112828;
+            }
+
             sizeX = GetWidth(bmp, 0.015625);
             sizeY = GetHeight(bmp, 0.0417310664);
-            height = GetHeight(bmp, 0.545595054);
+            height = GetHeight(bmp, 0.545595054 + offset);
 
             okBitmaps[0] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.7300347222), height);
             okBitmaps[1] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.7144097222), height);
@@ -1277,9 +1548,19 @@ namespace TaikoLogging
 
             Bitmap[] badBitmaps = new Bitmap[4];
 
+            offset = 0;
+            if (players == Players.RankedTop)
+            {
+                offset = -0.156105100;
+            }
+            else if (players == Players.RankedBottom)
+            {
+                offset = 0.241112828;
+            }
+
             sizeX = GetWidth(bmp, 0.015625);
-            sizeY = GetHeight(bmp, 0.0417310664605);
-            height = GetHeight(bmp, 0.602782071);
+            sizeY = GetHeight(bmp, 0.04173106);
+            height = GetHeight(bmp, 0.602782071 + offset);
 
             badBitmaps[0] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.7300347222), height);
             badBitmaps[1] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.7144097222), height);
@@ -1294,9 +1575,19 @@ namespace TaikoLogging
 
             Bitmap[] comboBitmaps = new Bitmap[4];
 
+            offset = 0;
+            if (players == Players.RankedTop)
+            {
+                offset = -0.156105100;
+            }
+            else if (players == Players.RankedBottom)
+            {
+                offset = 0.241112828;
+            }
+
             sizeX = GetWidth(bmp, 0.015625);
             sizeY = GetHeight(bmp, 0.0417310664605);
-            height = GetHeight(bmp, 0.4868624420401);
+            height = GetHeight(bmp, 0.4868624420401 + offset);
 
             comboBitmaps[0] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.9210069444), height);
             comboBitmaps[1] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.9053819444), height);
@@ -1311,9 +1602,19 @@ namespace TaikoLogging
 
             Bitmap[] drumrollBitmaps = new Bitmap[4];
 
+            offset = 0;
+            if (players == Players.RankedTop)
+            {
+                offset = -0.156105100;
+            }
+            else if (players == Players.RankedBottom)
+            {
+                offset = 0.241112828;
+            }
+
             sizeX = GetWidth(bmp, 0.015625);
             sizeY = GetHeight(bmp, 0.0417310664605);
-            height = GetHeight(bmp, 0.545595054095);
+            height = GetHeight(bmp, 0.545595054095 + offset);
 
             drumrollBitmaps[0] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.92013888), height);
             drumrollBitmaps[1] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.90451388), height);
@@ -1326,15 +1627,23 @@ namespace TaikoLogging
                 drumrollBitmaps[i].Save(folderLocation + baseFileName + ".drumrolls." + i.ToString() + ".png");
             }
         }
-        public void GetBigDigits(Bitmap bmp, string folderLocation, string baseFileName)
+        public void GetBigDigits(Bitmap bmp, Players players, string folderLocation, string baseFileName)
         {
-            //Bitmap bmp = Program.Program.screen.CaptureApplication();
+            double offset = 0;
+            if (players == Players.RankedTop)
+            {
+                offset = -0.15610510;
+            }
+            else if (players == Players.RankedBottom)
+            {
+                offset = 0.241112828;
+            }
 
             Bitmap[] scoreBitmaps = new Bitmap[7];
 
             int sizeX = GetWidth(bmp, 0.0225694444);
             int sizeY = GetHeight(bmp, 0.0556414219);
-            int height = GetHeight(bmp, 0.53477588871);
+            int height = GetHeight(bmp, 0.53477588871 + offset);
 
             scoreBitmaps[0] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.5503472222), height);
             scoreBitmaps[1] = GetBitmapArea(bmp, sizeX, sizeY, GetWidth(bmp, 0.5277777777), height);

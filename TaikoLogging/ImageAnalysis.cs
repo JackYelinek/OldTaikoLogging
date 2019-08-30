@@ -78,14 +78,17 @@ namespace TaikoLogging
                     if (currentState == State.SingleSongEnd)
                     {
                         Thread.Sleep(3500);
-                        currentState = CheckState(Program.screen.CaptureApplication());
-                        if (currentState == State.SingleResults)
+                        using (Bitmap resultsBmp = Program.screen.CaptureApplication())
                         {
-                            GetSingleResults(false);
-                        }
-                        else if (currentState == State.SingleSessionResults)
-                        {
-                            GetSingleResults(true);
+                            currentState = CheckState(resultsBmp);
+                            if (currentState == State.SingleResults)
+                            {
+                                GetSingleResults(false);
+                            }
+                            else if (currentState == State.SingleSessionResults)
+                            {
+                                GetSingleResults(true);
+                            }
                         }
                     }
                     else if (currentState == State.RankedResults)
@@ -118,33 +121,33 @@ namespace TaikoLogging
             Program.screen.CaptureApplication().Save(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Test Data\" + numStatesSaved++.ToString() + "." + currentState.ToString() + ".png", ImageFormat.Png);
         }
 
-        public void GetDLCSongs()
-        {
-            var bmp = Program.screen.CaptureApplication();
-            currentState = CheckState(bmp);
-            if (previousState != currentState)
-            {
-                // names each file based on the number it was made in, then by the state it thought it was
-                // It saves every time it changes the state
-                if (currentState == State.SingleSongEnd)
-                {
-                    TestingScreenshot();
-                    Thread.Sleep(3500);
-                    currentState = CheckState(Program.screen.CaptureApplication());
-                    if (currentState == State.SingleResults)
-                    {
-                        var dlcTitleBitmap = GetTitleBitmap(Program.screen.CaptureApplication());
-                        dlcTitleBitmap.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\DLC Songs\" + j++.ToString() + ".png");
-                    }
-                    else if (currentState == State.SingleSessionResults)
-                    {
-                        var dlcTitleBitmap = GetTitleBitmap(Program.screen.CaptureApplication());
-                        dlcTitleBitmap.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\DLC Songs\" + j++.ToString() + ".png");
-                    }
-                }
-            }
-            System.GC.Collect();
-        }
+        //public void GetDLCSongs()
+        //{
+        //    var bmp = Program.screen.CaptureApplication();
+        //    currentState = CheckState(bmp);
+        //    if (previousState != currentState)
+        //    {
+        //        // names each file based on the number it was made in, then by the state it thought it was
+        //        // It saves every time it changes the state
+        //        if (currentState == State.SingleSongEnd)
+        //        {
+        //            TestingScreenshot();
+        //            Thread.Sleep(3500);
+        //            currentState = CheckState(Program.screen.CaptureApplication());
+        //            if (currentState == State.SingleResults)
+        //            {
+        //                var dlcTitleBitmap = GetTitleBitmap(Program.screen.CaptureApplication());
+        //                dlcTitleBitmap.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\DLC Songs\" + j++.ToString() + ".png");
+        //            }
+        //            else if (currentState == State.SingleSessionResults)
+        //            {
+        //                var dlcTitleBitmap = GetTitleBitmap(Program.screen.CaptureApplication());
+        //                dlcTitleBitmap.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\DLC Songs\" + j++.ToString() + ".png");
+        //            }
+        //        }
+        //    }
+        //    System.GC.Collect();
+        //}
 
 
         #region Initialization
@@ -1493,7 +1496,22 @@ namespace TaikoLogging
 
         public void NewSongAdded()
         {
+            // Reinitialize the title bitmaps so it has the new song in them
             InitializeTitleBitmaps();
+
+            // Go through the GetSingleResults() so it will put the score on the spreadsheet
+            using (Bitmap resultsBmp = Program.screen.CaptureApplication())
+            {
+                currentState = CheckState(resultsBmp);
+                if (currentState == State.SingleResults)
+                {
+                    GetSingleResults(false);
+                }
+                else if (currentState == State.SingleSessionResults)
+                {
+                    GetSingleResults(true);
+                }
+            }
         }
 
         // These were for getting the bitmaps, just here for future reference and in case they'd be needed in the future

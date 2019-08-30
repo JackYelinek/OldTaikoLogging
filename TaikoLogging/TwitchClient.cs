@@ -69,15 +69,13 @@ namespace TaikoLogging
                         numScreenshots++;
                     }
                 }
-                string fileName = songTitle;
-                if (numScreenshots > 0)
-                {
-                    fileName += "." + numScreenshots;
-                }
 
-                newSongBitmap.Save(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Title Bitmaps\" + fileName + ".png");
+
+                newSongBitmap.Save(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Title Bitmaps\" + songTitle + "." + numScreenshots + ".png");
                 newSongIncoming = false;
                 newSongBitmap = null;
+                SendTwitchMessage(songTitle + " has been added!");
+                Program.analysis.NewSongAdded();
             }
         }
 

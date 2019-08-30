@@ -15,10 +15,10 @@ namespace TaikoLogging
         static public RinClient rin = new RinClient();
         static public bool twitchOn;
         static public ScreenGrab screen = new ScreenGrab();
+        static public ImageAnalysis analysis = new ImageAnalysis();
 
         static void Main(string[] args)
         {
-            ImageAnalysis analysis = new ImageAnalysis();
             EmulatorLogger emulatorLogger = new EmulatorLogger();
 
             // TODO Set this up automatically
@@ -59,7 +59,6 @@ namespace TaikoLogging
                 }
                 if (PS4 == true)
                 {
-                    twitchOn = true;
                     analysis.StandardLoop();
                     //analysis.GetDLCSongs();
                 }

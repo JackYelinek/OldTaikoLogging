@@ -212,6 +212,10 @@ namespace TaikoLogging
 
             // Color if not streaming = (76, 76, 76)
             // Color if streaming = (122,121,122)
+            if (y < 0)
+            {
+                return Program.twitchOn;
+            }
             var pixel = bmp.GetPixel(x, y);
             bool streaming = CompareColors(Color.FromArgb(pixel.R, pixel.G, pixel.B), Color.FromArgb(122, 121, 122));
 

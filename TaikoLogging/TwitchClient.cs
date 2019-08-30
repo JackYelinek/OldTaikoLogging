@@ -9,6 +9,8 @@ using TwitchLib;
 using TwitchLib.Client;
 using TwitchLib.Api.V5;
 using TwitchLib.Client.Models;
+using System.Drawing;
+using System.IO;
 
 namespace TaikoLogging
 {
@@ -18,12 +20,14 @@ namespace TaikoLogging
         TwitchClient client;
         GoogleSheetInterface sheet;
 
+        bool newSongIncoming = false;
+        Bitmap newSongBitmap;
+
         public RinClient()
         {
             sheet = new GoogleSheetInterface();
             Connect();
         }
-
 
         ~RinClient()
         {
@@ -47,20 +51,33 @@ namespace TaikoLogging
 
         private void Client_OnMessageReceived(object sender, TwitchLib.Client.Events.OnMessageReceivedArgs e)
         {
-            if(e.ChatMessage.Message.StartsWith("!notranked", StringComparison.InvariantCultureIgnoreCase) && string.Compare(e.ChatMessage.Username, "Deathblood", true) == 0)
+            if(CheckDBCommands("!notranked", e) || CheckDBCommands("!removeranked", e) || CheckDBCommands("!undoranked", e))
             {
                 sheet.RemoveLastRanked();
                 SendTwitchMessage("Last ranked match removed");
             }
-            else if (e.ChatMessage.Message.StartsWith("!removeranked", StringComparison.InvariantCultureIgnoreCase) && string.Compare(e.ChatMessage.Username, "Deathblood", true) == 0)
+            else if (CheckDBCommands("!song ", e) && newSongIncoming)
             {
-                sheet.RemoveLastRanked();
-                SendTwitchMessage("Last ranked match removed");
-            }
-            else if (e.ChatMessage.Message.StartsWith("!undoranked", StringComparison.InvariantCultureIgnoreCase) && string.Compare(e.ChatMessage.Username, "Deathblood", true) == 0)
-            {
-                sheet.RemoveLastRanked();
-                SendTwitchMessage("Last ranked match removed");
+                string songTitle = e.ChatMessage.Message.Remove(0, 6);
+                DirectoryInfo dirInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Title Bitmaps\");
+                var result = dirInfo.GetFiles();
+                int numScreenshots = 0;
+                for (int i = 0; i < result.Length; i++)
+                {
+                    if (result[i].Name.Remove(result[i].Name.IndexOf('.')) == songTitle)
+                    {
+                        numScreenshots++;
+                    }
+                }
+                string fileName = songTitle;
+                if (numScreenshots > 0)
+                {
+                    fileName += "." + numScreenshots;
+                }
+
+                newSongBitmap.Save(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Title Bitmaps\" + fileName + ".png");
+                newSongIncoming = false;
+                newSongBitmap = null;
             }
         }
 
@@ -77,5 +94,16 @@ namespace TaikoLogging
             }
         }
 
+        private bool CheckDBCommands(string command, TwitchLib.Client.Events.OnMessageReceivedArgs e)
+        {
+            return e.ChatMessage.Message.StartsWith(command, StringComparison.InvariantCultureIgnoreCase) && string.Compare(e.ChatMessage.Username, "Deathblood", true) == 0;
+        }
+
+        public void PrepareNewSong(Bitmap bmp)
+        {
+            newSongIncoming = true;
+            newSongBitmap = new Bitmap(bmp);
+            SendTwitchMessage("Couldn't figure out the song, !song <song>");
+        }
     }
 }

@@ -133,11 +133,13 @@ namespace TaikoLogging
                     currentState = CheckState(Program.screen.CaptureApplication());
                     if (currentState == State.SingleResults)
                     {
-                        GetTitleBitmap(Program.screen.CaptureApplication());
+                        var dlcTitleBitmap = GetTitleBitmap(Program.screen.CaptureApplication());
+                        dlcTitleBitmap.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\DLC Songs\" + j++.ToString() + ".png");
                     }
                     else if (currentState == State.SingleSessionResults)
                     {
-                        GetTitleBitmap(Program.screen.CaptureApplication());
+                        var dlcTitleBitmap = GetTitleBitmap(Program.screen.CaptureApplication());
+                        dlcTitleBitmap.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\DLC Songs\" + j++.ToString() + ".png");
                     }
                 }
             }
@@ -198,13 +200,16 @@ namespace TaikoLogging
         }
         private void InitializeTitleBitmaps()
         {
+            titleBitmaps = new List<Bitmap>();
+            titles = new List<string>();
             DirectoryInfo dirInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Title Bitmaps");
             var result = dirInfo.GetFiles();
             for (int i = 0; i < result.Length; i++)
             {
                 var bitmap = new Bitmap(result[i].FullName);
                 titleBitmaps.Add(bitmap);
-                titles.Add(result[i].Name.Remove(result[i].Name.LastIndexOf('.')));
+                string songTitle = result[i].Name.Remove(result[i].Name.LastIndexOf('.'));
+                titles.Add(songTitle.Remove(songTitle.LastIndexOf('.')));
             }
         }
         private void InitializeHighScoreBitmaps()
@@ -1466,20 +1471,30 @@ namespace TaikoLogging
         {
             int pixelDifferences = -1;
             int smallestIndex = 0;
+
             for (int i = 0; i < bitmaps.Count; i++)
             {
                 var tmpInt = CompareBitmaps(bmp, bitmaps[i]);
+
                 if (tmpInt < pixelDifferences || pixelDifferences == -1)
                 {
                     pixelDifferences = tmpInt;
                     smallestIndex = i;
                 }
             }
+            if (bitmaps == titleBitmaps && pixelDifferences >= 200000)
+            {
+                Program.rin.PrepareNewSong(bmp);
+            }
             return smallestIndex;
         }
 
-
         #endregion
+
+        public void NewSongAdded()
+        {
+            InitializeTitleBitmaps();
+        }
 
         // These were for getting the bitmaps, just here for future reference and in case they'd be needed in the future
         // Hey it's the future and they're needed

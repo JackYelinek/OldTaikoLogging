@@ -59,6 +59,7 @@ namespace TaikoLogging
                 }
                 if (PS4 == true)
                 {
+                    twitchOn = true;
                     analysis.StandardLoop();
                     //analysis.GetDLCSongs();
                 }

@@ -451,6 +451,10 @@ namespace TaikoLogging
 
             info.Add(GetTitle(bmp));
             headers.Add("Title");
+            if ((string)info[headers.IndexOf("Title")] == "")
+            {
+                return;
+            }
 
             info.Add(GetScore(bmp, players));
             headers.Add("Score");
@@ -501,6 +505,10 @@ namespace TaikoLogging
             // Song Data
             info.Add(GetTitle(bmp));
             headers.Add("Title");
+            if (info[headers.IndexOf("Title")] == "")
+            {
+                return;
+            }
             info.Add(CheckDifficulty(bmp, Players.RankedTop));
             headers.Add("Difficulty");
 
@@ -1252,6 +1260,11 @@ namespace TaikoLogging
                 // Second: Compare that bitmap to the List of bitmaps to find the closest match
                 int index = CompareBitmapToList(titleBmp, titleBitmaps);
                 // Third: Return the string in the index of the closest match
+                // If index == -1, then it couldn't find a song that was a close enough match
+                if (index == -1)
+                {
+                    return "";
+                }
                 return titles[index];
             }
         }
@@ -1488,6 +1501,7 @@ namespace TaikoLogging
             if (bitmaps == titleBitmaps && pixelDifferences >= 200000)
             {
                 Program.rin.PrepareNewSong(bmp);
+                return -1;
             }
             return smallestIndex;
         }
@@ -1510,6 +1524,10 @@ namespace TaikoLogging
                 else if (currentState == State.SingleSessionResults)
                 {
                     GetSingleResults(true);
+                }
+                else if (currentState == State.RankedResults)
+                {
+                    GetRankedResults();
                 }
             }
         }

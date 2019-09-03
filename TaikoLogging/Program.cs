@@ -59,8 +59,8 @@ namespace TaikoLogging
                 }
                 if (PS4 == true)
                 {
+                    //analysis.NotStandardLoop();
                     analysis.StandardLoop();
-                    //analysis.GetDLCSongs();
                 }
                 else if (emulator == true)
                 {

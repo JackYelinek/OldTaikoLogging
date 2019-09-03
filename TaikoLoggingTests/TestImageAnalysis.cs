@@ -1375,5 +1375,75 @@ namespace TaikoLoggingTests
             }
             GC.Collect();
         }
+
+        [TestMethod]
+        public void TestNewGetTitle()
+        {
+            // I won't test every single title, that'd take far too long
+            // I can test like 10-15 and be pretty confident it works well
+            // I suppose there could be some titles that end up not working, but it'd add too much time to this
+            ImageAnalysis imageAnalysis = new ImageAnalysis();
+
+            string folderPath = @"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Test Data\GetTitle\";
+
+            // If adding items to bmps here, add them to expectedResults below too
+            List<Bitmap> bmps = new List<Bitmap>()
+            {
+                new Bitmap(folderPath + "!!!カオスタイム!!!.Oni.0.png"),
+                new Bitmap(folderPath + "HARDCOREノ心得.Oni.1.png"),
+                new Bitmap(folderPath + "Infinite Rebellion.Oni.5.png"),
+                new Bitmap(folderPath + "UNDEAD HEART(怒りのWarriors).Oni.3.png"),
+                new Bitmap(folderPath + "Xa.Ura.4.png"),
+                new Bitmap(folderPath + "初音ミクの消失‐劇場版‐.Ura.3.png"),
+                new Bitmap(folderPath + "幽玄ノ乱.Oni.9.png"),
+                new Bitmap(folderPath + "愛と浄罪の森.Oni.0.png"),
+                new Bitmap(folderPath + "白鳥の湖.Ura.0.png"),
+                new Bitmap(folderPath + "竜と黒炎の姫君.Ura.5.png"),
+                new Bitmap(folderPath + "紫煌ノ乱.Oni.1.png"),
+                new Bitmap(folderPath + "Behemoth.Oni.0.png"),
+                new Bitmap(folderPath + "ナイト・オブ・ナイツ.Oni.0.png")
+            };
+
+            List<string> titles = new List<string>();
+
+            for (int i = 0; i < bmps.Count; i++)
+            {
+                titles.Add(imageAnalysis.NewGetTitle(bmps[i]));
+            }
+
+            List<bool> results = new List<bool>();
+            for (int i = 0; i < bmps.Count; i++)
+            {
+                results.Add(false);
+            }
+
+            List<string> expectedResults = new List<string>()
+            {
+                "!!!カオスタイム!!!",
+                "HARDCOREノ心得",
+                "Infinite Rebellion",
+                "UNDEAD HEART(怒りのWarriors)",
+                "Xa",
+                "初音ミクの消失‐劇場版‐",
+                "幽玄ノ乱",
+                "愛と浄罪の森",
+                "白鳥の湖",
+                "竜と黒炎の姫君",
+                "紫煌ノ乱",
+                "Behemoth",
+                "ナイト・オブ・ナイツ",
+            };
+
+            for (int i = 0; i < results.Count; i++)
+            {
+                bmps[i].Dispose();
+                if (titles[i] == expectedResults[i])
+                {
+                    results[i] = true;
+                }
+                Assert.IsTrue(results[i], "Expected " + expectedResults[i] + ", Result = '" + titles[i] + "'");
+            }
+            GC.Collect();
+        }
     }
 }

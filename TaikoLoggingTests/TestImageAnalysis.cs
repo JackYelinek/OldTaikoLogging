@@ -1331,7 +1331,16 @@ namespace TaikoLoggingTests
                 new Bitmap(folderPath + "竜と黒炎の姫君.Ura.5.png"),
                 new Bitmap(folderPath + "紫煌ノ乱.Oni.1.png"),
                 new Bitmap(folderPath + "Behemoth.Oni.0.png"),
-                new Bitmap(folderPath + "ナイト・オブ・ナイツ.Oni.0.png")
+                new Bitmap(folderPath + "ナイト・オブ・ナイツ.Oni.0.png"),
+                new Bitmap(folderPath + "1573.png"),
+                new Bitmap(folderPath + "1682.png"),
+                new Bitmap(folderPath + "1719.png"),
+                new Bitmap(folderPath + "1779.png"),
+                new Bitmap(folderPath + "1823.png"),
+                new Bitmap(folderPath + "1830.png"),
+                new Bitmap(folderPath + "1847.png"),
+                new Bitmap(folderPath + "1879.png"),
+                new Bitmap(folderPath + "1884.png"),
             };
 
             List<string> titles = new List<string>();
@@ -1362,6 +1371,14 @@ namespace TaikoLoggingTests
                 "紫煌ノ乱",
                 "Behemoth",
                 "ナイト・オブ・ナイツ",
+                "流星",
+                "Ignis Danse",
+                "エイリアンエイリアン",
+                "FREEDOM DiVE↓",
+                "ギミチョコ！！",
+                "VICTORIA",
+                "残酷な天使のテーゼ",
+                "Naked Glow",
             };
 
             for (int i = 0; i < results.Count; i++)
@@ -1401,7 +1418,16 @@ namespace TaikoLoggingTests
                 new Bitmap(folderPath + "竜と黒炎の姫君.Ura.5.png"),
                 new Bitmap(folderPath + "紫煌ノ乱.Oni.1.png"),
                 new Bitmap(folderPath + "Behemoth.Oni.0.png"),
-                new Bitmap(folderPath + "ナイト・オブ・ナイツ.Oni.0.png")
+                new Bitmap(folderPath + "ナイト・オブ・ナイツ.Oni.0.png"),
+                new Bitmap(folderPath + "1573.png"),
+                new Bitmap(folderPath + "1682.png"),
+                new Bitmap(folderPath + "1719.png"),
+                new Bitmap(folderPath + "1779.png"),
+                new Bitmap(folderPath + "1823.png"),
+                new Bitmap(folderPath + "1830.png"),
+                new Bitmap(folderPath + "1847.png"),
+                new Bitmap(folderPath + "1879.png"),
+                new Bitmap(folderPath + "1884.png"),
             };
 
             List<string> titles = new List<string>();
@@ -1432,6 +1458,14 @@ namespace TaikoLoggingTests
                 "紫煌ノ乱",
                 "Behemoth",
                 "ナイト・オブ・ナイツ",
+                "流星",
+                "Ignis Danse",
+                "エイリアンエイリアン",
+                "FREEDOM DiVE↓",
+                "ギミチョコ！！",
+                "VICTORIA",
+                "残酷な天使のテーゼ",
+                "Naked Glow",
             };
 
             for (int i = 0; i < results.Count; i++)

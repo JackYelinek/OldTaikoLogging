@@ -132,7 +132,6 @@ namespace TaikoLogging
                 Console.WriteLine("Ranked match logged");
             }
         }
-
         public void RemoveLastRanked()
         {
             var Headers = GetHeaders("'Ranked Logs'");
@@ -267,7 +266,6 @@ namespace TaikoLogging
             }
 
         }
-
         public void UpdatePS4BestGoods(List<object> info, List<string> headers)
         {
             var Headers = GetHeaders(info[headers.IndexOf("Difficulty")].ToString());
@@ -330,6 +328,56 @@ namespace TaikoLogging
                 Program.rin.SendTwitchMessage(twitchMessage);
             }
 
+        }
+        public void GetRandomSong()
+        {
+            var Headers = GetHeaders("Oni");
+
+            List<string> songs = new List<string>();
+            List<int> goalDifference = new List<int>();
+
+            string range = "Oni!A2:" + GetColumnName(Headers.Count);
+            var values = GetValues(range);
+
+            for (int i = 0; i < values.Count; i++)
+            {
+                if (values[i][Headers.IndexOf("Goal OKs")] == null)
+                {
+                    continue;
+                }
+                songs.Add(values[i][Headers.IndexOf("Title")].ToString());
+                goalDifference.Add((int)values[i][Headers.IndexOf("OK")] - (int)values[i][Headers.IndexOf("Goal OKs")]);
+            }
+
+            range = "Ura!A2:" + GetColumnName(Headers.Count);
+            values = GetValues(range);
+            for (int i = 0; i < values.Count; i++)
+            {
+                if (values[i][Headers.IndexOf("Goal OKs")] == null)
+                {
+                    continue;
+                }
+                songs.Add(values[i][Headers.IndexOf("Title")].ToString() + " Ura");
+                goalDifference.Add((int)values[i][Headers.IndexOf("OK")] - (int)values[i][Headers.IndexOf("Goal OKs")]);
+            }
+
+            int maxRand = goalDifference.Sum();
+            Random rand = new Random();
+            var randValue = rand.Next(maxRand);
+
+            for (int i = 0; i < goalDifference.Count; i++)
+            {
+                if (randValue < goalDifference[i])
+                {
+                    // this is the song it picks
+                    // I could add more info, like what my goal is, how many fewer OKs I want, stuff like that
+                    Program.rin.SendTwitchMessage(songs[i]);
+                }
+                else
+                {
+                    randValue -= goalDifference[i];
+                }
+            }
         }
 
         #region Emulator functions

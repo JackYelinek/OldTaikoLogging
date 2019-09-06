@@ -59,7 +59,7 @@ namespace TaikoLogging
             else if (CheckDBCommands("!song ", e) && newSongIncoming)
             {
                 string songTitle = e.ChatMessage.Message.Remove(0, 6);
-                DirectoryInfo dirInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Title Bitmaps\");
+                DirectoryInfo dirInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Title Bitmaps\BaseTitles\");
                 var result = dirInfo.GetFiles();
                 int numScreenshots = 0;
                 for (int i = 0; i < result.Length; i++)
@@ -71,11 +71,15 @@ namespace TaikoLogging
                 }
 
 
-                newSongBitmap.Save(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Title Bitmaps\" + songTitle + "." + numScreenshots + ".png");
+                newSongBitmap.Save(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Title Bitmaps\BaseTitles\" + songTitle + ".png");
                 newSongIncoming = false;
                 newSongBitmap = null;
                 SendTwitchMessage(songTitle + " has been added!");
                 Program.analysis.NewSongAdded();
+            }
+            else if (CheckDBCommands("!random", e))
+            {
+
             }
         }
 

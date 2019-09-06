@@ -1379,6 +1379,7 @@ namespace TaikoLoggingTests
                 "VICTORIA",
                 "残酷な天使のテーゼ",
                 "Naked Glow",
+                "限界突破×サバイバー",
             };
 
             for (int i = 0; i < results.Count; i++)
@@ -1393,9 +1394,11 @@ namespace TaikoLoggingTests
             GC.Collect();
         }
 
-        [TestMethod]
-        public void TestNewGetTitle()
+        //[TestMethod]
+        public void TestOldGetTitle()
         {
+            // This function isn't really needed anymore, but it's still here anyway
+
             // I won't test every single title, that'd take far too long
             // I can test like 10-15 and be pretty confident it works well
             // I suppose there could be some titles that end up not working, but it'd add too much time to this
@@ -1434,7 +1437,7 @@ namespace TaikoLoggingTests
 
             for (int i = 0; i < bmps.Count; i++)
             {
-                titles.Add(imageAnalysis.NewGetTitle(bmps[i]));
+                titles.Add(imageAnalysis.OldGetTitle(bmps[i]));
             }
 
             List<bool> results = new List<bool>();
@@ -1466,6 +1469,7 @@ namespace TaikoLoggingTests
                 "VICTORIA",
                 "残酷な天使のテーゼ",
                 "Naked Glow",
+                "限界突破×サバイバー",
             };
 
             for (int i = 0; i < results.Count; i++)

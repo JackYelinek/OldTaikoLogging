@@ -1343,7 +1343,7 @@ namespace TaikoLogging
         #endregion
 
         #region Refactored Data Gathering
-        public string GetTitle(Bitmap bmp)
+        public string OldGetTitle(Bitmap bmp)
         {
             // bmp in this case would be the full game screen
 
@@ -1361,7 +1361,7 @@ namespace TaikoLogging
                 return titles[index];
             }
         }
-        public string NewGetTitle(Bitmap bmp)
+        public string GetTitle(Bitmap bmp)
         {
             // bmp in this case would be the full game screen
 
@@ -1369,6 +1369,10 @@ namespace TaikoLogging
             using (Bitmap titleBmp = GetTitleBitmap(bmp))
             {
                 int index = CompareBitmapToList(CreateTitleBitmap(titleBmp, titleBackgroundBitmaps[titleBackgrounds.IndexOf("Single")]), baseTitleBitmaps);
+                if (index == -1)
+                {
+                    return "";
+                }
                 return baseTitles[index];
             }
         }
@@ -1606,6 +1610,16 @@ namespace TaikoLogging
                 }
             }
 
+            if (bitmaps == baseTitleBitmaps)
+            {
+                Console.WriteLine(baseTitles[smallestIndex] + "Title pixelDifference: " + pixelDifferences);
+                if (pixelDifferences >= 300000)
+                {
+                    Program.rin.PrepareNewSong(bmp);
+                    return -1;
+                }
+            }
+
             return smallestIndex;
         }
 
@@ -1614,7 +1628,7 @@ namespace TaikoLogging
         public void NewSongAdded()
         {
             // Reinitialize the title bitmaps so it has the new song in them
-            InitializeTitleBitmaps();
+            InitializeBaseTitleBitmaps();
 
             // Go through the GetSingleResults() so it will put the score on the spreadsheet
             using (Bitmap resultsBmp = Program.screen.CaptureApplication())

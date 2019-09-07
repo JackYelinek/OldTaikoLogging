@@ -16,6 +16,7 @@ namespace TaikoLogging
         static public bool twitchOn;
         static public ScreenGrab screen = new ScreenGrab();
         static public ImageAnalysis analysis = new ImageAnalysis();
+        static public DebugLogging logger = new DebugLogging();
 
         static void Main(string[] args)
         {
@@ -25,6 +26,8 @@ namespace TaikoLogging
 
             bool PS4 = false;
             bool emulator = false;
+
+
 
             while(true)
             {

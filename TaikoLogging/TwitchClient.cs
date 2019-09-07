@@ -47,6 +47,9 @@ namespace TaikoLogging
         private void Client_OnConnectionError(object sender, TwitchLib.Client.Events.OnConnectionErrorArgs e)
         {
             //Console.WriteLine($"Error!! {e.Error}");
+
+            // That's probably good enough
+            Program.logger.LogVariable("TwitchClient Connection Error", "Error", e.Error);
         }
 
         private void Client_OnMessageReceived(object sender, TwitchLib.Client.Events.OnMessageReceivedArgs e)

@@ -147,6 +147,8 @@ namespace TaikoLogging
             }
 
 
+            // I'm actually gonna keep these WriteLines, they're nice to see right as it starts up that they aren't all 0s
+
             Console.WriteLine(topOffset);
             Console.WriteLine(leftOffset);
             Console.WriteLine(bottomOffset);

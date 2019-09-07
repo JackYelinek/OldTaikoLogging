@@ -193,6 +193,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DebugLogging.cs" />
     <Compile Include="GoogleSheetInterface.cs" />
     <Compile Include="ImageAnalysis.cs" />
     <Compile Include="EmulatorLogger.cs" />

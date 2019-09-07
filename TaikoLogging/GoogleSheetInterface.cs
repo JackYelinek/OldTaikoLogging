@@ -129,7 +129,6 @@ namespace TaikoLogging
 
                 // NOT TESTING
                 bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Ranked Logs\" + info[headers.IndexOf("Match")] + ".png", ImageFormat.Png);
-                Console.WriteLine("Ranked match logged");
             }
         }
         public void RemoveLastRanked()
@@ -182,7 +181,8 @@ namespace TaikoLogging
             {
                 // something got fucked up
                 // probably a good idea to set up some form of logging for this sort of thing, but meh
-                Console.WriteLine("Couldn't find \"" + info[headers.IndexOf("Title")] + "\" in the sheet");
+                Program.logger.LogManyVariables("UpdatePS4HighScore: Song Not Found", headers, info);
+
                 return;
             }
 
@@ -261,8 +261,6 @@ namespace TaikoLogging
             {
                 // NOT TESTING
                 bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores\" + info[headers.IndexOf("Title")] + "." + info[headers.IndexOf("Difficulty")].ToString() + "." + numScreenshots.ToString() + ".png", ImageFormat.Png);
-                Console.WriteLine("HighScore logged");
-
             }
 
         }
@@ -293,6 +291,7 @@ namespace TaikoLogging
             {
                 // something got fucked up
                 // probably a good idea to set up some form of logging for this sort of thing, but meh
+                Program.logger.LogManyVariables("UpdatePS4BestGoods: Song Not Found", headers, info);
                 return;
             }
 
@@ -404,6 +403,8 @@ namespace TaikoLogging
             {
                 // something got fucked up
                 // probably a good idea to set up some form of logging for this sort of thing, but meh
+                // Set up logger that works well for my updated functions, which this is not
+                //Program.logger.LogManyVariables("UpdateEmulatorHighScore: Song Not Found", )
                 Console.WriteLine("Failed to update " + title + ", " + info[0].ToString() + ", " + info[1].ToString() + ", " + info[2].ToString() + ", " + info[3].ToString() + ", " + info[4].ToString() + ", ");
                 return;
             }
@@ -476,7 +477,6 @@ namespace TaikoLogging
             //updateResponse = updateRequest.Execute();
 
 
-            Console.WriteLine("HighScore logged");
 
         }
 

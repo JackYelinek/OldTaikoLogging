@@ -73,6 +73,11 @@ namespace TaikoLogging
                 info[headers.IndexOf("Win/Loss")] = "Lose";
             }
 
+            if ((int)info[headers.IndexOf("My Score")] == 0 && (int)info[headers.IndexOf("Opp Score")] == 0)
+            {
+                return;
+            }
+
             info.Add((int)info[headers.IndexOf("My Score")] - (int)info[headers.IndexOf("Opp Score")]);
             headers.Add("Difference");
 
@@ -160,9 +165,17 @@ namespace TaikoLogging
         public void UpdatePS4HighScore(List<object> info, List<string> headers, Bitmap bmp)
         {
             var Headers = GetHeaders("Oni");
-
+            string range = string.Empty;
             // Find the song in the spreadsheet
-            string range = info[headers.IndexOf("Difficulty")].ToString() + "!" + GetColumnName(Headers.IndexOf("Title")) + "2:" + GetColumnName(Headers.IndexOf("Score"));
+            if (info[headers.IndexOf("Account")].ToString() == "RinzoP")
+            {
+                range += "Messy " + info[headers.IndexOf("Difficulty")].ToString() + "!";
+            }
+            else
+            {
+                range += info[headers.IndexOf("Difficulty")].ToString() + "!";
+            }
+            range += GetColumnName(Headers.IndexOf("Title")) + "2:" + GetColumnName(Headers.IndexOf("Score"));
             var values = GetValues(range);
             int songIndex = -1;
             if (values != null && values.Count > 0)
@@ -188,7 +201,16 @@ namespace TaikoLogging
 
             // This isn't very fluid
             // If something gets changed in the spreadsheet, this breaks
-            string score = values.ElementAt(songIndex).ElementAt(4).ToString();
+            string score = string.Empty;
+
+            if (values[songIndex].Count < 5)
+            {
+                score = "0";
+            }
+            else
+            {
+                score = values[songIndex][4].ToString();
+            }
             while (true)
             {
                 if (score.IndexOf(',') == -1)
@@ -241,9 +263,18 @@ namespace TaikoLogging
 
             List<IList<object>> sendValues = new List<IList<object>>();
             sendValues.Add(baseValues);
-            SendData(info[headers.IndexOf("Difficulty")].ToString() + "!" + GetColumnName(Headers.IndexOf("Score")) + (songIndex + 2).ToString() + ":"
-                + GetColumnName(Headers.IndexOf("DateTime")) + (songIndex + 2).ToString(), sendValues);
+            if (info[headers.IndexOf("Account")].ToString() == "Deathblood")
+            {
+                range = info[headers.IndexOf("Difficulty")].ToString() + "!";
+            }
+            else
+            {
+                range = "Messy " + info[headers.IndexOf("Difficulty")].ToString() + "!";
+            }
 
+            range += GetColumnName(Headers.IndexOf("Score")) + (songIndex + 2).ToString() + ":"
+                + GetColumnName(Headers.IndexOf("DateTime")) + (songIndex + 2).ToString();
+            SendData(range, sendValues);
 
 
             DirectoryInfo dirInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores");
@@ -267,7 +298,19 @@ namespace TaikoLogging
         public void UpdatePS4BestGoods(List<object> info, List<string> headers)
         {
             var Headers = GetHeaders(info[headers.IndexOf("Difficulty")].ToString());
-            string range = info[headers.IndexOf("Difficulty")].ToString() + "!" + GetColumnName(Headers.IndexOf("Title")) + "2:" + GetColumnName(Headers.IndexOf("Best Goods"));
+
+            string range = string.Empty;
+            // Find the song in the spreadsheet
+            if (info[headers.IndexOf("Account")].ToString() == "RinzoP")
+            {
+                range += "Messy " + info[headers.IndexOf("Difficulty")].ToString() + "!";
+            }
+            else
+            {
+                range += info[headers.IndexOf("Difficulty")].ToString() + "!";
+            }
+            range += GetColumnName(Headers.IndexOf("Title")) + "2:" + GetColumnName(Headers.IndexOf("Best Goods"));
+
             var request = service.Spreadsheets.Values.Get(spreadsheetId, range);
             ValueRange response = request.Execute();
             var values = response.Values;
@@ -294,8 +337,15 @@ namespace TaikoLogging
                 Program.logger.LogManyVariables("UpdatePS4BestGoods: Song Not Found", headers, info);
                 return;
             }
-
-            string sheetGoods = values.ElementAt(songIndex)[10].ToString();
+            string sheetGoods = string.Empty;
+            if (values[songIndex].Count < 11)
+            {
+                sheetGoods = "0";
+            }
+            else
+            {
+                sheetGoods = values.ElementAt(songIndex)[10].ToString();
+            }
 
             if ((int)info[headers.IndexOf("GOOD")] < int.Parse(sheetGoods))
             {
@@ -309,20 +359,39 @@ namespace TaikoLogging
             sendValues.Add(baseValues);
 
 
-            SendData(info[headers.IndexOf("Difficulty")].ToString() + "!" + GetColumnName(Headers.IndexOf("Best Goods")) + (songIndex + 2).ToString(), sendValues);
+            if (info[headers.IndexOf("Account")].ToString() == "Deathblood")
+            {
+                range = info[headers.IndexOf("Difficulty")].ToString() + "!";
+            }
+            else
+            {
+                range = "Messy " + info[headers.IndexOf("Difficulty")].ToString() + "!";
+            }
+
+            range += GetColumnName(Headers.IndexOf("Best Goods")) + (songIndex + 2).ToString();
+            SendData(range, sendValues);
 
             if (test == false)
             {
 
                 int goodsDifference = (int)info[headers.IndexOf("GOOD")] - int.Parse(sheetGoods);
                 string twitchMessage = string.Empty;
+                string songTitle = info[headers.IndexOf("Title")].ToString();
+                if (info[headers.IndexOf("Account")].ToString() == "RinzoP")
+                {
+                    songTitle += " Messy";
+                }
                 if (goodsDifference == 1)
                 {
-                    twitchMessage += "New best accuracy on " + info[headers.IndexOf("Title")] + ", " + goodsDifference.ToString() + " more good!";
+                    twitchMessage += "New best accuracy on " + songTitle + ", " + goodsDifference.ToString() + " more good!";
+                }
+                else if (goodsDifference == 0)
+                {
+                    twitchMessage += "Tied accuracy on " + songTitle + "!";
                 }
                 else
                 {
-                    twitchMessage += "New best accuracy on " + info[headers.IndexOf("Title")] + ", " + goodsDifference.ToString() + " more goods!";
+                    twitchMessage += "New best accuracy on " + songTitle + ", " + goodsDifference.ToString() + " more goods!";
                 }
                 Program.rin.SendTwitchMessage(twitchMessage);
             }
@@ -520,9 +589,6 @@ namespace TaikoLogging
 
         public List<string> GetHeaders(string sheet)
         {
-            // This part would have to be updated if more headers are added
-            // I don't think it'd allow me to make it go past AG if there's no cells there
-            // Also note this is just for the Beatmaps sheet's headers
             string range = sheet + "!A1:Z1";
             var values = GetValues(range);
             List<string> Headers = new List<string>();
@@ -532,13 +598,6 @@ namespace TaikoLogging
             }
             return Headers;
         }
-
-        //public IList<IList<object>> GetSongData()
-        //{
-        //    var Headers = GetHeaders();
-        //    string range = "Beatmaps!" + GetColumnName(Headers.IndexOf("★")) + "2:" + GetColumnName(Headers.IndexOf("Acc"));
-        //    return GetValues(range);
-        //}
 
         public void SendData(string range, IList<IList<object>> data)
         {
@@ -559,6 +618,10 @@ namespace TaikoLogging
 
         public string GetColumnName(int index)
         {
+            if (index < 0)
+            {
+                return "";
+            }
             const string letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
             var value = "";

@@ -53,6 +53,7 @@ namespace TaikoLogging
         List<Bitmap> winLossBitmaps = new List<Bitmap>();
 
         List<Bitmap> accountBitmaps = new List<Bitmap>();
+        List<string> accounts = new List<string>();
 
         private int j = 0;
         private int numStatesSaved = 0;
@@ -379,6 +380,7 @@ namespace TaikoLogging
             {
                 var bitmap = new Bitmap(result[i].FullName);
                 accountBitmaps.Add(bitmap);
+                accounts.Add(result[i].Name.Remove(result[i].Name.LastIndexOf('.')));
             }
         }
         #endregion
@@ -499,33 +501,6 @@ namespace TaikoLogging
         {
             Bitmap bmp = Program.screen.CaptureApplication();
 
-            List<object> info = new List<object>();
-            List<string> headers = new List<string>();
-
-            if (IsDeathblood(bmp, Players.Single) == false)
-            {
-                // I think it's safe to say that if it isn't my main account, I don't care to check the rest
-                // I could eventually make a messy sheet, in which case I'd send everything to that if this is my alt
-                return;
-            }
-            var mods = CheckMods(bmp, Players.Single);
-            info.Add(CheckDifficulty(bmp, Players.Single));
-            headers.Add("Difficulty");
-            for (int i = 0; i < mods.Count; i++)
-            {
-                if (mods.ElementAt(i) == "Shin-uchi")
-                {
-                    // I don't want to save any shin-uchi scores
-                    return;
-                }
-            }
-            if ((Difficulty)info[headers.IndexOf("Difficulty")] == Difficulty.Easy || (Difficulty)info[headers.IndexOf("Difficulty")] == Difficulty.Normal)
-            {
-                // I don't care about easy or normal for my sheet
-                // I don't really care about hard either, but I have the sheet anyway, so might as well save it if I get it
-                return;
-            }
-
             Players players;
 
             if (isSession == true)
@@ -536,6 +511,34 @@ namespace TaikoLogging
             {
                 players = Players.Single;
             }
+
+            List<object> info = new List<object>();
+            List<string> headers = new List<string>();
+
+            bool isShinUchi = false;
+
+            string account = CheckAccount(bmp, players);
+
+            var mods = CheckMods(bmp, players);
+            info.Add(CheckDifficulty(bmp, players));
+            headers.Add("Difficulty");
+            for (int i = 0; i < mods.Count; i++)
+            {
+                if (mods[i] == "Shin-uchi")
+                {
+                    // I don't want to save any shin-uchi scores (except BestGoods which I forgot to update this to take into account)
+                    isShinUchi = true;
+                }
+            }
+
+            if ((Difficulty)info[headers.IndexOf("Difficulty")] == Difficulty.Easy || (Difficulty)info[headers.IndexOf("Difficulty")] == Difficulty.Normal)
+            {
+                // I don't care about easy or normal for my sheet
+                // I don't really care about hard either, but I have the sheet anyway, so might as well save it if I get it
+                return;
+            }
+
+
 
 
             info.Add(GetTitle(bmp));
@@ -563,9 +566,14 @@ namespace TaikoLogging
             {
                 return;
             }
+
             bool highScore = IsHighScore(bmp);
+
+            info.Add(account);
+            headers.Add("Account");
+
             sheet.UpdatePS4BestGoods(info, headers);
-            if (highScore == true)
+            if ( /*highScore == true && */ isShinUchi == false)
             {
                 sheet.UpdatePS4HighScore(info, headers, bmp);
 
@@ -584,8 +592,8 @@ namespace TaikoLogging
             List<object> info = new List<object>();
             List<string> headers = new List<string>();
 
-            bool account = IsDeathblood(bmp, Players.RankedTop);
-            if (account == false)
+            string account = CheckAccount(bmp, Players.RankedTop);
+            if (account != "Deathblood")
             {
                 // I don't care if it's ranked on my alt
                 return;
@@ -767,21 +775,6 @@ namespace TaikoLogging
             return CompareBitmaps(winlossBmp, winLossBitmaps[1]) < CompareBitmaps(winlossBmp, winLossBitmaps[0]);
         }
 
-        public bool IsDeathblood(Bitmap bmp, Players players)
-        {
-            double offset = 0;
-            if (players == Players.RankedTop)
-            {
-                offset = -0.156105100;
-            }
-            else if (players == Players.RankedBottom)
-            {
-                offset = 0.241112828;
-            }
-            var accountBmp = GetBitmapArea(bmp, GetWidth(bmp, 0.08333333), GetHeight(bmp, 0.0231839), GetWidth(bmp, 0.10677083), GetHeight(bmp, 0.333848531 + offset));
-            accountBmp = ScaleDown(accountBmp, 96, 15);
-            return CompareBitmaps(accountBmp, accountBitmaps[0]) < CompareBitmaps(accountBmp, accountBitmaps[1]);
-        }
 
         // OCR is a pain in the ass and I can't be bothered figuring out how to make it work
         // My main guess is that I'd have to train the data myself, but I don't even have enough data to train it
@@ -841,7 +834,22 @@ namespace TaikoLogging
             var titleBmp = GetBitmapArea(bmp, GetWidth(bmp, relativeValues[0]), GetHeight(bmp, relativeValues[1]), GetWidth(bmp, relativeValues[2]), GetHeight(bmp, relativeValues[3]));
             return ScaleDown(titleBmp, 450, 28);
         }
+        public string CheckAccount(Bitmap bmp, Players players)
+        {
+            double offset = 0;
+            if (players == Players.RankedTop)
+            {
+                offset = -0.156105100;
+            }
+            else if (players == Players.RankedBottom)
+            {
+                offset = 0.241112828;
+            }
+            var accountBmp = GetBitmapArea(bmp, GetWidth(bmp, 0.08333333), GetHeight(bmp, 0.0231839), GetWidth(bmp, 0.10677083), GetHeight(bmp, 0.333848531 + offset));
+            accountBmp = ScaleDown(accountBmp, 96, 15);
 
+            return accounts[CompareBitmapToList(accountBmp, accountBitmaps)];
+        }
         public int GetScore(Bitmap bmp, Players player)
         {
             List<Bitmap> scoreBitmaps = GetScoreBitmaps(bmp, player);

@@ -55,6 +55,7 @@ namespace TaikoLogging
         }
 
         // This might be useful, or maybe not, I have no clue
+        // I thought I could put anything into List<object>, but it's a bit more complicated than that
         public void LogManyVariables(string category, List<string> headers, List<object> info)
         {
             string message = "[" + category + "] ";

@@ -82,7 +82,7 @@ namespace TaikoLogging
             }
             else if (CheckDBCommands("!random", e))
             {
-
+                sheet.GetRandomSong();
             }
         }
 

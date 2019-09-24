@@ -409,6 +409,7 @@ namespace TaikoLoggingTests
                 new Bitmap(folderPath + "竜と黒炎の姫君.Ura.5.png"),
                 new Bitmap(folderPath + "紫煌ノ乱.Oni.1.png"),
                 new Bitmap(folderPath + "ナイト・オブ・ナイツ.Oni.0.png"),
+                new Bitmap(folderPath + "Let It Go～ありのままで～.Oni.3.png")
             };
 
             List<int> drumroll = new List<int>();
@@ -437,7 +438,8 @@ namespace TaikoLoggingTests
                 0,
                 77,
                 0,
-                126
+                126,
+                604
             };
             for (int i = 0; i < bmps.Count; i++)
             {

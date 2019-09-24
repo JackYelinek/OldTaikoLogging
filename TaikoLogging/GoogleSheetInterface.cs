@@ -333,50 +333,64 @@ namespace TaikoLogging
             var Headers = GetHeaders("Oni");
 
             List<string> songs = new List<string>();
-            List<int> goalDifference = new List<int>();
+            List<int> goalValues = new List<int>();
 
             string range = "Oni!A2:" + GetColumnName(Headers.Count);
             var values = GetValues(range);
 
             for (int i = 0; i < values.Count; i++)
             {
-                if (values[i][Headers.IndexOf("Goal OKs")] == null)
+                if (values[i][Headers.IndexOf("Goal OKs")] == "" || int.Parse(values[i][Headers.IndexOf("OK")].ToString()) == 0 || int.Parse(values[i][Headers.IndexOf("OK")].ToString()) - int.Parse(values[i][Headers.IndexOf("Goal OKs")].ToString()) <= 0)
                 {
                     continue;
                 }
                 songs.Add(values[i][Headers.IndexOf("Title")].ToString());
-                goalDifference.Add((int)values[i][Headers.IndexOf("OK")] - (int)values[i][Headers.IndexOf("Goal OKs")]);
+                int numNotes = int.Parse(values[i][Headers.IndexOf("GOOD")].ToString()) + int.Parse(values[i][Headers.IndexOf("OK")].ToString()) + int.Parse(values[i][Headers.IndexOf("BAD")].ToString());
+                int goalValue = numNotes / (int.Parse(values[i][Headers.IndexOf("OK")].ToString()) - int.Parse(values[i][Headers.IndexOf("Goal OKs")].ToString()));
+                goalValues.Add(goalValue);
             }
 
             range = "Ura!A2:" + GetColumnName(Headers.Count);
             values = GetValues(range);
             for (int i = 0; i < values.Count; i++)
             {
-                if (values[i][Headers.IndexOf("Goal OKs")] == null)
+                if (values[i][Headers.IndexOf("Goal OKs")] == "" || int.Parse(values[i][Headers.IndexOf("OK")].ToString()) == 0 || int.Parse(values[i][Headers.IndexOf("OK")].ToString()) - int.Parse(values[i][Headers.IndexOf("Goal OKs")].ToString()) <= 0)
                 {
                     continue;
                 }
-                songs.Add(values[i][Headers.IndexOf("Title")].ToString() + " Ura");
-                goalDifference.Add((int)values[i][Headers.IndexOf("OK")] - (int)values[i][Headers.IndexOf("Goal OKs")]);
+                songs.Add(values[i][Headers.IndexOf("Title")].ToString());
+                int numNotes = int.Parse(values[i][Headers.IndexOf("GOOD")].ToString()) + int.Parse(values[i][Headers.IndexOf("OK")].ToString()) + int.Parse(values[i][Headers.IndexOf("BAD")].ToString());
+                int goalValue = numNotes / (int.Parse(values[i][Headers.IndexOf("OK")].ToString()) - int.Parse(values[i][Headers.IndexOf("Goal OKs")].ToString()));
+                goalValues.Add(goalValue);
             }
 
-            int maxRand = goalDifference.Sum();
+            int maxRand = goalValues.Sum();
             Random rand = new Random();
             var randValue = rand.Next(maxRand);
 
-            for (int i = 0; i < goalDifference.Count; i++)
+            for (int i = 0; i < goalValues.Count; i++)
             {
-                if (randValue < goalDifference[i])
+                if (randValue < goalValues[i])
                 {
                     // this is the song it picks
                     // I could add more info, like what my goal is, how many fewer OKs I want, stuff like that
                     Program.rin.SendTwitchMessage(songs[i]);
+                    break;
                 }
                 else
                 {
-                    randValue -= goalDifference[i];
+                    randValue -= goalValues[i];
                 }
             }
+
+            List<object> loggingGoalDifference = new List<object>();
+            for (int i = 0; i < goalValues.Count; i++)
+            {
+                loggingGoalDifference.Add(goalValues[i]);
+            }
+
+            Program.logger.LogManyVariables("Random", songs, loggingGoalDifference);
+            Program.logger.LogVariable("Random", "randValue", randValue);
         }
 
         #region Emulator functions

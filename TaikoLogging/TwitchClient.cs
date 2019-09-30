@@ -96,7 +96,9 @@ namespace TaikoLogging
             if (Program.twitchOn == true)
             {
                 client.SendMessage(TwitchInfo.ChannelName, message);
+                Console.WriteLine("Twitch message sent: " + message);
             }
+            Console.WriteLine("Twitch offline: " + message);
         }
 
         private bool CheckDBCommands(string command, TwitchLib.Client.Events.OnMessageReceivedArgs e)

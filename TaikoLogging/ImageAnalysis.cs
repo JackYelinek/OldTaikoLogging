@@ -18,7 +18,7 @@ namespace TaikoLogging
         {
             CustomizeRoom, DifficultySelect, EventPage, MainMenu, MainMenuSettings, MenuLoading, PracticePause, PracticeSelect, PracticeSong,
             RankedEndSong, RankedLeaderboards, RankedMidSong, RankedPause, RankedPointsGain, RankedResults, RankedSelect, RankedSongFound, RankedStats,
-            SingleSongEnd, SingleResults, SingleSong, SingleSessionResults, SingleSongPause, SongLoading, SongSelect, SongSelectSettings, SongSettings, TreasureBoxes
+            SingleResults, SingleSong, SingleSessionResults, SingleSongPause, SongLoading, SongSelect, SongSelectSettings, SongSettings, TreasureBoxes
         };
         State previousState;
         State currentState;
@@ -83,9 +83,7 @@ namespace TaikoLogging
                 currentState = CheckState(bmp);
                 if (previousState != currentState)
                 {
-                    // names each file based on the number it was made in, then by the state it thought it was
-                    // It saves every time it changes the state
-                    if (currentState == State.SingleSongEnd)
+                    if (currentState == State.SingleResults || currentState == State.SingleSessionResults)
                     {
                         Thread.Sleep(3500);
                         using (Bitmap resultsBmp = Program.screen.CaptureApplication())
@@ -113,7 +111,25 @@ namespace TaikoLogging
 
         public void NotStandardLoop()
         {
+            GetSingleResults(false);
+        }
 
+        public void AnalyzeResults()
+        {
+            currentState = CheckState(Program.screen.CaptureApplication());
+
+            if (currentState == State.SingleResults)
+            {
+                GetSingleResults(false);
+            }
+            else if (currentState == State.SingleSessionResults)
+            {
+                GetSingleResults(true);
+            }
+            else if (currentState == State.RankedResults)
+            {
+                GetRankedResults();
+            }
         }
 
         const int BitmapLeniency = 15;
@@ -650,11 +666,87 @@ namespace TaikoLogging
             sheet.UpdatePS4BestGoods(info, headers);
         }
 
+        public void FixRankedLogs()
+        {
+            DirectoryInfo dirInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\Image Data\Ranked Logs");
+            var results = dirInfo.GetFiles();
+
+            for (int i = 0; i < results.Length; i++)
+            {
+                if (int.Parse(results[i].Name.Remove(results[i].Name.IndexOf('.'))) < 1640)
+                {
+                    continue;
+                }
+                using (Bitmap bmp = new Bitmap(results[i].FullName))
+                {
+                    int matchNumber = int.Parse(results[i].Name.Remove(results[i].Name.IndexOf('.')));
+
+                    List<object> info = new List<object>();
+                    List<string> headers = new List<string>();
+
+                    info.Add(GetTitle(bmp));
+                    headers.Add("Title");
+                    if (info[headers.IndexOf("Title")].ToString() == "")
+                    {
+                        return;
+                    }
+                    info.Add(CheckDifficulty(bmp, Players.RankedTop));
+                    headers.Add("Difficulty");
+
+                    // Top Player Data
+                    info.Add(GetScore(bmp, Players.RankedTop));
+                    headers.Add("My Score");
+                    info.Add(GetGoods(bmp, Players.RankedTop));
+                    headers.Add("My Goods");
+                    info.Add(GetOKs(bmp, Players.RankedTop));
+                    headers.Add("My OKs");
+                    info.Add(GetBads(bmp, Players.RankedTop));
+                    headers.Add("My Bads");
+                    info.Add(GetCombo(bmp, Players.RankedTop));
+                    headers.Add("My Combo");
+                    info.Add(GetDrumroll(bmp, Players.RankedTop));
+                    headers.Add("My Drumroll");
+
+                    // Bottom Player Data
+                    info.Add(GetScore(bmp, Players.RankedBottom));
+                    headers.Add("Opp Score");
+                    info.Add(GetGoods(bmp, Players.RankedBottom));
+                    headers.Add("Opp Goods");
+                    info.Add(GetOKs(bmp, Players.RankedBottom));
+                    headers.Add("Opp OKs");
+                    info.Add(GetBads(bmp, Players.RankedBottom));
+                    headers.Add("Opp Bads");
+                    info.Add(GetCombo(bmp, Players.RankedBottom));
+                    headers.Add("Opp Combo");
+                    info.Add(GetDrumroll(bmp, Players.RankedBottom));
+                    headers.Add("Opp Drumroll");
+
+                    // Result Data
+                    bool victory = RankedWinLoss(bmp);
+                    if (victory == true)
+                    {
+                        info.Add("Win");
+                    }
+                    else
+                    {
+                        info.Add("Lose");
+                    }
+                    headers.Add("Win/Loss");
+
+                    sheet.FixRankedLogsData(info, headers, matchNumber);
+
+                }
+            }
+
+
+        }
+
+
 
         #region Data gathering
 
 
-       
+
 
         public bool IsHighScore(Bitmap bmp)
         {
@@ -1077,7 +1169,7 @@ namespace TaikoLogging
             if (bitmaps == baseTitleBitmaps)
             {
                 Program.logger.LogPixelDifference(baseTitles[smallestIndex], pixelDifferences);
-                if (pixelDifferences >= 300000)
+                if (pixelDifferences >= 200000)
                 {
                     Program.rin.PrepareNewSong(bmp);
                     return -1;

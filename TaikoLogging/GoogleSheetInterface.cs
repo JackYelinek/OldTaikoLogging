@@ -276,23 +276,51 @@ namespace TaikoLogging
                 + GetColumnName(Headers.IndexOf("DateTime")) + (songIndex + 2).ToString();
             SendData(range, sendValues);
 
-
-            DirectoryInfo dirInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores");
-            var result = dirInfo.GetFiles();
-            int numScreenshots = 0;
-            for (int i = 0; i < result.Length; i++)
+            if (test == false)
             {
-                if (result[i].Name.Remove(result[i].Name.IndexOf('.')) == info[headers.IndexOf("Title")].ToString() && result[i].Name.Remove(0, result[i].Name.IndexOf('.') + 1).Remove(result[i].Name.Remove(0, result[i].Name.IndexOf('.') + 1).IndexOf('.')) == info[headers.IndexOf("Difficulty")].ToString())
+
+                if (info[headers.IndexOf("Account")].ToString() == "Deathblood")
                 {
-                    numScreenshots++;
+                    DirectoryInfo dirInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores\Normal\" + info[headers.IndexOf("Title")]);
+                    if (dirInfo.Exists == false)
+                    {
+                        dirInfo.Create();
+                    }
+                    var result = dirInfo.GetFiles();
+                    bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores\Normal\" + info[headers.IndexOf("Title")]  + "\\" + info[headers.IndexOf("Title")] + "." + info[headers.IndexOf("Difficulty")].ToString() + "." + result.Length + ".png", ImageFormat.Png);
+                }
+                else if (info[headers.IndexOf("Account")].ToString() == "RinzoP")
+                {
+                    DirectoryInfo dirInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores\Messy\" + info[headers.IndexOf("Title")]);
+                    if (dirInfo.Exists == false)
+                    {
+                        dirInfo.Create();
+                    }
+                    var result = dirInfo.GetFiles();
+                    bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores\Messy\" + info[headers.IndexOf("Title")] + "\\" + info[headers.IndexOf("Title")] + "." + info[headers.IndexOf("Difficulty")].ToString() + "." + result.Length + ".png", ImageFormat.Png);
                 }
             }
 
-            if (test == false)
-            {
-                // NOT TESTING
-                bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores\" + info[headers.IndexOf("Title")] + "." + info[headers.IndexOf("Difficulty")].ToString() + "." + numScreenshots.ToString() + ".png", ImageFormat.Png);
-            }
+
+
+
+
+            //DirectoryInfo dirInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores");
+            //var result = dirInfo.GetFiles();
+            //int numScreenshots = 0;
+            //for (int i = 0; i < result.Length; i++)
+            //{
+            //    if (result[i].Name.Remove(result[i].Name.IndexOf('.')) == info[headers.IndexOf("Title")].ToString() && result[i].Name.Remove(0, result[i].Name.IndexOf('.') + 1).Remove(result[i].Name.Remove(0, result[i].Name.IndexOf('.') + 1).IndexOf('.')) == info[headers.IndexOf("Difficulty")].ToString())
+            //    {
+            //        numScreenshots++;
+            //    }
+            //}
+
+            //if (test == false)
+            //{
+            //    // NOT TESTING
+            //    bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores\" + info[headers.IndexOf("Title")] + "." + info[headers.IndexOf("Difficulty")].ToString() + "." + numScreenshots.ToString() + ".png", ImageFormat.Png);
+            //}
 
         }
         public void UpdatePS4BestGoods(List<object> info, List<string> headers)
@@ -460,6 +488,50 @@ namespace TaikoLogging
 
             Program.logger.LogManyVariables("Random", songs, loggingGoalDifference);
             Program.logger.LogVariable("Random", "randValue", randValue);
+        }
+        public void FixRankedLogsData(List<object> info, List<string> headers, int matchNumber)
+        {
+            var Headers = GetHeaders("Ranked Logs");
+            string range = string.Empty;
+
+            range = "Ranked Logs!A2:" + GetColumnName(Headers.IndexOf("DateTime"));
+
+            var values = GetValues(range);
+
+            List<IList<object>> sendValues = new List<IList<object>>();
+            int index = 0;
+            for (int i = 0; i < values.Count; i++)
+            {
+                IList<object> baseValues = new List<object>();
+                if (matchNumber != int.Parse(values[i][Headers.IndexOf("Match")].ToString()))
+                {
+                    continue;
+                }
+                index = i+2;
+                for (int k = 0; k < Headers.Count; k++)
+                {
+                    bool headerFound = false;
+                    for (int l = 0; l < headers.Count; l++)
+                    {
+                        if (Headers[k] == headers[l])
+                        {
+                            baseValues.Add(info[l].ToString());
+                            headerFound = true;
+                            break;
+                        }
+                    }
+                    if (headerFound == false)
+                    {
+                        baseValues.Add(null);
+                    }
+                }
+                sendValues.Add(baseValues);
+                break;
+            }
+
+            range = "Ranked Logs!A" + index.ToString() + ":" + GetColumnName(Headers.Count);
+
+            SendData(range, sendValues);
         }
 
         #region Emulator functions

@@ -19,6 +19,7 @@ namespace TaikoLogging
 
         }
 
+        // TODO I'd like to be able to see some logging stuff live, like if the song can't be found even when it is in the program
 
 
 

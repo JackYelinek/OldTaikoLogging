@@ -13,7 +13,6 @@ namespace TaikoLogging
 {
     class ImageAnalysis
     {
-        GoogleSheetInterface sheet;
         public enum State
         {
             CustomizeRoom, DifficultySelect, EventPage, MainMenu, MainMenuSettings, MenuLoading, PracticePause, PracticeSelect, PracticeSong,
@@ -59,16 +58,6 @@ namespace TaikoLogging
         private int numStatesSaved = 0;
         public ImageAnalysis()
         {
-            // expert level programming right here
-            try
-            {
-                sheet = new GoogleSheetInterface();
-            }
-            catch
-            {
-
-            }
-
             InitializeAll();
 
             //TestingScreenshot();
@@ -83,26 +72,10 @@ namespace TaikoLogging
                 currentState = CheckState(bmp);
                 if (previousState != currentState)
                 {
-                    if (currentState == State.SingleResults || currentState == State.SingleSessionResults)
+                    if (currentState == State.SingleResults || currentState == State.SingleSessionResults || currentState == State.RankedResults)
                     {
                         Thread.Sleep(3500);
-                        using (Bitmap resultsBmp = Program.screen.CaptureApplication())
-                        {
-                            currentState = CheckState(resultsBmp);
-                            if (currentState == State.SingleResults)
-                            {
-                                GetSingleResults(false);
-                            }
-                            else if (currentState == State.SingleSessionResults)
-                            {
-                                GetSingleResults(true);
-                            }
-                        }
-                    }
-                    else if (currentState == State.RankedResults)
-                    {
-                        Thread.Sleep(4000);
-                        GetRankedResults();
+                        AnalyzeResults();
                     }
                 }
             }
@@ -588,10 +561,10 @@ namespace TaikoLogging
             info.Add(account);
             headers.Add("Account");
 
-            sheet.UpdatePS4BestGoods(info, headers);
+            Program.sheet.UpdatePS4BestGoods(info, headers);
             if ( /*highScore == true && */ isShinUchi == false)
             {
-                sheet.UpdatePS4HighScore(info, headers, bmp);
+                Program.sheet.UpdatePS4HighScore(info, headers, bmp);
 
                 //DirectoryInfo dirInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores");
                 //var result = dirInfo.GetFiles();
@@ -608,6 +581,8 @@ namespace TaikoLogging
             List<object> info = new List<object>();
             List<string> headers = new List<string>();
 
+
+
             string account = CheckAccount(bmp, Players.RankedTop);
             if (account != "Deathblood")
             {
@@ -618,7 +593,7 @@ namespace TaikoLogging
             // Song Data
             info.Add(GetTitle(bmp));
             headers.Add("Title");
-            if (info[headers.IndexOf("Title")] == "")
+            if (info[headers.IndexOf("Title")].ToString() == "")
             {
                 return;
             }
@@ -657,13 +632,16 @@ namespace TaikoLogging
             info.Add(RankedWinLoss(bmp));
             headers.Add("Win/Loss");
 
+            info.Add(account);
+            headers.Add("Account");
+
             // Check to see if the scores are possible, they must always end with a 0
             if ((int)info[headers.IndexOf("My Score")] % 10 != 0 || (int)info[headers.IndexOf("Opp Score")] % 10 != 0)
             {
                 return;
             }
-            sheet.AddRankedEntry(info, headers, bmp);
-            sheet.UpdatePS4BestGoods(info, headers);
+            Program.sheet.AddRankedEntry(info, headers, bmp);
+            Program.sheet.UpdatePS4BestGoods(info, headers);
         }
 
         public void FixRankedLogs()
@@ -733,7 +711,7 @@ namespace TaikoLogging
                     }
                     headers.Add("Win/Loss");
 
-                    sheet.FixRankedLogsData(info, headers, matchNumber);
+                    Program.sheet.FixRankedLogsData(info, headers, matchNumber);
 
                 }
             }
@@ -1169,7 +1147,7 @@ namespace TaikoLogging
             if (bitmaps == baseTitleBitmaps)
             {
                 Program.logger.LogPixelDifference(baseTitles[smallestIndex], pixelDifferences);
-                if (pixelDifferences >= 200000)
+                if (pixelDifferences >= 300000)
                 {
                     Program.rin.PrepareNewSong(bmp);
                     return -1;

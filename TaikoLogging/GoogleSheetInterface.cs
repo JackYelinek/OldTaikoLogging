@@ -432,46 +432,79 @@ namespace TaikoLogging
             List<string> songs = new List<string>();
             List<int> goalValues = new List<int>();
 
+            List<int> songOKs = new List<int>();
+            List<int> goalOKs = new List<int>();
+
             string range = "Oni!A2:" + GetColumnName(Headers.Count);
             var values = GetValues(range);
 
+            int numOni = 0;
             for (int i = 0; i < values.Count; i++)
             {
-                if (values[i][Headers.IndexOf("Goal OKs")] == "" || int.Parse(values[i][Headers.IndexOf("OK")].ToString()) == 0 || int.Parse(values[i][Headers.IndexOf("OK")].ToString()) - int.Parse(values[i][Headers.IndexOf("Goal OKs")].ToString()) <= 0)
+                if (values[i][Headers.IndexOf("Goal OKs")].ToString() == "" || int.Parse(values[i][Headers.IndexOf("OK")].ToString()) == 0 || int.Parse(values[i][Headers.IndexOf("OK")].ToString()) - int.Parse(values[i][Headers.IndexOf("Goal OKs")].ToString()) <= 0)
                 {
                     continue;
                 }
                 songs.Add(values[i][Headers.IndexOf("Title")].ToString());
-                int numNotes = int.Parse(values[i][Headers.IndexOf("GOOD")].ToString()) + int.Parse(values[i][Headers.IndexOf("OK")].ToString()) + int.Parse(values[i][Headers.IndexOf("BAD")].ToString());
-                int goalValue = numNotes / (int.Parse(values[i][Headers.IndexOf("OK")].ToString()) - int.Parse(values[i][Headers.IndexOf("Goal OKs")].ToString()));
+                int songOK = int.Parse(values[i][Headers.IndexOf("OK")].ToString());
+                int goalOK = int.Parse(values[i][Headers.IndexOf("Goal OKs")].ToString());
+                //int numNotes = int.Parse(values[i][Headers.IndexOf("GOOD")].ToString()) + songOK + int.Parse(values[i][Headers.IndexOf("BAD")].ToString());
+                int goalValue = (songOK + int.Parse(values[i][Headers.IndexOf("BAD")].ToString())) - goalOK;
                 goalValues.Add(goalValue);
+                songOKs.Add(songOK);
+                goalOKs.Add(goalOK);
+
+
+                numOni++;
             }
 
             range = "Ura!A2:" + GetColumnName(Headers.Count);
             values = GetValues(range);
             for (int i = 0; i < values.Count; i++)
             {
-                if (values[i][Headers.IndexOf("Goal OKs")] == "" || int.Parse(values[i][Headers.IndexOf("OK")].ToString()) == 0 || int.Parse(values[i][Headers.IndexOf("OK")].ToString()) - int.Parse(values[i][Headers.IndexOf("Goal OKs")].ToString()) <= 0)
+                if (values[i][Headers.IndexOf("Goal OKs")].ToString() == "" || int.Parse(values[i][Headers.IndexOf("OK")].ToString()) == 0 || int.Parse(values[i][Headers.IndexOf("OK")].ToString()) - int.Parse(values[i][Headers.IndexOf("Goal OKs")].ToString()) <= 0)
                 {
                     continue;
                 }
                 songs.Add(values[i][Headers.IndexOf("Title")].ToString());
-                int numNotes = int.Parse(values[i][Headers.IndexOf("GOOD")].ToString()) + int.Parse(values[i][Headers.IndexOf("OK")].ToString()) + int.Parse(values[i][Headers.IndexOf("BAD")].ToString());
-                int goalValue = numNotes / (int.Parse(values[i][Headers.IndexOf("OK")].ToString()) - int.Parse(values[i][Headers.IndexOf("Goal OKs")].ToString()));
+                int songOK = int.Parse(values[i][Headers.IndexOf("OK")].ToString());
+                int goalOK = int.Parse(values[i][Headers.IndexOf("Goal OKs")].ToString());
+                //int numNotes = int.Parse(values[i][Headers.IndexOf("GOOD")].ToString()) + songOK + int.Parse(values[i][Headers.IndexOf("BAD")].ToString());
+                int goalValue = (songOK + int.Parse(values[i][Headers.IndexOf("BAD")].ToString())) - goalOK;
                 goalValues.Add(goalValue);
+                songOKs.Add(songOK);
+                goalOKs.Add(goalOK);
             }
 
             int maxRand = goalValues.Sum();
             Random rand = new Random();
-            var randValue = rand.Next(maxRand);
+            float randValue = rand.Next(maxRand);
+
+            List<float> chances = new List<float>();
+
+            for (int i = 0; i < goalValues.Count; i++)
+            {
+                // I think this math is correct
+                chances.Add(goalValues[i] / (float)goalValues.Sum());
+            }
 
             for (int i = 0; i < goalValues.Count; i++)
             {
                 if (randValue < goalValues[i])
                 {
-                    // this is the song it picks
-                    // I could add more info, like what my goal is, how many fewer OKs I want, stuff like that
-                    Program.rin.SendTwitchMessage(songs[i]);
+                    // Song picked
+                    string message = songs[i];
+
+                    if(i > numOni)
+                    {
+                        message += " Ura";
+                    }
+
+
+                    message += ", " + songOKs[i] + " OKs -> " + goalOKs[i] + " Goal OKs, " + chances[i] * 100 + "% chance of hitting this song";
+
+                    Program.rin.SendTwitchMessage(message);
+
                     break;
                 }
                 else
@@ -480,6 +513,7 @@ namespace TaikoLogging
                 }
             }
 
+            #region Logging
             List<object> loggingGoalDifference = new List<object>();
             for (int i = 0; i < goalValues.Count; i++)
             {
@@ -488,6 +522,7 @@ namespace TaikoLogging
 
             Program.logger.LogManyVariables("Random", songs, loggingGoalDifference);
             Program.logger.LogVariable("Random", "randValue", randValue);
+            #endregion
         }
         public void FixRankedLogsData(List<object> info, List<string> headers, int matchNumber)
         {

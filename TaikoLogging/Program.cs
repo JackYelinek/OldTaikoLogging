@@ -6,6 +6,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace TaikoLogging
@@ -17,17 +18,18 @@ namespace TaikoLogging
         static public ScreenGrab screen = new ScreenGrab();
         static public ImageAnalysis analysis = new ImageAnalysis();
         static public DebugLogging logger = new DebugLogging();
+        static public GoogleSheetInterface sheet = new GoogleSheetInterface();
+        static public EmulatorLogger emulatorLogger = new EmulatorLogger();
 
         static void Main(string[] args)
         {
-            EmulatorLogger emulatorLogger = new EmulatorLogger();
-
             // TODO Set this up automatically
 
             bool PS4 = false;
             bool emulator = false;
 
-
+            Thread inputThread = new Thread(ReadInput);
+            inputThread.Start();
 
             while(true)
             {
@@ -64,6 +66,7 @@ namespace TaikoLogging
                 {
                     //analysis.NotStandardLoop();
                     analysis.StandardLoop();
+                    
                 }
                 else if (emulator == true)
                 {
@@ -75,5 +78,38 @@ namespace TaikoLogging
 
         }
 
+        static void ReadInput()
+        {
+            List<string> commandWord = new List<string>()
+            {
+                "analyze", "result",
+                "random",
+                "help"
+            };
+            while(true)
+            {
+                var input = Console.ReadLine();
+
+                if (string.CompareOrdinal(input, "analyze") == 0 || string.CompareOrdinal(input, "result") == 0)
+                {
+                    analysis.AnalyzeResults();
+                }
+                else if (string.CompareOrdinal(input, "random") == 0)
+                {
+                    sheet.GetRandomSong();
+                }
+                else if (string.CompareOrdinal(input, "help") == 0)
+                {
+                    string message = "List of commands:\n";
+                    for (int i = 0; i < commandWord.Count; i++)
+                    {
+                        message += commandWord[i] + "\n";
+                    }
+                    message += "\n";
+
+                    Console.WriteLine(message);
+                }
+            }
+        }
     }
 }

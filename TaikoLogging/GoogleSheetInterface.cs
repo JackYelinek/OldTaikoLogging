@@ -298,6 +298,7 @@ namespace TaikoLogging
                     }
                     var result = dirInfo.GetFiles();
                     bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores\Messy\" + info[headers.IndexOf("Title")] + "\\" + info[headers.IndexOf("Title")] + "." + info[headers.IndexOf("Difficulty")].ToString() + "." + result.Length + ".png", ImageFormat.Png);
+
                 }
             }
 

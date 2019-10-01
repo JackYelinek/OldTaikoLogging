@@ -8,6 +8,7 @@ using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Drawing.Imaging;
+using System.Windows.Forms;
 
 namespace TaikoLogging
 {
@@ -489,6 +490,11 @@ namespace TaikoLogging
         public void GetSingleResults(bool isSession)
         {
             Bitmap bmp = Program.screen.CaptureApplication();
+            
+            Thread thread = new Thread(() => Clipboard.SetImage(bmp));
+            thread.SetApartmentState(ApartmentState.STA); //Set the thread to STA
+            thread.Start();
+            thread.Join();
 
             Players players;
 
@@ -581,7 +587,10 @@ namespace TaikoLogging
             List<object> info = new List<object>();
             List<string> headers = new List<string>();
 
-
+            Thread thread = new Thread(() => Clipboard.SetImage(bmp));
+            thread.SetApartmentState(ApartmentState.STA); //Set the thread to STA
+            thread.Start();
+            thread.Join();
 
             string account = CheckAccount(bmp, Players.RankedTop);
             if (account != "Deathblood")

@@ -104,7 +104,6 @@ namespace TaikoLogging
             {
                 GetRankedResults();
             }
-            Console.WriteLine("Analysis Complete\n");
         }
 
         const int BitmapLeniency = 15;
@@ -580,6 +579,8 @@ namespace TaikoLogging
                 //bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores\" + result.Length + ".png", ImageFormat.Png);
             }
             Console.WriteLine(info[headers.IndexOf("Title")].ToString());
+            Console.WriteLine("Analysis Complete\n");
+
         }
 
 
@@ -656,6 +657,8 @@ namespace TaikoLogging
             Program.sheet.AddRankedEntry(info, headers, bmp);
             Program.sheet.UpdatePS4BestGoods(info, headers);
             Console.WriteLine(info[headers.IndexOf("Title")].ToString());
+            Console.WriteLine("Analysis Complete\n");
+
         }
 
         public void FixRankedLogs()

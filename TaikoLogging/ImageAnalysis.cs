@@ -9,6 +9,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
+using IronOcr;
 
 namespace TaikoLogging
 {
@@ -85,7 +86,11 @@ namespace TaikoLogging
 
         public void NotStandardLoop()
         {
-            GetSingleResults(false);
+            using (Bitmap bmp = new Bitmap(@"D:\My Stuff\My Programs\Taiko\Image Data\Ranked Logs\1713.png"))
+            {
+                var name = GetOpponentName(bmp);
+                Console.WriteLine(name);
+            }
         }
 
         public void AnalyzeResults()
@@ -1140,7 +1145,38 @@ namespace TaikoLogging
             }
             return scoreBitmaps;
         }
+        public string GetOpponentName(Bitmap bmp)
+        {
+            //AutoOcr OCR = new AutoOcr() { ReadBarCodes = false };
 
+            var Ocr = new AdvancedOcr()
+            {
+                InputImageType = AdvancedOcr.InputTypes.Snippet,
+                ColorSpace = AdvancedOcr.OcrColorSpace.Color,
+                ReadBarCodes = false,
+                EnhanceResolution = true,
+                EnhanceContrast = true,
+                
+            };
+            //GetOpponentNameBitmap(bmp);
+            //var Results = OCR.Read(GetOpponentNameBitmap(bmp));
+            var Results = Ocr.Read(GetOpponentNameBitmap(bmp));
+            return Results.Text;
+        }
+        public Bitmap GetOpponentNameBitmap(Bitmap bmp)
+        {
+            int width = GetWidth(bmp, 0.13932399f);
+            int height = GetHeight(bmp, 0.02052785f);
+            
+            int x = GetWidth(bmp, 0.08903544f);
+            int y = GetHeight(bmp, 0.57478005f);
+
+            Bitmap nameBitmap = GetBitmapArea(bmp, width, height, x, y);
+
+            //nameBitmap = CleanOpponentNameBitmap(nameBitmap);
+
+            return nameBitmap;
+        }
 
         public int CompareBitmapToList(Bitmap bmp, List<Bitmap> bitmaps)
         {

@@ -86,11 +86,7 @@ namespace TaikoLogging
 
         public void NotStandardLoop()
         {
-            using (Bitmap bmp = new Bitmap(@"D:\My Stuff\My Programs\Taiko\Image Data\Ranked Logs\1713.png"))
-            {
-                var name = GetOpponentName(bmp);
-                Console.WriteLine(name);
-            }
+
         }
 
         public void AnalyzeResults()
@@ -585,7 +581,10 @@ namespace TaikoLogging
             }
             Console.WriteLine(info[headers.IndexOf("Title")].ToString());
             Console.WriteLine("Analysis Complete\n");
-
+            if (randomMode == true)
+            {
+                Program.sheet.GetRandomSong();
+            }
         }
 
 
@@ -1147,19 +1146,17 @@ namespace TaikoLogging
         }
         public string GetOpponentName(Bitmap bmp)
         {
-            //AutoOcr OCR = new AutoOcr() { ReadBarCodes = false };
+            //AutoOcr Ocr = new AutoOcr() { ReadBarCodes = false };
 
             var Ocr = new AdvancedOcr()
             {
                 InputImageType = AdvancedOcr.InputTypes.Snippet,
                 ColorSpace = AdvancedOcr.OcrColorSpace.Color,
                 ReadBarCodes = false,
-                EnhanceResolution = true,
-                EnhanceContrast = true,
-                
+                Strategy = AdvancedOcr.OcrStrategy.Advanced,
             };
-            //GetOpponentNameBitmap(bmp);
-            //var Results = OCR.Read(GetOpponentNameBitmap(bmp));
+
+
             var Results = Ocr.Read(GetOpponentNameBitmap(bmp));
             return Results.Text;
         }
@@ -1172,8 +1169,6 @@ namespace TaikoLogging
             int y = GetHeight(bmp, 0.57478005f);
 
             Bitmap nameBitmap = GetBitmapArea(bmp, width, height, x, y);
-
-            //nameBitmap = CleanOpponentNameBitmap(nameBitmap);
 
             return nameBitmap;
         }
@@ -1233,6 +1228,21 @@ namespace TaikoLogging
                 {
                     GetRankedResults();
                 }
+            }
+        }
+
+        bool randomMode = false;
+        public void RandomModeToggle()
+        {
+            randomMode = !randomMode;
+            if (randomMode == true)
+            {
+                Program.rin.SendTwitchMessage("Random Mode on");
+                Program.sheet.GetRandomSong();
+            }
+            else
+            {
+                Program.rin.SendTwitchMessage("Random Mode off");
             }
         }
 

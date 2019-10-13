@@ -84,6 +84,10 @@ namespace TaikoLogging
             {
                 sheet.GetRandomSong();
             }
+            else if (CheckDBCommands("!random mode", e))
+            {
+                Program.analysis.RandomModeToggle();
+            }
         }
 
         internal void Disconnect()

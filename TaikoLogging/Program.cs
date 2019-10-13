@@ -84,7 +84,8 @@ namespace TaikoLogging
             {
                 "analyze", "result",
                 "random",
-                "help"
+                "help",
+                "random mode"
             };
             while(true)
             {
@@ -93,6 +94,10 @@ namespace TaikoLogging
                 if (string.CompareOrdinal(input, "analyze") == 0 || string.CompareOrdinal(input, "result") == 0)
                 {
                     analysis.AnalyzeResults();
+                }
+                else if (string.CompareOrdinal(input, "random mode") == 0)
+                {
+                    analysis.RandomModeToggle();
                 }
                 else if (string.CompareOrdinal(input, "random") == 0)
                 {

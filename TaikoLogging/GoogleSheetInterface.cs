@@ -541,7 +541,7 @@ namespace TaikoLogging
                     }
 
 
-                    message += ", " + songOKs[i] + " OKs -> " + goalOKs[i] + " Goal OKs, " + chances[i] * 100 + "% chance of hitting this song";
+                    message += ", " + songOKs[i] + " OKs -> " + goalOKs[i] + " Goal OKs, " + chances[i] * 100 + "% chance of hitting this song\n";
 
                     Program.rin.SendTwitchMessage(message);
 

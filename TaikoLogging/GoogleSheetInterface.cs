@@ -230,11 +230,23 @@ namespace TaikoLogging
             {
                 if (test == false)
                 {
+                    string songTitle = info[headers.IndexOf("Title")].ToString();
+                    if (info[headers.IndexOf("Difficulty")].ToString() == "Ura")
+                    {
+                        songTitle += " Ura";
+                    }
+                    if (info[headers.IndexOf("Account")].ToString() == "RinzoP")
+                    {
+                        songTitle += " Messy";
+                    }
                     if (int.Parse(score) == (int)info[headers.IndexOf("Score")])
                     {
-                        Program.rin.SendTwitchMessage("Tied high score! " + info[headers.IndexOf("Title")] + " = " + ((int)info[headers.IndexOf("Score")] - int.Parse(score)).ToString());
+                        Program.rin.SendTwitchMessage("Tied high score! " + songTitle + " = " + ((int)info[headers.IndexOf("Score")] - int.Parse(score)).ToString());
                     }
-                    Program.rin.SendTwitchMessage("New high score! " + info[headers.IndexOf("Title")] + " +" + ((int)info[headers.IndexOf("Score")] - int.Parse(score)).ToString());
+                    else
+                    {
+                        Program.rin.SendTwitchMessage("New high score! " + songTitle + " +" + ((int)info[headers.IndexOf("Score")] - int.Parse(score)).ToString());
+                    }
                 }
             }
 
@@ -378,6 +390,30 @@ namespace TaikoLogging
 
             if ((int)info[headers.IndexOf("GOOD")] < int.Parse(sheetGoods))
             {
+                if (test == false)
+                {
+                    int goodsDifference = (int)info[headers.IndexOf("GOOD")] - int.Parse(sheetGoods);
+                    string twitchMessage = string.Empty;
+                    string songTitle = info[headers.IndexOf("Title")].ToString();
+                    if (info[headers.IndexOf("Difficulty")].ToString() == "Ura")
+                    {
+                        songTitle += " Ura";
+                    }
+                    if (info[headers.IndexOf("Account")].ToString() == "RinzoP")
+                    {
+                        songTitle += " Messy";
+                    }
+                    if (goodsDifference == -1)
+                    {
+                        twitchMessage += "1 good away from best accuracy on " + songTitle + "!";
+                    }
+                    else
+                    {
+                        twitchMessage += goodsDifference + " good away from best accuracy on " + songTitle + "!";
+                    }
+                    Program.rin.SendTwitchMessage(twitchMessage);
+
+                }
                 return;
             }
             IList<object> baseValues = new List<object>
@@ -402,10 +438,13 @@ namespace TaikoLogging
 
             if (test == false)
             {
-
                 int goodsDifference = (int)info[headers.IndexOf("GOOD")] - int.Parse(sheetGoods);
                 string twitchMessage = string.Empty;
                 string songTitle = info[headers.IndexOf("Title")].ToString();
+                if (info[headers.IndexOf("Difficulty")].ToString() == "Ura")
+                {
+                    songTitle += " Ura";
+                }
                 if (info[headers.IndexOf("Account")].ToString() == "RinzoP")
                 {
                     songTitle += " Messy";

@@ -81,23 +81,26 @@ namespace TaikoLogging
         }
         private void AddNewSong(string message)
         {
-            string songTitle = message.Remove(0, 6);
-            DirectoryInfo dirInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Title Bitmaps\BaseTitles\");
-            var result = dirInfo.GetFiles();
-            int numScreenshots = 0;
-            for (int i = 0; i < result.Length; i++)
+            if (newSongIncoming == true)
             {
-                if (result[i].Name.Remove(result[i].Name.IndexOf('.')) == songTitle)
+                string songTitle = message.Remove(0, 6);
+                DirectoryInfo dirInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Title Bitmaps\BaseTitles\");
+                var result = dirInfo.GetFiles();
+                int numScreenshots = 0;
+                for (int i = 0; i < result.Length; i++)
                 {
-                    numScreenshots++;
+                    if (result[i].Name.Remove(result[i].Name.IndexOf('.')) == songTitle)
+                    {
+                        numScreenshots++;
+                    }
                 }
-            }
 
-            newSongBitmap.Save(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Title Bitmaps\BaseTitles\" + songTitle + ".png");
-            newSongIncoming = false;
-            newSongBitmap = null;
-            Program.rin.SendTwitchMessage(songTitle + " has been added!");
-            Program.analysis.NewSongAdded();
+                newSongBitmap.Save(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Title Bitmaps\BaseTitles\" + songTitle + ".png");
+                newSongIncoming = false;
+                newSongBitmap = null;
+                Program.rin.SendTwitchMessage(songTitle + " has been added!");
+                Program.analysis.NewSongAdded();
+            }
         }
         private void ToggleRandomMode(string message)
         {

@@ -1197,9 +1197,10 @@ namespace TaikoLogging
                 Program.logger.LogPixelDifference(baseTitles[smallestIndex], pixelDifferences);
                 if (pixelDifferences >= 300000)
                 {
-                    Program.rin.PrepareNewSong(bmp);
+                    Program.commands.PrepareNewSong(bmp);
                     return -1;
                 }
+                Console.WriteLine("Title pixelDifference = " + pixelDifferences);
             }
 
             return smallestIndex;

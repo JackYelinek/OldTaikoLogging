@@ -20,6 +20,7 @@ namespace TaikoLogging
         static public DebugLogging logger = new DebugLogging();
         static public GoogleSheetInterface sheet = new GoogleSheetInterface();
         static public EmulatorLogger emulatorLogger = new EmulatorLogger();
+        static public Commands commands = new Commands();
 
         static void Main(string[] args)
         {
@@ -91,29 +92,7 @@ namespace TaikoLogging
             {
                 var input = Console.ReadLine();
 
-                if (string.CompareOrdinal(input, "analyze") == 0 || string.CompareOrdinal(input, "result") == 0)
-                {
-                    analysis.AnalyzeResults();
-                }
-                else if (string.CompareOrdinal(input, "random mode") == 0)
-                {
-                    analysis.RandomModeToggle();
-                }
-                else if (string.CompareOrdinal(input, "random") == 0)
-                {
-                    sheet.GetRandomSong();
-                }
-                else if (string.CompareOrdinal(input, "help") == 0)
-                {
-                    string message = "List of commands:\n";
-                    for (int i = 0; i < commandWord.Count; i++)
-                    {
-                        message += commandWord[i] + "\n";
-                    }
-                    message += "\n";
-
-                    Console.WriteLine(message);
-                }
+                commands.CheckCommands(input);
             }
         }
     }

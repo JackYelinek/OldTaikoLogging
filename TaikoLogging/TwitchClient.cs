@@ -54,39 +54,46 @@ namespace TaikoLogging
 
         private void Client_OnMessageReceived(object sender, TwitchLib.Client.Events.OnMessageReceivedArgs e)
         {
-            if(CheckDBCommands("!notranked", e) || CheckDBCommands("!removeranked", e) || CheckDBCommands("!undoranked", e))
-            {
-                sheet.RemoveLastRanked();
-                SendTwitchMessage("Last ranked match removed");
-            }
-            else if (CheckDBCommands("!song ", e) && newSongIncoming)
-            {
-                string songTitle = e.ChatMessage.Message.Remove(0, 6);
-                DirectoryInfo dirInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Title Bitmaps\BaseTitles\");
-                var result = dirInfo.GetFiles();
-                int numScreenshots = 0;
-                for (int i = 0; i < result.Length; i++)
-                {
-                    if (result[i].Name.Remove(result[i].Name.IndexOf('.')) == songTitle)
-                    {
-                        numScreenshots++;
-                    }
-                }
+            #region oldCommands
+            //if(CheckDBCommands("!notranked", e) || CheckDBCommands("!removeranked", e) || CheckDBCommands("!undoranked", e))
+            //{
+            //    sheet.RemoveLastRanked();
+            //    SendTwitchMessage("Last ranked match removed");
+            //}
+            //else if (CheckDBCommands("!song ", e) && newSongIncoming)
+            //{
+            //    string songTitle = e.ChatMessage.Message.Remove(0, 6);
+            //    DirectoryInfo dirInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Title Bitmaps\BaseTitles\");
+            //    var result = dirInfo.GetFiles();
+            //    int numScreenshots = 0;
+            //    for (int i = 0; i < result.Length; i++)
+            //    {
+            //        if (result[i].Name.Remove(result[i].Name.IndexOf('.')) == songTitle)
+            //        {
+            //            numScreenshots++;
+            //        }
+            //    }
 
 
-                newSongBitmap.Save(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Title Bitmaps\BaseTitles\" + songTitle + ".png");
-                newSongIncoming = false;
-                newSongBitmap = null;
-                SendTwitchMessage(songTitle + " has been added!");
-                Program.analysis.NewSongAdded();
-            }
-            else if (CheckDBCommands("!random", e))
+            //    newSongBitmap.Save(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Title Bitmaps\BaseTitles\" + songTitle + ".png");
+            //    newSongIncoming = false;
+            //    newSongBitmap = null;
+            //    SendTwitchMessage(songTitle + " has been added!");
+            //    Program.analysis.NewSongAdded();
+            //}
+            //else if (CheckDBCommands("!random mode", e))
+            //{
+            //    Program.analysis.RandomModeToggle();
+            //}
+            //else if (CheckDBCommands("!random", e))
+            //{
+            //    sheet.GetRandomSong();
+            //}
+            #endregion
+
+            if (string.Compare(e.ChatMessage.Username, "Deathblood", true) == 0)
             {
-                sheet.GetRandomSong();
-            }
-            else if (CheckDBCommands("!random mode", e))
-            {
-                Program.analysis.RandomModeToggle();
+                Program.commands.CheckCommands(e.ChatMessage.Message);
             }
         }
 

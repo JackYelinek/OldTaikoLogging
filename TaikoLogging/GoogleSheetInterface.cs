@@ -407,9 +407,13 @@ namespace TaikoLogging
                     {
                         twitchMessage += "1 good away from best accuracy on " + songTitle + "!";
                     }
+                    else if (goodsDifference > -11)
+                    {
+                        twitchMessage += (goodsDifference * -1) + " goods away from best accuracy on " + songTitle + "!";
+                    }
                     else
                     {
-                        twitchMessage += goodsDifference + " good away from best accuracy on " + songTitle + "!";
+                        return;
                     }
                     Program.rin.SendTwitchMessage(twitchMessage);
 
@@ -474,6 +478,7 @@ namespace TaikoLogging
 
             List<int> songOKs = new List<int>();
             List<int> goalOKs = new List<int>();
+            List<int> songBads = new List<int>();
 
             string range = "Oni!A2:" + GetColumnName(Headers.Count);
             var values = GetValues(range);
@@ -481,18 +486,20 @@ namespace TaikoLogging
             int numOni = 0;
             for (int i = 0; i < values.Count; i++)
             {
-                if (values[i][Headers.IndexOf("Goal OKs")].ToString() == "" || int.Parse(values[i][Headers.IndexOf("OK")].ToString()) == 0 || int.Parse(values[i][Headers.IndexOf("OK")].ToString()) - int.Parse(values[i][Headers.IndexOf("Goal OKs")].ToString()) <= 0)
-                {
-                    continue;
-                }
                 songs.Add(values[i][Headers.IndexOf("Title")].ToString());
                 int songOK = int.Parse(values[i][Headers.IndexOf("OK")].ToString());
                 int goalOK = int.Parse(values[i][Headers.IndexOf("Goal OKs")].ToString());
+                int songBad = int.Parse(values[i][Headers.IndexOf("BAD")].ToString());
                 //int numNotes = int.Parse(values[i][Headers.IndexOf("GOOD")].ToString()) + songOK + int.Parse(values[i][Headers.IndexOf("BAD")].ToString());
-                int goalValue = (songOK + int.Parse(values[i][Headers.IndexOf("BAD")].ToString())) - goalOK;
+                int goalValue = (songOK + (songBad * 2)) - goalOK;
+                if (goalValue < 0)
+                {
+                    goalValue = 0;
+                }
                 goalValues.Add(goalValue);
                 songOKs.Add(songOK);
                 goalOKs.Add(goalOK);
+                songBads.Add(songBad);
 
 
                 numOni++;
@@ -502,18 +509,20 @@ namespace TaikoLogging
             values = GetValues(range);
             for (int i = 0; i < values.Count; i++)
             {
-                if (values[i][Headers.IndexOf("Goal OKs")].ToString() == "" || int.Parse(values[i][Headers.IndexOf("OK")].ToString()) == 0 || int.Parse(values[i][Headers.IndexOf("OK")].ToString()) - int.Parse(values[i][Headers.IndexOf("Goal OKs")].ToString()) <= 0)
-                {
-                    continue;
-                }
                 songs.Add(values[i][Headers.IndexOf("Title")].ToString());
                 int songOK = int.Parse(values[i][Headers.IndexOf("OK")].ToString());
                 int goalOK = int.Parse(values[i][Headers.IndexOf("Goal OKs")].ToString());
+                int songBad = int.Parse(values[i][Headers.IndexOf("BAD")].ToString());
                 //int numNotes = int.Parse(values[i][Headers.IndexOf("GOOD")].ToString()) + songOK + int.Parse(values[i][Headers.IndexOf("BAD")].ToString());
-                int goalValue = (songOK + int.Parse(values[i][Headers.IndexOf("BAD")].ToString())) - goalOK;
+                int goalValue = (songOK + (songBad * 2)) - goalOK;
+                if (goalValue < 0)
+                {
+                    goalValue = 0;
+                }
                 goalValues.Add(goalValue);
                 songOKs.Add(songOK);
                 goalOKs.Add(goalOK);
+                songBads.Add(songBad);
             }
 
             int maxRand = goalValues.Sum();
@@ -530,6 +539,10 @@ namespace TaikoLogging
 
             for (int i = 0; i < goalValues.Count; i++)
             {
+                if (goalValues[i] == 0)
+                {
+                    continue;
+                }
                 if (randValue < goalValues[i])
                 {
                     // Song picked
@@ -541,7 +554,28 @@ namespace TaikoLogging
                     }
 
 
-                    message += ", " + songOKs[i] + " OKs -> " + goalOKs[i] + " Goal OKs, " + chances[i] * 100 + "% chance of hitting this song\n";
+                    message += ", " + songOKs[i] + " OKs ";
+                    if (songBads[i] != 0)
+                    {
+                        message += songBads[i] + " Bads ";
+                    }
+                    message += "-> " + goalOKs[i] + " Goal OKs, " + chances[i] * 100 + "% chance of picking this song\n";
+
+                    if (CheckIfEnglish(songs[i]) == false)
+                    {
+                        if (i > numOni)
+                        {
+                            for (int j = 0; j < songs.Count; j++)
+                            {
+                                if (songs[j] == songs[i])
+                                {
+                                    i = j;
+                                    break;
+                                }
+                            }
+                        }
+                        message += FindClosestReadableSong(songs, i, numOni);
+                    }
 
                     Program.rin.SendTwitchMessage(message);
 
@@ -564,6 +598,71 @@ namespace TaikoLogging
             Program.logger.LogVariable("Random", "randValue", randValue);
             #endregion
         }
+
+        public string FindClosestReadableSong(List<string> songs, int i, int numOni)
+        {
+            string message = string.Empty;
+            for (int j = 1; j < numOni; j++)
+            {
+                if (i - j >= 0)
+                {
+                    if (CheckIfEnglish(songs[i - j]) == true)
+                    {
+                        message += j + " songs to the right of " + songs[i - j] + "\n";
+                        break;
+                    }
+                }
+                else
+                {
+                    if (CheckIfEnglish(songs[i - j + numOni]) == true)
+                    {
+                        message += j + " songs to the right of " + songs[i - j + songs.Count] + "\n";
+                        break;
+                    }
+                }
+                if (i + j < songs.Count)
+                {
+                    if (CheckIfEnglish(songs[i + j]) == true)
+                    {
+                        message += j + " songs to the left of " + songs[i + j] + "\n";
+                        break;
+                    }
+                }
+                else
+                {
+                    if (CheckIfEnglish(songs[i + j - numOni]) == true)
+                    {
+                        message += j + " songs to the left of " + songs[i + j - songs.Count] + "\n";
+                        break;
+                    }
+                }
+            }
+            return message;
+        }
+        private bool CheckIfEnglish(string songTitle)
+        {
+            int numEnglishCharacters = 0;
+            string englishCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890!\"'↓~";
+            while(songTitle.IndexOfAny(englishCharacters.ToCharArray()) != -1)
+            {
+                songTitle = songTitle.Remove(songTitle.IndexOfAny(englishCharacters.ToCharArray()), 1);
+                numEnglishCharacters++;
+                if (numEnglishCharacters >= 2)
+                {
+                    return true;
+                }
+            }
+            if (numEnglishCharacters < 5)
+            {
+                // I don't think this if/else statement is needed
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
         public void FixRankedLogsData(List<object> info, List<string> headers, int matchNumber)
         {
             var Headers = GetHeaders("Ranked Logs");

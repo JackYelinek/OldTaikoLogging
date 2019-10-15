@@ -60,6 +60,7 @@ namespace TaikoLogging
                     if (message.IndexOf(commandWords[i][j]) == 0)
                     {
                         commandFunctions[i](message);
+                        return;
                     }
                 }
             }

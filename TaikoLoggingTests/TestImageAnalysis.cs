@@ -256,6 +256,7 @@ namespace TaikoLoggingTests
                 new Bitmap(folderPath + "竜と黒炎の姫君.Ura.5.png"),
                 new Bitmap(folderPath + "紫煌ノ乱.Oni.1.png"),
                 new Bitmap(folderPath + "ナイト・オブ・ナイツ.Oni.0.png"),
+                new Bitmap(folderPath + "ドキドキ胸きゅん おまつりタイム.Oni.0.png"),
             };
 
             List<int> bads = new List<int>();
@@ -281,6 +282,7 @@ namespace TaikoLoggingTests
                 5,
                 87,
                 16,
+                0,
                 0,
                 0,
                 0,
@@ -333,6 +335,7 @@ namespace TaikoLoggingTests
                 new Bitmap(folderPath + "竜と黒炎の姫君.Ura.5.png"),
                 new Bitmap(folderPath + "紫煌ノ乱.Oni.1.png"),
                 new Bitmap(folderPath + "ナイト・オブ・ナイツ.Oni.0.png"),
+                new Bitmap(folderPath + "ドキドキ胸きゅん おまつりタイム.Oni.0.png"),
             };
 
             List<int> combo = new List<int>();
@@ -361,7 +364,8 @@ namespace TaikoLoggingTests
                 861,
                 932,
                 823,
-                651
+                651,
+                652
             };
             for (int i = 0; i < bmps.Count; i++)
             {
@@ -409,7 +413,8 @@ namespace TaikoLoggingTests
                 new Bitmap(folderPath + "竜と黒炎の姫君.Ura.5.png"),
                 new Bitmap(folderPath + "紫煌ノ乱.Oni.1.png"),
                 new Bitmap(folderPath + "ナイト・オブ・ナイツ.Oni.0.png"),
-                new Bitmap(folderPath + "Let It Go～ありのままで～.Oni.3.png")
+                new Bitmap(folderPath + "Let It Go～ありのままで～.Oni.3.png"),
+                new Bitmap(folderPath + "ドキドキ胸きゅん おまつりタイム.Oni.0.png"),
             };
 
             List<int> drumroll = new List<int>();
@@ -439,7 +444,8 @@ namespace TaikoLoggingTests
                 77,
                 0,
                 126,
-                604
+                604,
+                862
             };
             for (int i = 0; i < bmps.Count; i++)
             {
@@ -487,6 +493,7 @@ namespace TaikoLoggingTests
                 new Bitmap(folderPath + "竜と黒炎の姫君.Ura.5.png"),
                 new Bitmap(folderPath + "紫煌ノ乱.Oni.1.png"),
                 new Bitmap(folderPath + "ナイト・オブ・ナイツ.Oni.0.png"),
+                new Bitmap(folderPath + "ドキドキ胸きゅん おまつりタイム.Oni.0.png"),
             };
 
             List<int> goods = new List<int>();
@@ -515,7 +522,8 @@ namespace TaikoLoggingTests
                 781,
                 850,
                 779,
-                643
+                643,
+                641
             };
             for (int i = 0; i < bmps.Count; i++)
             {
@@ -563,6 +571,7 @@ namespace TaikoLoggingTests
                 new Bitmap(folderPath + "竜と黒炎の姫君.Ura.5.png"),
                 new Bitmap(folderPath + "紫煌ノ乱.Oni.1.png"),
                 new Bitmap(folderPath + "ナイト・オブ・ナイツ.Oni.0.png"),
+                new Bitmap(folderPath + "ドキドキ胸きゅん おまつりタイム.Oni.0.png"),
             };
 
             List<int> oks = new List<int>();
@@ -591,7 +600,8 @@ namespace TaikoLoggingTests
                 80,
                 82,
                 44,
-                8
+                8,
+                11
             };
 
             for (int i = 0; i < bmps.Count; i++)
@@ -639,6 +649,7 @@ namespace TaikoLoggingTests
                 new Bitmap(folderPath + "竜と黒炎の姫君.Ura.5.png"),
                 new Bitmap(folderPath + "紫煌ノ乱.Oni.1.png"),
                 new Bitmap(folderPath + "ナイト・オブ・ナイツ.Oni.0.png"),
+                new Bitmap(folderPath + "ドキドキ胸きゅん おまつりタイム.Oni.0.png"),
             };
 
             List<int> scores = new List<int>();
@@ -667,7 +678,8 @@ namespace TaikoLoggingTests
                 1156460,
                 1164020,
                 1179040,
-                1109030
+                1109030,
+                1166320
             };
             for (int i = 0; i < bmps.Count; i++)
             {

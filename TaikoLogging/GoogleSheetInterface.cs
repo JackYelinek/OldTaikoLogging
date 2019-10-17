@@ -559,7 +559,8 @@ namespace TaikoLogging
                     {
                         message += songBads[i] + " Bads ";
                     }
-                    message += "-> " + goalOKs[i] + " Goal OKs, " + chances[i] * 100 + "% chance of picking this song\n";
+                    message += "-> " + goalOKs[i] + " Goal OKs";
+                    string consoleMessage = chances[i] * 100 + "% chance of picking this song\n";
 
                     if (CheckIfEnglish(songs[i]) == false)
                     {
@@ -574,11 +575,11 @@ namespace TaikoLogging
                                 }
                             }
                         }
-                        message += FindClosestReadableSong(songs, i, numOni);
+                        consoleMessage += FindClosestReadableSong(songs, i, numOni);
                     }
 
                     Program.rin.SendTwitchMessage(message);
-
+                    Console.WriteLine(consoleMessage);
                     break;
                 }
                 else

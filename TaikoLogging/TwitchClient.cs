@@ -23,6 +23,12 @@ namespace TaikoLogging
         bool newSongIncoming = false;
         Bitmap newSongBitmap;
 
+
+
+        // Minor note to myself
+        // "Unaccounted for [UserState]: badge-info" keeps popping up in the console window
+        // This is not my error, it's an error with TwitchLib, which has been fixed but not released yet
+
         public RinClient()
         {
             sheet = new GoogleSheetInterface();
@@ -91,7 +97,7 @@ namespace TaikoLogging
             //}
             #endregion
 
-            if (string.Compare(e.ChatMessage.Username, "Deathblood", true) == 0)
+            if (e.ChatMessage.IsBroadcaster == true)
             {
                 Program.commands.CheckCommands(e.ChatMessage.Message);
             }

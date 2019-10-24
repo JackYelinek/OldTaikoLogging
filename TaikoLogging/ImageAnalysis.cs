@@ -275,10 +275,13 @@ namespace TaikoLogging
             var result = dirInfo.GetFiles();
             for (int i = 0; i < result.Length; i++)
             {
-                var bitmap = new Bitmap(result[i].FullName);
+                Bitmap bitmap = new Bitmap(result[i].FullName);
+
+
                 titleBitmaps.Add(bitmap);
                 string songTitle = result[i].Name.Remove(result[i].Name.LastIndexOf('.'));
-                titles.Add(songTitle.Remove(songTitle.LastIndexOf('.')));
+                titles.Add(songTitle);
+
             }
         }
         private void InitializeBaseTitleBitmaps()
@@ -908,12 +911,13 @@ namespace TaikoLogging
             // First: Get a bitmap of just the title area that will be compared
             using (Bitmap titleBmp = GetTitleBitmap(bmp))
             {
-                int index = CompareBitmapToList(CreateTitleBitmap(titleBmp, titleBackgroundBitmaps[titleBackgrounds.IndexOf("Single")]), baseTitleBitmaps);
+                //int index = CompareBitmapToList(CreateTitleBitmap(titleBmp, titleBackgroundBitmaps[titleBackgrounds.IndexOf("Single")]), baseTitleBitmaps);
+                int index = CompareBitmapToList(titleBmp, titleBitmaps);
                 if (index == -1)
                 {
                     return "";
                 }
-                return baseTitles[index];
+                return titles[index];
             }
         }
         public Bitmap GetTitleBitmap(Bitmap bmp)
@@ -1192,13 +1196,17 @@ namespace TaikoLogging
                 }
             }
 
-            if (bitmaps == baseTitleBitmaps)
+            if (bitmaps == titleBitmaps)
             {
-                Program.logger.LogPixelDifference(baseTitles[smallestIndex], pixelDifferences);
-                if (pixelDifferences >= 300000)
+                Program.logger.LogPixelDifference(titles[smallestIndex], pixelDifferences);
+                if (pixelDifferences >= 150000)
                 {
                     Program.commands.PrepareNewSong(bmp);
                     return -1;
+                }
+                else
+                {
+                    //AddNewSongTitleBitmap(bmp, titles[smallestIndex]);
                 }
                 Console.WriteLine("Title pixelDifference = " + pixelDifferences);
             }
@@ -1210,9 +1218,6 @@ namespace TaikoLogging
 
         public void NewSongAdded()
         {
-            // Reinitialize the title bitmaps so it has the new song in them
-            InitializeBaseTitleBitmaps();
-
             // Go through the GetSingleResults() so it will put the score on the spreadsheet
             using (Bitmap resultsBmp = Program.screen.CaptureApplication())
             {
@@ -1431,6 +1436,18 @@ namespace TaikoLogging
 
         }
 
+        public void AddNewSongTitleBitmap(Bitmap bmp, string songTitle)
+        {
+            //if (File.Exists(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Title Bitmaps\" + songTitle + ".png") == true)
+            //{
+            //    titleBitmaps.Clear();
+            //    titles.Clear();
+            //    File.Delete(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Title Bitmaps\" + songTitle + ".png");
+            //}
+            bmp.Save(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Title Bitmaps\" + songTitle + ".png");
+            
+            InitializeTitleBitmaps();
+        }
 
         // These are general functions used for everything
         private int GetHeight(Bitmap bmp, double ratio)
@@ -1463,6 +1480,7 @@ namespace TaikoLogging
             // Get the differences.
             int[,] diffs = new int[wid, hgt];
             int max_diff = 0;
+
             for (int x = 0; x < wid; x += 2)
             {
                 for (int y = 0; y < hgt; y += 2)
@@ -1475,7 +1493,6 @@ namespace TaikoLogging
                     Math.Abs(color1.R - color2.R) +
                     Math.Abs(color1.G - color2.G) +
                     Math.Abs(color1.B - color2.B));
-
                     max_diff += diffs[x, y];
                 }
             }
@@ -1501,11 +1518,13 @@ namespace TaikoLogging
             return bmp;
         }
         // This creates a title bitmap without the background
-        private Bitmap CreateTitleBitmap(Bitmap bmp1, Bitmap background)
+        private Bitmap CreateTitleBitmap(Bitmap bmp, Bitmap background)
         {
             // Get height and width to iterate through each pixel
-            int wid = bmp1.Width;
-            int hgt = bmp1.Height;
+            int wid = bmp.Width;
+            int hgt = bmp.Height;
+
+            Bitmap newBmp = new Bitmap(wid, hgt);
 
             // iterate through each pixel
             for (int x = 0; x < wid; x++)
@@ -1513,7 +1532,7 @@ namespace TaikoLogging
                 for (int y = 0; y < hgt; y++)
                 {
                     // get the colors
-                    Color color1 = bmp1.GetPixel(x, y);
+                    Color color1 = bmp.GetPixel(x, y);
                     Color backgroundColor = background.GetPixel(x, y);
                     // if color1 is the same as backgroundColor
                     // set pixel(x, y) fully transparent (0, 0, 0, 0)
@@ -1522,11 +1541,15 @@ namespace TaikoLogging
                     // (226,245,246) is probably the closest I'm willing to get to a different color
                     if (color1.R - color1.G > BitmapLeniency || color1.G - color1.B > BitmapLeniency || color1.B - color1.R > BitmapLeniency || color1 == backgroundColor)
                     {
-                        bmp1.SetPixel(x, y, Color.FromArgb(0, 0, 0, 0));
+                        newBmp.SetPixel(x, y, Color.FromArgb(0, 0, 0, 0));
+                    }
+                    else
+                    {
+                        newBmp.SetPixel(x, y, color1);
                     }
                 }
             }
-            return bmp1;
+            return newBmp;
             //bmp1.Save(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Title Bitmaps\BaseTitles\" + songTitle + ".png");
         }
     }

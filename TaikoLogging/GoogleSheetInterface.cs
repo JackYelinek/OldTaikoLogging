@@ -617,7 +617,7 @@ namespace TaikoLogging
                 {
                     if (CheckIfEnglish(songs[i - j + numOni]) == true)
                     {
-                        message += j + " songs to the right of " + songs[i - j + songs.Count] + "\n";
+                        message += j + " songs to the right of " + songs[i - j + numOni] + "\n";
                         break;
                     }
                 }
@@ -633,7 +633,7 @@ namespace TaikoLogging
                 {
                     if (CheckIfEnglish(songs[i + j - numOni]) == true)
                     {
-                        message += j + " songs to the left of " + songs[i + j - songs.Count] + "\n";
+                        message += j + " songs to the left of " + songs[i + j - numOni] + "\n";
                         break;
                     }
                 }

@@ -65,8 +65,8 @@ namespace TaikoLogging
                 }
                 if (PS4 == true)
                 {
-                    //analysis.NotStandardLoop();
                     analysis.StandardLoop();
+                    //analysis.NotStandardLoop();
                     
                 }
                 else if (emulator == true)

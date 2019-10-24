@@ -1408,7 +1408,7 @@ namespace TaikoLoggingTests
             GC.Collect();
         }
 
-        //[TestMethod]
+        [TestMethod]
         public void TestOldGetTitle()
         {
             // This function isn't really needed anymore, but it's still here anyway

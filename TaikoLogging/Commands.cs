@@ -78,28 +78,21 @@ namespace TaikoLogging
         {
             newSongIncoming = true;
             newSongBitmap = new Bitmap(bmp);
-            Program.rin.SendTwitchMessage("Couldn't figure out the song, !song <song>");
+            //Program.rin.SendTwitchMessage("Couldn't figure out the song, !song <song>");
+            Console.WriteLine("Couldn't figure out the song, !song <song>");
         }
         private void AddNewSong(string message)
         {
             if (newSongIncoming == true)
             {
                 string songTitle = message.Remove(0, 6);
-                DirectoryInfo dirInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Title Bitmaps\BaseTitles\");
-                var result = dirInfo.GetFiles();
-                int numScreenshots = 0;
-                for (int i = 0; i < result.Length; i++)
-                {
-                    if (result[i].Name.Remove(result[i].Name.IndexOf('.')) == songTitle)
-                    {
-                        numScreenshots++;
-                    }
-                }
 
-                newSongBitmap.Save(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Title Bitmaps\BaseTitles\" + songTitle + ".png");
+                Program.analysis.AddNewSongTitleBitmap(newSongBitmap, songTitle);
+
+                Console.WriteLine(songTitle + " has been added!");
+
                 newSongIncoming = false;
                 newSongBitmap = null;
-                Program.rin.SendTwitchMessage(songTitle + " has been added!");
                 Program.analysis.NewSongAdded();
             }
         }

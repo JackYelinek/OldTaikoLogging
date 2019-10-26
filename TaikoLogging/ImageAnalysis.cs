@@ -1210,14 +1210,17 @@ namespace TaikoLogging
             {
                 Program.logger.LogPixelDifference(titles[smallestIndex], pixelDifferences);
                 Console.WriteLine("Title pixelDifference = " + pixelDifferences);
-                if (pixelDifferences >= 300000)
+                if (currentState != State.RankedResults)
                 {
-                    Program.commands.PrepareNewSong(bmp);
-                    return -1;
-                }
-                else
-                {
-                    AddNewSongTitleBitmap(bmp, titles[smallestIndex]);
+                    if (pixelDifferences >= 300000)
+                    {
+                        Program.commands.PrepareNewSong(bmp);
+                        return -1;
+                    }
+                    else if (pixelDifferences > 100000)
+                    {
+                        AddNewSongTitleBitmap(bmp, titles[smallestIndex]);
+                    }
                 }
             }
 

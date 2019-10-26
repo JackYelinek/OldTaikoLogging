@@ -245,7 +245,8 @@ namespace TaikoLogging
             }
             for (int i = 0; i < result.Length; i++)
             {
-                var bitmap = new Bitmap(result[i].FullName);
+                Bitmap tmp = new Bitmap(result[i].FullName);
+                Bitmap bitmap = (Bitmap)tmp.Clone();
                 stateBitmaps.Add(bitmap);
                 states.Add(result[i].Name.Remove(result[i].Name.IndexOf('.')));
             }
@@ -275,14 +276,23 @@ namespace TaikoLogging
             var result = dirInfo.GetFiles();
             for (int i = 0; i < result.Length; i++)
             {
-                Bitmap bitmap = new Bitmap(result[i].FullName);
-
+                Bitmap tmp = new Bitmap(result[i].FullName);
+                Bitmap bitmap = new Bitmap(tmp);
+                tmp.Dispose();
 
                 titleBitmaps.Add(bitmap);
                 string songTitle = result[i].Name.Remove(result[i].Name.LastIndexOf('.'));
                 titles.Add(songTitle);
 
             }
+        }
+        private void ClearTitleBitmaps()
+        {
+            for (int i = 0; i < titleBitmaps.Count; i++)
+            {
+                titleBitmaps.Clear();
+            }
+            titles.Clear();
         }
         private void InitializeBaseTitleBitmaps()
         {
@@ -1199,16 +1209,16 @@ namespace TaikoLogging
             if (bitmaps == titleBitmaps)
             {
                 Program.logger.LogPixelDifference(titles[smallestIndex], pixelDifferences);
-                if (pixelDifferences >= 150000)
+                Console.WriteLine("Title pixelDifference = " + pixelDifferences);
+                if (pixelDifferences >= 300000)
                 {
                     Program.commands.PrepareNewSong(bmp);
                     return -1;
                 }
                 else
                 {
-                    //AddNewSongTitleBitmap(bmp, titles[smallestIndex]);
+                    AddNewSongTitleBitmap(bmp, titles[smallestIndex]);
                 }
-                Console.WriteLine("Title pixelDifference = " + pixelDifferences);
             }
 
             return smallestIndex;
@@ -1235,6 +1245,17 @@ namespace TaikoLogging
                     GetRankedResults();
                 }
             }
+        }
+        public void AddNewSongTitleBitmap(Bitmap bmp, string songTitle)
+        {
+            if (File.Exists(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Title Bitmaps\" + songTitle + ".png") == true)
+            {
+                ClearTitleBitmaps();
+                File.Delete(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Title Bitmaps\" + songTitle + ".png");
+            }
+            bmp.Save(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Title Bitmaps\" + songTitle + ".png");
+
+            InitializeTitleBitmaps();
         }
 
         bool randomMode = false;
@@ -1436,18 +1457,7 @@ namespace TaikoLogging
 
         }
 
-        public void AddNewSongTitleBitmap(Bitmap bmp, string songTitle)
-        {
-            //if (File.Exists(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Title Bitmaps\" + songTitle + ".png") == true)
-            //{
-            //    titleBitmaps.Clear();
-            //    titles.Clear();
-            //    File.Delete(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Title Bitmaps\" + songTitle + ".png");
-            //}
-            bmp.Save(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Title Bitmaps\" + songTitle + ".png");
-            
-            InitializeTitleBitmaps();
-        }
+
 
         // These are general functions used for everything
         private int GetHeight(Bitmap bmp, double ratio)

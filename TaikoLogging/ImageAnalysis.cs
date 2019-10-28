@@ -17,9 +17,9 @@ namespace TaikoLogging
     {
         public enum State
         {
-            CustomizeRoom, DifficultySelect, EventPage, MainMenu, MainMenuSettings, MenuLoading, PracticePause, PracticeSelect, PracticeSong,
+            CustomizeRoom, DifficultySelect, EventPage, MainMenu, MainMenuSettings, MenuLoading, PracticePause, PracticeSelect, PracticeSong, PS4MainMenu, PS4CaptureGallery,
             RankedEndSong, RankedLeaderboards, RankedMidSong, RankedPause, RankedPointsGain, RankedResults, RankedSelect, RankedSongFound, RankedStats,
-            SingleResults, SingleSong, SingleSessionResults, SingleSongPause, SongLoading, SongSelect, SongSelectSettings, SongSettings, TreasureBoxes
+            SingleResults, SingleSong, SingleSessionResults, SingleSongPause, SongLoading, SongSelect, SongSelectSettings, SongSettings, TreasureBoxes, SongBingoCard
         };
         State previousState;
         State currentState;
@@ -61,18 +61,28 @@ namespace TaikoLogging
         public ImageAnalysis()
         {
             InitializeAll();
-
-            //TestingScreenshot();
-
-
         }
 
+        bool inCaptureGallery = false;
         public void StandardLoop()
         {
             using (Bitmap bmp = Program.screen.CaptureApplication())
             {
                 currentState = CheckState(bmp);
+                if (currentState == State.PS4CaptureGallery)
+                {
+                    inCaptureGallery = true;
+                }
+                if (currentState == State.PS4MainMenu)
+                {
+                    inCaptureGallery = false;
+                }
                 if (previousState != currentState)
+                {
+                    Console.WriteLine(currentState);
+                    bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\TestingStates\" + j++ + "." + currentState + ".png");
+                }
+                if (previousState != currentState && inCaptureGallery == false)
                 {
                     if (currentState == State.SingleResults || currentState == State.SingleSessionResults || currentState == State.RankedResults)
                     {
@@ -111,104 +121,7 @@ namespace TaikoLogging
         const int StrikesBeforeFailed = 500;
 
         
-        //private bool CompareTitleBitmaps(Bitmap checkingBitmap, Bitmap titleBitmap)
-        //{
-        //    // This function should only work for titles
-        //    // I'm only focusing on it working for titles
 
-        //    // checkingBitmap = the bitmap on screen being checked
-        //    // titleBitmap = the initialized bitmaps used to see if that's the song
-        //    // Ranked is so I know which background to compare to
-
-        //    int wid = checkingBitmap.Width;
-        //    int hgt = checkingBitmap.Height;
-
-        //    Bitmap singleBackgroundBitmap = new Bitmap(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Title Bitmaps\Background\Single.png");
-        //    Bitmap rankedBackgroundBitmap = new Bitmap(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Title Bitmaps\Background\Ranked.png");
-
-        //    Bitmap failedPixels = new Bitmap(titleBitmap);
-        //    Bitmap failedCheckPixels = new Bitmap(checkingBitmap);
-
-        //    int strikes = StrikesBeforeFailed;
-        //    // Get the differences.
-        //    for (int y = hgt - 1; y >= 0; y--)
-        //    {
-        //        for (int x = wid - 1; x >= 0; x--)
-        //        {
-        //            // Calculate the pixels' difference.
-        //            Color checkingColor = checkingBitmap.GetPixel(x, y);
-        //            Color titleColor = titleBitmap.GetPixel(x, y);
-        //            Color singleBackgroundColor = singleBackgroundBitmap.GetPixel(x, y);
-        //            Color rankedBackgroundColor = rankedBackgroundBitmap.GetPixel(x, y);
-
-        //            // First check to see if the Base bitmap expects it to be a background pixel
-        //            // (If the titleColor is (0, 0, 0, 0), it's background
-
-        //            // Then check to see if the Checking bitmap's pixel should be a background pixel
-        //            // (If the checkingColor can get through the "Background check", then it should still be a candidate)
-
-        //            // If base should be a background, but checking isn't, strike--
-        //            // if titleColor isn't background (not (0, 0, 0, 0)), then check to see if the checking bitmap's pixel should be a background pixel
-
-        //            bool isBackground = false;
-        //            if (checkingColor.R - checkingColor.G > BitmapLeniency + 5 || checkingColor.G - checkingColor.B > BitmapLeniency + 5 || checkingColor.B - checkingColor.R > BitmapLeniency + 5 ||
-        //                checkingColor == singleBackgroundColor || checkingColor == rankedBackgroundColor)
-        //            {
-        //                isBackground = true;
-        //            }
-
-        //            if (titleColor == Color.FromArgb(0, 0, 0, 0))
-        //            {
-        //                if (isBackground == false)
-        //                {
-        //                    failedPixels.SetPixel(x, y, Color.HotPink);
-        //                    failedCheckPixels.SetPixel(x, y, Color.HotPink);
-        //                    if (strikes-- <= 0)
-        //                    {
-        //                        checkingBitmap.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\" + j + ".RealChecking.png");
-        //                        titleBitmap.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\" + j + ".BaseTitle.png");
-        //                        failedPixels.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\" + j + ".testing.png");
-        //                        failedCheckPixels.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\" + j++ + ".checking.png");
-        //                        return false;
-        //                    }
-        //                }
-        //            }
-        //            else
-        //            {
-        //                if (isBackground == true)
-        //                {
-        //                    failedPixels.SetPixel(x, y, Color.HotPink);
-        //                    failedCheckPixels.SetPixel(x, y, Color.HotPink);
-        //                    if (strikes-- <= 0)
-        //                    {
-        //                        checkingBitmap.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\" + j + ".RealChecking.png");
-        //                        titleBitmap.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\" + j + ".BaseTitle.png");
-        //                        failedPixels.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\" + j + ".testing.png");
-        //                        failedCheckPixels.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\" + j++ + ".checking.png");
-        //                        return false;
-        //                    }
-        //                }
-        //                else
-        //                {
-        //                    if (ComparePixels(checkingColor, titleColor) > 300)
-        //                    {
-        //                        failedPixels.SetPixel(x, y, Color.HotPink);
-        //                        failedCheckPixels.SetPixel(x, y, Color.HotPink);
-        //                        if (strikes-- <= 0)
-        //                        {
-        //                            checkingBitmap.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\" + j + ".RealChecking.png");
-        //                            titleBitmap.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\" + j + ".BaseTitle.png");
-        //                            failedPixels.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\" + j + ".testing.png");
-        //                            failedCheckPixels.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\" + j++ + ".checking.png");
-        //                            return false;
-        //                        }
-        //                    }
-        //                }
-        //            }
-        //        }
-        //    }
-        //    return true;
-        //}
 
         private void TestingScreenshot()
         {
@@ -246,10 +159,37 @@ namespace TaikoLogging
             for (int i = 0; i < result.Length; i++)
             {
                 Bitmap tmp = new Bitmap(result[i].FullName);
-                Bitmap bitmap = (Bitmap)tmp.Clone();
+                Bitmap bitmap = new Bitmap(tmp);
+                tmp.Dispose();
                 stateBitmaps.Add(bitmap);
                 states.Add(result[i].Name.Remove(result[i].Name.IndexOf('.')));
             }
+        }
+        public void CreateNewState(string state)
+        {
+            var tmp = Program.screen.CaptureApplication();
+
+            DirectoryInfo dirInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\State Bitmaps Original");
+            var result = dirInfo.GetFiles();
+
+            int numStates = 0;
+            for (int i = 0; i < result.Length; i++)
+            {
+                if (result[i].Name.Remove(result[i].Name.IndexOf('.')) == state)
+                {
+                    numStates++;
+                }
+            }
+
+            tmp.Save(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\State Bitmaps Original\" + state + "." + numStates + ".png");
+            for (int i = 0; i < stateBitmaps.Count; i++)
+            {
+                stateBitmaps[i].Dispose();
+            }
+            stateBitmaps.Clear();
+            states.Clear();
+            InitializeStateBitmaps();
+            Console.WriteLine(state + " has been added as a state.");
         }
         private void ScaleStateBitmaps()
         {
@@ -495,6 +435,10 @@ namespace TaikoLogging
                     pixelDifferences = tmpInt;
                     smallestIndex = i;
                 }
+            }
+            if (stateBitmaps.Count == 0 || states.Count == 0 || stateBitmaps.Count != states.Count)
+            {
+                return previousState;
             }
             previousState = currentState;
             Enum.TryParse(states[smallestIndex], out State state);
@@ -914,6 +858,105 @@ namespace TaikoLogging
                 return titles[index];
             }
         }
+
+        //private bool CompareTitleBitmaps(Bitmap checkingBitmap, Bitmap titleBitmap)
+        //{
+        //    // This function should only work for titles
+        //    // I'm only focusing on it working for titles
+
+        //    // checkingBitmap = the bitmap on screen being checked
+        //    // titleBitmap = the initialized bitmaps used to see if that's the song
+        //    // Ranked is so I know which background to compare to
+
+        //    int wid = checkingBitmap.Width;
+        //    int hgt = checkingBitmap.Height;
+
+        //    Bitmap singleBackgroundBitmap = new Bitmap(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Title Bitmaps\Background\Single.png");
+        //    Bitmap rankedBackgroundBitmap = new Bitmap(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Title Bitmaps\Background\Ranked.png");
+
+        //    Bitmap failedPixels = new Bitmap(titleBitmap);
+        //    Bitmap failedCheckPixels = new Bitmap(checkingBitmap);
+
+        //    int strikes = StrikesBeforeFailed;
+        //    // Get the differences.
+        //    for (int y = hgt - 1; y >= 0; y--)
+        //    {
+        //        for (int x = wid - 1; x >= 0; x--)
+        //        {
+        //            // Calculate the pixels' difference.
+        //            Color checkingColor = checkingBitmap.GetPixel(x, y);
+        //            Color titleColor = titleBitmap.GetPixel(x, y);
+        //            Color singleBackgroundColor = singleBackgroundBitmap.GetPixel(x, y);
+        //            Color rankedBackgroundColor = rankedBackgroundBitmap.GetPixel(x, y);
+
+        //            // First check to see if the Base bitmap expects it to be a background pixel
+        //            // (If the titleColor is (0, 0, 0, 0), it's background
+
+        //            // Then check to see if the Checking bitmap's pixel should be a background pixel
+        //            // (If the checkingColor can get through the "Background check", then it should still be a candidate)
+
+        //            // If base should be a background, but checking isn't, strike--
+        //            // if titleColor isn't background (not (0, 0, 0, 0)), then check to see if the checking bitmap's pixel should be a background pixel
+
+        //            bool isBackground = false;
+        //            if (checkingColor.R - checkingColor.G > BitmapLeniency + 5 || checkingColor.G - checkingColor.B > BitmapLeniency + 5 || checkingColor.B - checkingColor.R > BitmapLeniency + 5 ||
+        //                checkingColor == singleBackgroundColor || checkingColor == rankedBackgroundColor)
+        //            {
+        //                isBackground = true;
+        //            }
+
+        //            if (titleColor == Color.FromArgb(0, 0, 0, 0))
+        //            {
+        //                if (isBackground == false)
+        //                {
+        //                    failedPixels.SetPixel(x, y, Color.HotPink);
+        //                    failedCheckPixels.SetPixel(x, y, Color.HotPink);
+        //                    if (strikes-- <= 0)
+        //                    {
+        //                        checkingBitmap.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\" + j + ".RealChecking.png");
+        //                        titleBitmap.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\" + j + ".BaseTitle.png");
+        //                        failedPixels.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\" + j + ".testing.png");
+        //                        failedCheckPixels.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\" + j++ + ".checking.png");
+        //                        return false;
+        //                    }
+        //                }
+        //            }
+        //            else
+        //            {
+        //                if (isBackground == true)
+        //                {
+        //                    failedPixels.SetPixel(x, y, Color.HotPink);
+        //                    failedCheckPixels.SetPixel(x, y, Color.HotPink);
+        //                    if (strikes-- <= 0)
+        //                    {
+        //                        checkingBitmap.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\" + j + ".RealChecking.png");
+        //                        titleBitmap.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\" + j + ".BaseTitle.png");
+        //                        failedPixels.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\" + j + ".testing.png");
+        //                        failedCheckPixels.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\" + j++ + ".checking.png");
+        //                        return false;
+        //                    }
+        //                }
+        //                else
+        //                {
+        //                    if (ComparePixels(checkingColor, titleColor) > 300)
+        //                    {
+        //                        failedPixels.SetPixel(x, y, Color.HotPink);
+        //                        failedCheckPixels.SetPixel(x, y, Color.HotPink);
+        //                        if (strikes-- <= 0)
+        //                        {
+        //                            checkingBitmap.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\" + j + ".RealChecking.png");
+        //                            titleBitmap.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\" + j + ".BaseTitle.png");
+        //                            failedPixels.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\" + j + ".testing.png");
+        //                            failedCheckPixels.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\" + j++ + ".checking.png");
+        //                            return false;
+        //                        }
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
+        //    return true;
+        //}
         public string GetTitle(Bitmap bmp)
         {
             // bmp in this case would be the full game screen

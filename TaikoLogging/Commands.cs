@@ -47,6 +47,11 @@ namespace TaikoLogging
             tmpList.Add("!analyze");
             tmpList.Add("!result");
             commandWords.Add(tmpList);
+
+            commandFunctions.Add(CreateNewState);
+            tmpList = new List<string>();
+            tmpList.Add("!state ");
+            commandWords.Add(tmpList);
         }
 
         public delegate void CommandFunction(string message);
@@ -85,7 +90,7 @@ namespace TaikoLogging
         {
             if (newSongIncoming == true)
             {
-                string songTitle = message.Remove(0, 6);
+                string songTitle = message.Remove(0, "!song ".Length);
 
                 Program.analysis.AddNewSongTitleBitmap(newSongBitmap, songTitle);
 
@@ -95,6 +100,13 @@ namespace TaikoLogging
                 newSongBitmap = null;
                 Program.analysis.NewSongAdded();
             }
+        }
+        private void CreateNewState(string message)
+        {
+            string state = message.Remove(0, "!state ".Length);
+
+            Program.analysis.CreateNewState(state);
+
         }
         private void ToggleRandomMode(string message)
         {

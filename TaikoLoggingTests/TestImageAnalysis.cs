@@ -1346,6 +1346,7 @@ namespace TaikoLoggingTests
                 new Bitmap(folderPath + "紫煌ノ乱.Oni.1.png"),
                 new Bitmap(folderPath + "Behemoth.Oni.0.png"),
                 new Bitmap(folderPath + "ナイト・オブ・ナイツ.Oni.0.png"),
+
                 new Bitmap(folderPath + "1573.png"),
                 new Bitmap(folderPath + "1682.png"),
                 new Bitmap(folderPath + "1719.png"),
@@ -1359,8 +1360,11 @@ namespace TaikoLoggingTests
 
             List<string> titles = new List<string>();
 
+
+
             for (int i = 0; i < bmps.Count; i++)
             {
+                imageAnalysis.CheckState(bmps[i]);
                 titles.Add(imageAnalysis.GetTitle(bmps[i]));
             }
 

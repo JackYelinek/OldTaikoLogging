@@ -32,6 +32,9 @@ namespace TaikoLogging
         List<Bitmap> titleBitmaps = new List<Bitmap>();
         List<string> titles = new List<string>();
 
+        List<Bitmap> rankedTitleBitmaps = new List<Bitmap>();
+        List<string> rankedTitles = new List<string>();
+
         List<Bitmap> baseTitleBitmaps = new List<Bitmap>();
         List<string> baseTitles = new List<string>();
 
@@ -68,7 +71,7 @@ namespace TaikoLogging
         {
             using (Bitmap bmp = Program.screen.CaptureApplication())
             {
-                currentState = CheckState(bmp);
+                CheckState(bmp);
                 if (currentState == State.PS4CaptureGallery)
                 {
                     inCaptureGallery = true;
@@ -101,7 +104,7 @@ namespace TaikoLogging
 
         public void AnalyzeResults()
         {
-            currentState = CheckState(Program.screen.CaptureApplication());
+            CheckState(Program.screen.CaptureApplication());
 
             if (currentState == State.SingleResults)
             {
@@ -133,7 +136,8 @@ namespace TaikoLogging
         {
             InitializeStateBitmaps();
             InitializeTitleBitmaps();
-            InitializeBaseTitleBitmaps();
+            InitializeRankedTitleBitmaps();
+            //InitializeBaseTitleBitmaps();
             InitializeHighScoreBitmaps();
             InitializeSmallNumbers();
             InitializeBigNumbers();
@@ -226,6 +230,23 @@ namespace TaikoLogging
 
             }
         }
+        private void InitializeRankedTitleBitmaps()
+        {
+            rankedTitleBitmaps = new List<Bitmap>();
+            rankedTitles = new List<string>();
+            DirectoryInfo dirInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Ranked Title Bitmaps");
+            var result = dirInfo.GetFiles();
+            for (int i = 0; i < result.Length; i++)
+            {
+                Bitmap tmp = new Bitmap(result[i].FullName);
+                Bitmap bitmap = new Bitmap(tmp);
+                tmp.Dispose();
+
+                rankedTitleBitmaps.Add(bitmap);
+                string songTitle = result[i].Name.Remove(result[i].Name.LastIndexOf('.'));
+                rankedTitles.Add(songTitle);
+            }
+        }
         private void ClearTitleBitmaps()
         {
             for (int i = 0; i < titleBitmaps.Count; i++)
@@ -233,6 +254,14 @@ namespace TaikoLogging
                 titleBitmaps.Clear();
             }
             titles.Clear();
+        }
+        private void ClearRankedTitleBitmaps()
+        {
+            for (int i = 0; i < rankedTitleBitmaps.Count; i++)
+            {
+                rankedTitleBitmaps.Clear();
+            }
+            rankedTitles.Clear();
         }
         private void InitializeBaseTitleBitmaps()
         {
@@ -442,6 +471,7 @@ namespace TaikoLogging
             }
             previousState = currentState;
             Enum.TryParse(states[smallestIndex], out State state);
+            currentState = state;
             return state;
         }
 
@@ -965,14 +995,89 @@ namespace TaikoLogging
             using (Bitmap titleBmp = GetTitleBitmap(bmp))
             {
                 //int index = CompareBitmapToList(CreateTitleBitmap(titleBmp, titleBackgroundBitmaps[titleBackgrounds.IndexOf("Single")]), baseTitleBitmaps);
-                int index = CompareBitmapToList(titleBmp, titleBitmaps);
-                if (index == -1)
+                string songTitle = string.Empty;
+                if (currentState == State.RankedResults)
                 {
-                    return "";
+                    songTitle = CompareRankedTitleBitmaps(titleBmp);
                 }
-                return titles[index];
+                else
+                {
+                    songTitle = CompareSingleTitleBitmaps(titleBmp);
+                }
+                return songTitle;
             }
         }
+        private string CompareSingleTitleBitmaps(Bitmap bmp)
+        {
+            int pixelDifferences = -1;
+            int smallestIndex = 0;
+
+            List<Bitmap> bitmaps = titleBitmaps;
+
+            for (int i = 0; i < bitmaps.Count; i++)
+            {
+                var tmpInt = CompareBitmaps(bmp, bitmaps[i]);
+
+                if ((tmpInt < pixelDifferences || pixelDifferences == -1))
+                {
+                    pixelDifferences = tmpInt;
+                    smallestIndex = i;
+                }
+            }
+
+            Program.logger.LogPixelDifference(titles[smallestIndex], pixelDifferences);
+            Console.WriteLine("Title pixelDifference = " + pixelDifferences);
+
+            if (currentState == State.RankedResults)
+            {
+                return titles[smallestIndex];
+            }
+
+            if (pixelDifferences >= 300000)
+            {
+                Program.commands.PrepareNewSong(bmp);
+                return "";
+            }
+            else if (pixelDifferences > 50000)
+            {
+                AddNewSongTitleBitmap(bmp, titles[smallestIndex]);
+            }
+
+            return titles[smallestIndex];
+        }
+        private string CompareRankedTitleBitmaps(Bitmap bmp)
+        {
+            int pixelDifferences = -1;
+            int smallestIndex = 0;
+
+            string songTitle = string.Empty;
+
+            List<Bitmap> bitmaps = rankedTitleBitmaps;
+
+            for (int i = 0; i < bitmaps.Count; i++)
+            {
+                var tmpInt = CompareBitmaps(bmp, bitmaps[i]);
+
+                if ((tmpInt < pixelDifferences || pixelDifferences == -1))
+                {
+                    pixelDifferences = tmpInt;
+                    smallestIndex = i;
+                }
+            }
+
+            if (pixelDifferences >= 30000 || pixelDifferences  == -1)
+            {
+                songTitle = CompareSingleTitleBitmaps(bmp);
+                AddNewSongTitleBitmap(bmp, songTitle);
+            }
+            else
+            {
+                songTitle = rankedTitles[smallestIndex];
+                AddNewSongTitleBitmap(bmp, songTitle);
+            }
+            return songTitle;
+        }
+
         public Bitmap GetTitleBitmap(Bitmap bmp)
         {
             // I have a sheet on my test taiko spreadsheet that shows how I got these values, although it's a bit of a mess
@@ -1249,23 +1354,7 @@ namespace TaikoLogging
                 }
             }
 
-            if (bitmaps == titleBitmaps)
-            {
-                Program.logger.LogPixelDifference(titles[smallestIndex], pixelDifferences);
-                Console.WriteLine("Title pixelDifference = " + pixelDifferences);
-                if (currentState != State.RankedResults)
-                {
-                    if (pixelDifferences >= 300000)
-                    {
-                        Program.commands.PrepareNewSong(bmp);
-                        return -1;
-                    }
-                    else if (pixelDifferences > 100000)
-                    {
-                        AddNewSongTitleBitmap(bmp, titles[smallestIndex]);
-                    }
-                }
-            }
+
 
             return smallestIndex;
         }
@@ -1294,14 +1383,25 @@ namespace TaikoLogging
         }
         public void AddNewSongTitleBitmap(Bitmap bmp, string songTitle)
         {
-            if (File.Exists(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Title Bitmaps\" + songTitle + ".png") == true)
+            string folder = @"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\";
+            if (currentState == State.RankedResults)
+            {
+                folder += @"Ranked Title Bitmaps\";
+            }
+            else
+            {
+                folder += @"Title Bitmaps\";
+            }
+            if (File.Exists(folder + songTitle + ".png") == true)
             {
                 ClearTitleBitmaps();
-                File.Delete(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Title Bitmaps\" + songTitle + ".png");
+                ClearRankedTitleBitmaps();
+                File.Delete(folder + songTitle + ".png");
             }
-            bmp.Save(@"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Title Bitmaps\" + songTitle + ".png");
+            bmp.Save(folder + songTitle + ".png");
 
             InitializeTitleBitmaps();
+            InitializeRankedTitleBitmaps();
         }
 
         bool randomMode = false;

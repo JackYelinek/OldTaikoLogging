@@ -55,6 +55,7 @@ namespace TaikoLogging
         List<string> mods = new List<string>();
 
         List<Bitmap> winLossBitmaps = new List<Bitmap>();
+        List<string> winLoss = new List<string>();
 
         List<Bitmap> accountBitmaps = new List<Bitmap>();
         List<string> accounts = new List<string>();
@@ -99,6 +100,12 @@ namespace TaikoLogging
 
         public void NotStandardLoop()
         {
+            // For something that'd be looped, but isn't the real deal, just testing stuff usually
+
+        }
+        public void NotStandardNotLoop()
+        {
+            // For something that just has to be done once, usually testing stuff or adding files or something
 
         }
 
@@ -343,6 +350,7 @@ namespace TaikoLogging
             {
                 var bitmap = new Bitmap(result[i].FullName);
                 winLossBitmaps.Add(bitmap);
+                winLoss.Add(result[i].Name.Remove(result[i].Name.LastIndexOf('.')));
             }
         }
         private void InitializeAccountBitmaps()
@@ -634,7 +642,7 @@ namespace TaikoLogging
             headers.Add("Opp Drumroll");
 
             // Result Data
-            info.Add(RankedWinLoss(bmp));
+            info.Add(GetWinLossBitmap(bmp));
             headers.Add("Win/Loss");
 
             info.Add(account);
@@ -708,15 +716,7 @@ namespace TaikoLogging
                     headers.Add("Opp Drumroll");
 
                     // Result Data
-                    bool victory = RankedWinLoss(bmp);
-                    if (victory == true)
-                    {
-                        info.Add("Win");
-                    }
-                    else
-                    {
-                        info.Add("Lose");
-                    }
+                    info.Add(GetRankedWinLoss(bmp));
                     headers.Add("Win/Loss");
 
                     Program.sheet.FixRankedLogsData(info, headers, matchNumber);
@@ -1181,6 +1181,21 @@ namespace TaikoLogging
             }
             return number;
         }
+        public string GetRankedWinLoss(Bitmap bmp)
+        {
+            using (Bitmap winLossBmp = GetWinLossBitmap(bmp))
+            {
+                // Second: Compare that bitmap to the List of bitmaps to find the closest match
+                int index = CompareBitmapToList(winLossBmp, winLossBitmaps);
+                // Third: Return the string in the index of the closest match
+                // If index == -1, then it couldn't find a song that was a close enough match
+                if (index == -1)
+                {
+                    return "";
+                }
+                return winLoss[index];
+            }
+        }
         public List<Bitmap> GetGoodsBitmaps(Bitmap bmp, Players player)
         {
             double offset = 0;
@@ -1334,18 +1349,32 @@ namespace TaikoLogging
 
             return nameBitmap;
         }
+        public Bitmap GetWinLossBitmap(Bitmap bmp)
+        {
+            int width = GetWidth(bmp, 0.146701388f);
+            int height = GetHeight(bmp, 0.0401854f);
+
+            int x = GetWidth(bmp, 0.2465277f);
+            int y = GetHeight(bmp, 0.26120556f);
+
+            Bitmap winlossBmp = GetBitmapArea(bmp, width, height, x, y);
+
+            winlossBmp = ScaleDown(winlossBmp, 169, 26);
+
+            return winlossBmp;
+        }
 
         public int CompareBitmapToList(Bitmap bmp, List<Bitmap> bitmaps)
         {
             int pixelDifferences = -1;
             int smallestIndex = 0;
 
-            List<int> testingDifferences = new List<int>();
+            //List<int> testingDifferences = new List<int>();
 
             for (int i = 0; i < bitmaps.Count; i++)
             {
                 var tmpInt = CompareBitmaps(bmp, bitmaps[i]);
-                testingDifferences.Add(tmpInt);
+                //testingDifferences.Add(tmpInt);
 
                 if ((tmpInt < pixelDifferences || pixelDifferences == -1))
                 {
@@ -1353,8 +1382,6 @@ namespace TaikoLogging
                     smallestIndex = i;
                 }
             }
-
-
 
             return smallestIndex;
         }

@@ -67,7 +67,11 @@ namespace TaikoLogging
                 {
                     analysis.StandardLoop();
                     //analysis.NotStandardLoop();
-                    
+
+                    //{
+                    //    analysis.NotStandardNotLoop();
+                    //    break;
+                    //}
                 }
                 else if (emulator == true)
                 {

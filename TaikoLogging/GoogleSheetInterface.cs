@@ -64,15 +64,6 @@ namespace TaikoLogging
             info.Add(int.Parse(values[0][0].ToString()) + 1);
             headers.Add("Match");
 
-            if ((bool)info[headers.IndexOf("Win/Loss")] == true)
-            {
-                info[headers.IndexOf("Win/Loss")] = "Win";
-            }
-            else
-            {
-                info[headers.IndexOf("Win/Loss")] = "Lose";
-            }
-
             if ((int)info[headers.IndexOf("My Score")] == 0 && (int)info[headers.IndexOf("Opp Score")] == 0)
             {
                 return;
@@ -116,15 +107,24 @@ namespace TaikoLogging
 
             SendData(range, sendValues);
 
+            string songTitle = info[headers.IndexOf("Title")].ToString();
+            if (info[headers.IndexOf("Difficulty")].ToString() == "Ura")
+            {
+                songTitle += " Ura";
+            }
 
             string twitchMessage = "Match " + info[headers.IndexOf("Match")].ToString() + ": ";
             if ((string)info[headers.IndexOf("Win/Loss")] == "Win")
             {
-                twitchMessage += "Won " + info[headers.IndexOf("Title")] + " by " + info[headers.IndexOf("Difference")] + " RinComfy";
+                twitchMessage += "Won " + songTitle + " by " + info[headers.IndexOf("Difference")] + " RinComfy";
+            }
+            else if ((string)info[headers.IndexOf("Win/Loss")] == "Lose")
+            {
+                twitchMessage += "Lost " + songTitle + " by " + info[headers.IndexOf("Difference")] + " RinThump";
             }
             else
             {
-                twitchMessage += "Lost " + info[headers.IndexOf("Title")] + " by " + info[headers.IndexOf("Difference")] + " RinThump";
+                twitchMessage += "Tied " + songTitle + " RoWOOW";
             }
 
 

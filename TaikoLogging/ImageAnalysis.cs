@@ -82,7 +82,7 @@ namespace TaikoLogging
                 }
                 if (previousState != currentState)
                 {
-                    Console.WriteLine(currentState);
+                    //Console.WriteLine(currentState);
                     bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\TestingStates\" + j++ + "." + currentState + ".png");
                 }
                 if (previousState != currentState && inCaptureGallery == false)

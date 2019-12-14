@@ -205,6 +205,8 @@
     <Compile Include="GoogleSheetInterface.cs" />
     <Compile Include="ImageAnalysis.cs" />
     <Compile Include="EmulatorLogger.cs" />
+    <Compile Include="PlayRecording.cs" />
+    <Compile Include="PlayRecordingSheetsInterface.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScreenGrab.cs" />

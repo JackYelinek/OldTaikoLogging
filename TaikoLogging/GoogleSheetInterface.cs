@@ -55,6 +55,22 @@ namespace TaikoLogging
             });
         }
 
+        public void Test()
+        {
+            //List<IList<object>> sendValues = new List<IList<object>>();
+            //IList<object> baseValues = new List<object>();
+
+            //baseValues.Add("test");
+
+            //sendValues.Add(baseValues);
+
+            //string range = "test!A1";
+
+            //SendData(range, sendValues);
+
+            AddSheet("test");
+        }
+
         public void AddRankedEntry(List<object> info, List<string> headers, Bitmap bmp)
         {
             var Headers = GetHeaders("'Ranked Logs'");
@@ -862,7 +878,38 @@ namespace TaikoLogging
 
             var updateResponse = updateRequest.Execute();
         }
+        public void AddSheet(string sheetName)
+        {
+            var sheetRequest = new Google.Apis.Sheets.v4.Data.AddSheetRequest();
+            sheetRequest.Properties = new SheetProperties();
+            sheetRequest.Properties.Title = sheetName;
+            Request newRequest = new Request()
+            {
+                AddSheet = sheetRequest
+            };
 
+            var requestBody = new Google.Apis.Sheets.v4.Data.BatchUpdateSpreadsheetRequest();
+            requestBody.Requests = new List<Request>();
+            requestBody.Requests.Add(newRequest);
+
+            var updateRequest = service.Spreadsheets.BatchUpdate(requestBody, spreadsheetId);
+
+            var updateResponse = updateRequest.Execute();
+        }
+        public int GetSheetID(string sheetName)
+        {
+            var request = service.Spreadsheets.Get(spreadsheetId);
+            var response = request.Execute();
+
+            for (int i = 0; i < response.Sheets.Count; i++)
+            {
+                if (response.Sheets[i].Properties.Title == sheetName)
+                {
+                    return (int)response.Sheets[i].Properties.SheetId;
+                }
+            }
+            return -1;
+        }
         public string GetColumnName(int index)
         {
             if (index < 0)

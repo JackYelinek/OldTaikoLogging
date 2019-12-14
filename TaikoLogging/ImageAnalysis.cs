@@ -60,6 +60,9 @@ namespace TaikoLogging
         List<Bitmap> accountBitmaps = new List<Bitmap>();
         List<string> accounts = new List<string>();
 
+        public bool newSongMode = false;
+
+
         private int j = 0;
         private int numStatesSaved = 0;
         public ImageAnalysis()
@@ -531,6 +534,16 @@ namespace TaikoLogging
             }
 
 
+            if (newSongMode == true)
+            {
+                var titleBitmap = GetTitleBitmap(bmp);
+                Console.WriteLine("Please input title, or 'n' if this isn't a new song:");
+                var title = Console.ReadLine();
+                if (title != "n")
+                {
+                    AddNewSongTitleBitmap(titleBitmap, title);
+                }
+            }
 
 
             info.Add(GetTitle(bmp));
@@ -642,7 +655,7 @@ namespace TaikoLogging
             headers.Add("Opp Drumroll");
 
             // Result Data
-            info.Add(GetWinLossBitmap(bmp));
+            info.Add(GetRankedWinLoss(bmp));
             headers.Add("Win/Loss");
 
             info.Add(account);
@@ -1032,12 +1045,6 @@ namespace TaikoLogging
             {
                 return titles[smallestIndex];
             }
-
-            if (pixelDifferences >= 300000)
-            {
-                Program.commands.PrepareNewSong(bmp);
-                return "";
-            }
             else if (pixelDifferences > 50000)
             {
                 AddNewSongTitleBitmap(bmp, titles[smallestIndex]);
@@ -1388,28 +1395,30 @@ namespace TaikoLogging
 
         #endregion
 
-        public void NewSongAdded()
-        {
-            // Go through the GetSingleResults() so it will put the score on the spreadsheet
-            using (Bitmap resultsBmp = Program.screen.CaptureApplication())
-            {
-                currentState = CheckState(resultsBmp);
-                if (currentState == State.SingleResults)
-                {
-                    GetSingleResults(false);
-                }
-                else if (currentState == State.SingleSessionResults)
-                {
-                    GetSingleResults(true);
-                }
-                else if (currentState == State.RankedResults)
-                {
-                    GetRankedResults();
-                }
-            }
-        }
+        //public void NewSongAdded()
+        //{
+        //    // Go through the GetSingleResults() so it will put the score on the spreadsheet
+        //    using (Bitmap resultsBmp = Program.screen.CaptureApplication())
+        //    {
+        //        currentState = CheckState(resultsBmp);
+        //        if (currentState == State.SingleResults)
+        //        {
+        //            GetSingleResults(false);
+        //        }
+        //        else if (currentState == State.SingleSessionResults)
+        //        {
+        //            GetSingleResults(true);
+        //        }
+        //        else if (currentState == State.RankedResults)
+        //        {
+        //            GetRankedResults();
+        //        }
+        //    }
+        //}
         public void AddNewSongTitleBitmap(Bitmap bmp, string songTitle)
         {
+            ClearTitleBitmaps();
+            ClearRankedTitleBitmaps();
             string folder = @"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\";
             if (currentState == State.RankedResults)
             {
@@ -1421,8 +1430,6 @@ namespace TaikoLogging
             }
             if (File.Exists(folder + songTitle + ".png") == true)
             {
-                ClearTitleBitmaps();
-                ClearRankedTitleBitmaps();
                 File.Delete(folder + songTitle + ".png");
             }
             bmp.Save(folder + songTitle + ".png");

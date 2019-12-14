@@ -32,6 +32,12 @@ namespace TaikoLogging
             Thread inputThread = new Thread(ReadInput);
             inputThread.Start();
 
+
+            //PlayRecordingSheetsInterface playRecordingSheetsInterface = new PlayRecordingSheetsInterface();
+
+
+
+
             while(true)
             {
                 // I'm not sure if this is the best way to check for it, maybe i could just have it check every 10 loops, or 100
@@ -61,7 +67,7 @@ namespace TaikoLogging
                     // That wouldn't really work, since emulator looks like PS4 on obs
                     // I could check to see if it starts to fail a bunch of the data checks I guess? But that would require a lot of checks, and some failed data gathering
                     emulator = true;
-                    PS4 = true;
+                    PS4 = false;
                 }
                 if (PS4 == true)
                 {

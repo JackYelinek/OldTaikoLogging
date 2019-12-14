@@ -27,10 +27,10 @@ namespace TaikoLogging
             tmpList.Add("!removelast");
             commandWords.Add(tmpList);
 
-            commandFunctions.Add(AddNewSong);
-            tmpList = new List<string>();
-            tmpList.Add("!song ");
-            commandWords.Add(tmpList);
+            //commandFunctions.Add(AddNewSong);
+            //tmpList = new List<string>();
+            //tmpList.Add("!song ");
+            //commandWords.Add(tmpList);
 
             commandFunctions.Add(ToggleRandomMode);
             tmpList = new List<string>();
@@ -51,6 +51,11 @@ namespace TaikoLogging
             commandFunctions.Add(CreateNewState);
             tmpList = new List<string>();
             tmpList.Add("!state ");
+            commandWords.Add(tmpList);
+
+            commandFunctions.Add(NewSongMode);
+            tmpList = new List<string>();
+            tmpList.Add("!newsong");
             commandWords.Add(tmpList);
         }
 
@@ -86,21 +91,21 @@ namespace TaikoLogging
             //Program.rin.SendTwitchMessage("Couldn't figure out the song, !song <song>");
             Console.WriteLine("Couldn't figure out the song, !song <song>");
         }
-        private void AddNewSong(string message)
-        {
-            if (newSongIncoming == true)
-            {
-                string songTitle = message.Remove(0, "!song ".Length);
+        //private void AddNewSong(string message)
+        //{
+        //    if (newSongIncoming == true)
+        //    {
+        //        string songTitle = message.Remove(0, "!song ".Length);
 
-                Program.analysis.AddNewSongTitleBitmap(newSongBitmap, songTitle);
+        //        Program.analysis.AddNewSongTitleBitmap(newSongBitmap, songTitle);
 
-                Console.WriteLine(songTitle + " has been added!");
+        //        Console.WriteLine(songTitle + " has been added!");
 
-                newSongIncoming = false;
-                newSongBitmap = null;
-                Program.analysis.NewSongAdded();
-            }
-        }
+        //        newSongIncoming = false;
+        //        newSongBitmap = null;
+        //        Program.analysis.NewSongAdded();
+        //    }
+        //}
         private void CreateNewState(string message)
         {
             string state = message.Remove(0, "!state ".Length);
@@ -119,6 +124,18 @@ namespace TaikoLogging
         private void AnalyzeResults(string message)
         {
             Program.analysis.AnalyzeResults();
+        }
+        private void NewSongMode(string message)
+        {
+            Program.analysis.newSongMode = !Program.analysis.newSongMode;
+            if (Program.analysis.newSongMode == true)
+            {
+                Console.WriteLine("NewSongMode on");
+            }
+            else
+            {
+                Console.WriteLine("NewSongMode off");
+            }
         }
     }
 }

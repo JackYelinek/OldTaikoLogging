@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
 using IronOcr;
+using System.Diagnostics;
 
 namespace TaikoLogging
 {
@@ -84,11 +85,11 @@ namespace TaikoLogging
                 {
                     inCaptureGallery = false;
                 }
-                if (previousState != currentState)
-                {
-                    //Console.WriteLine(currentState);
-                    bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\TestingStates\" + j++ + "." + currentState + ".png");
-                }
+                //if (previousState != currentState)
+                //{
+                //    //Console.WriteLine(currentState);
+                //    bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\TestingStates\" + j++ + "." + currentState + ".png");
+                //}
                 if (previousState != currentState && inCaptureGallery == false)
                 {
                     if (currentState == State.SingleResults || currentState == State.SingleSessionResults || currentState == State.RankedResults)
@@ -105,11 +106,123 @@ namespace TaikoLogging
         {
             // For something that'd be looped, but isn't the real deal, just testing stuff usually
 
+            // Time to start working in this function again
         }
         public void NotStandardNotLoop()
         {
             // For something that just has to be done once, usually testing stuff or adding files or something
+            TestRecordingFunction();
 
+        }
+
+        DateTime prevTime = DateTime.Now;
+
+
+        int recordingNumber = 0;
+        List<Thread> threads = new List<Thread>();
+        const int numThreads = 4;
+        DateTime startTime;
+        Stopwatch stopwatch = new Stopwatch();
+        private void RecordingFunction()
+        {
+            startTime = DateTime.Now;
+            stopwatch.Start();
+            for (int i = 0; i < numThreads; i++)
+            {
+                Thread thread = new Thread(CaptureGood);
+                thread.Start(i);
+            }
+        }
+
+        private void TestRecordingFunction()
+        {
+            int i = 0;
+            while (true)
+            {
+                //Thread.Sleep(Math.Max((int)(DateTime.Now - startTime - nextTime).TotalMilliseconds, 0));
+
+                // x = 311
+                // y = 214
+                // width = 383 - 311 = 72
+                // height = 248 - 214 = 34
+                // 360 216
+                var bmp = Program.screen.CapturePixelColor(360, 216);
+                //var tmp = Program.screen.CaptureAreaQuickly(311, 212, 72, 15);
+                //tmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\tmpRecording\" + i + ".png");
+                //tmp = Program.screen.CaptureApplication();
+                //tmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\tmpFull\" + i++ + ".png");
+
+                //bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\TestingRecording\" + i++ + ".png");
+
+                // This is probably the best way to make a thread with multiple parameters
+                Thread analysisThread = new Thread(
+                    unused => AnalyzeGood(bmp, i)
+                    );
+                analysisThread.Start();
+
+                //Console.WriteLine(DateTime.Now - prevTime);
+                //prevTime = DateTime.Now;
+            }
+        }
+
+        private void CaptureGood(object threadNumber)
+        {
+            int i = 0;
+            long nextTime = (long)(((1.0f / 60.0f) * (int)threadNumber) + (((1.0f / 60.0f) * numThreads) * i))*1000;
+            while (true)
+            {
+                //Thread.Sleep(Math.Max((int)(DateTime.Now - startTime - nextTime).TotalMilliseconds, 0));
+                if (stopwatch.ElapsedMilliseconds <= nextTime)
+                {
+                    continue;
+                }
+                i = (int)((stopwatch.ElapsedMilliseconds - (long)((1.0f / 60.0f) * (int)threadNumber)) / (long)(((double)((1.0f / 60.0f) * numThreads)) * 1000));
+                // x = 311
+                // y = 214
+                // width = 383 - 311 = 72
+                // height = 248 - 214 = 34
+                var bmp = Program.screen.CaptureAreaQuickly(311, 212, 72, 15);
+                bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\TestingRecording\" + ((i++ * numThreads) + (int)threadNumber) + ".png");
+
+                // This is probably the best way to make a thread with multiple parameters
+                Thread analysisThread = new Thread(
+                    unused => AnalyzeGood(bmp, ((i++ * numThreads) + (int)threadNumber))
+                    );
+                analysisThread.Start();
+
+                //Console.WriteLine(DateTime.Now - prevTime);
+                //prevTime = DateTime.Now;
+
+                nextTime = (long)(((1.0f / 60.0f) * (int)threadNumber) + (((1.0f / 60.0f) * numThreads) * i)) * 1000;
+            }
+        }
+        public enum Note { Good, OK, Bad };
+        Dictionary<int, Note> NoteResults = new Dictionary<int, Note>();
+        private void AnalyzeGood(Bitmap bmp, int i)
+        {
+            const int tolerance = 50;
+            Color bmpColor = bmp.GetPixel(0, 0);
+            //Color bmpColor = bmp.GetPixel(49, 4);
+            Color goodColor = Color.FromArgb(138, 151, 25);
+            Color okColor = Color.FromArgb(234,236,233);
+            Color badColor = Color.FromArgb(128,97,228);
+
+            if(CompareColors(bmpColor, goodColor) < tolerance)
+            {
+                NoteResults.Add(i, Note.Good);
+                Console.WriteLine("Good");
+            }
+            if (CompareColors(bmpColor, okColor) < tolerance)
+            {
+                NoteResults.Add(i, Note.OK);
+                Console.WriteLine("OK");
+            }
+            if (CompareColors(bmpColor, badColor) < tolerance)
+            {
+                NoteResults.Add(i, Note.Bad);
+                Console.WriteLine("Bad");
+            }
+            bmp.Dispose();
         }
 
         public void AnalyzeResults()
@@ -1679,14 +1792,18 @@ namespace TaikoLogging
                     Color color1 = bmp1.GetPixel(x, y);
                     Color color2 = bmp2.GetPixel(x, y);
 
-                    diffs[x, y] = (int)(
-                    Math.Abs(color1.R - color2.R) +
-                    Math.Abs(color1.G - color2.G) +
-                    Math.Abs(color1.B - color2.B));
+                    diffs[x, y] = CompareColors(color1, color2);
                     max_diff += diffs[x, y];
                 }
             }
             return max_diff;
+        }
+        private int CompareColors(Color color1, Color color2)
+        {
+            return (int)(
+                    Math.Abs(color1.R - color2.R) +
+                    Math.Abs(color1.G - color2.G) +
+                    Math.Abs(color1.B - color2.B));
         }
         private Bitmap ScaleDown(Bitmap image, float width, float height)
         {

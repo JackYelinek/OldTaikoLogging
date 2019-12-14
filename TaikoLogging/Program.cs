@@ -34,11 +34,11 @@ namespace TaikoLogging
 
 
             //PlayRecordingSheetsInterface playRecordingSheetsInterface = new PlayRecordingSheetsInterface();
+            //NewScreenGrab newScreenGrab = new NewScreenGrab();
 
 
 
-
-            while(true)
+            while (true)
             {
                 // I'm not sure if this is the best way to check for it, maybe i could just have it check every 10 loops, or 100
                 // Events would be nice to set up, but I'm not sure if I could do that, or how I'd do that
@@ -76,6 +76,7 @@ namespace TaikoLogging
 
                     //{
                     //    analysis.NotStandardNotLoop();
+                    //    Thread.Sleep(100000000);
                     //    break;
                     //}
                 }

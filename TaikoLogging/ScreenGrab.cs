@@ -39,6 +39,8 @@ namespace TaikoLogging
         // Can I make this work without opening OBS for testing
         // Yup, with the 100% expert level code
         // I am a literal god
+        int testX;
+        int testY;
         private void Setup()
         {
             var processes = Process.GetProcessesByName("obs64");
@@ -58,19 +60,36 @@ namespace TaikoLogging
             // That's wrong because when setting up, I need to check things from before it has any offsets
             graphics.CopyFromScreen(rect.left, rect.top, 0, 0, new Size(rect.right - rect.left, rect.bottom - rect.top), CopyPixelOperation.SourceCopy);
             FindGameWindow(bmp);
+            testX = rect.left + leftOffset;
+            testY = rect.top + topOffset;
         }
 
         // Won't save the image, just returns the bitmap
         public Bitmap CaptureApplication()
         {
 
-            User32.GetWindowRect(proc.MainWindowHandle, ref rect);
+            //User32.GetWindowRect(proc.MainWindowHandle, ref rect);
             var bmp = new Bitmap(rightOffset - leftOffset, bottomOffset - topOffset, PixelFormat.Format32bppArgb);
             Graphics graphics = Graphics.FromImage(bmp);
             graphics.CopyFromScreen(rect.left + leftOffset, rect.top + topOffset, 0, 0, new Size(rightOffset - leftOffset, bottomOffset - topOffset), CopyPixelOperation.SourceCopy);
             return bmp;
         }
 
+        // This returns the bitmap of just the area specified to improve speed
+        public Bitmap CaptureAreaQuickly(int x, int y, int width, int height)
+        {
+            var bmp = new Bitmap(width, height, PixelFormat.Format32bppArgb);
+            Graphics graphics = Graphics.FromImage(bmp);
+            graphics.CopyFromScreen(testX + x, testY + y, 0, 0, new Size(width, height), CopyPixelOperation.SourceCopy);
+            return bmp;
+        }
+        public Bitmap CapturePixelColor(int x, int y)
+        {
+            var bmp = new Bitmap(1, 1, PixelFormat.Format32bppArgb);
+            Graphics graphics = Graphics.FromImage(bmp);
+            graphics.CopyFromScreen(x, y, 0, 0, new Size(1, 1), CopyPixelOperation.SourceCopy);
+            return bmp;
+        }
         // Put any bool in order to save the bitmap
         public Bitmap CaptureApplication(bool Testing)
         {
@@ -81,6 +100,8 @@ namespace TaikoLogging
             Console.WriteLine("Picture Taken");
             return bmp;
         }
+
+
 
         public void FindGameWindow(Bitmap bmp)
         {
@@ -176,7 +197,7 @@ namespace TaikoLogging
 
         public bool CheckTwitch()
         {
-            User32.GetWindowRect(proc.MainWindowHandle, ref rect);
+            //User32.GetWindowRect(proc.MainWindowHandle, ref rect);
             var bmp = new Bitmap(rect.right - rect.left, rect.bottom - rect.top, PixelFormat.Format32bppArgb);
             Graphics graphics = Graphics.FromImage(bmp);
             graphics.CopyFromScreen(rect.left, rect.top, 0, 0, new Size(rect.right - rect.left, rect.bottom - rect.top), CopyPixelOperation.SourceCopy);

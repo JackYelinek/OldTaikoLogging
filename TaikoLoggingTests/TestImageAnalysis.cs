@@ -13,7 +13,7 @@ namespace TaikoLoggingTests
         [TestMethod]
         public void TestFindGameWindow()
         {
-            ScreenGrab screen = new ScreenGrab();
+            OldScreenGrab screen = new OldScreenGrab();
 
 
             string folderPath = @"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Test Data\FindGameWindow\";
@@ -62,7 +62,7 @@ namespace TaikoLoggingTests
 
             // I made this test because I thought the function was broken
             // Turns out I'm just a little stupid
-            ScreenGrab screen = new ScreenGrab();
+            OldScreenGrab screen = new OldScreenGrab();
 
 
             string folderPath = @"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\Test Data\FindGameWindow\";

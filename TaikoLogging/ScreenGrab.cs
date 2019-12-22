@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -13,34 +12,18 @@ namespace TaikoLogging
 {
     class ScreenGrab
     {
-        public int i = 0;
         Process proc;
-        User32.Rect rect = new User32.Rect();
-
         public int topOffset = 0;
         public int leftOffset = 0;
         public int bottomOffset = 0;
         public int rightOffset = 0;
-
-
-
+        RECT rect = new RECT();
 
         public ScreenGrab()
         {
             Setup();
         }
 
-        public ScreenGrab(bool testing)
-        {
-            Setup();
-            //FindGameWindow();
-        }
-
-        // Can I make this work without opening OBS for testing
-        // Yup, with the 100% expert level code
-        // I am a literal god
-        int testX;
-        int testY;
         private void Setup()
         {
             var processes = Process.GetProcessesByName("obs64");
@@ -52,56 +35,21 @@ namespace TaikoLogging
             {
                 proc = processes[0];
             }
-            // I probably don't need to care about the outer box, just the middle box
-            User32.GetWindowRect(proc.MainWindowHandle, ref rect);
-            var bmp = new Bitmap(rect.right - rect.left, rect.bottom - rect.top, PixelFormat.Format32bppArgb);
-            Graphics graphics = Graphics.FromImage(bmp);
-            // I had rect.left = leftOffset, rect.top + topOffset here
-            // That's wrong because when setting up, I need to check things from before it has any offsets
-            graphics.CopyFromScreen(rect.left, rect.top, 0, 0, new Size(rect.right - rect.left, rect.bottom - rect.top), CopyPixelOperation.SourceCopy);
+
+            var bmp = PrintWindow(proc.MainWindowHandle);
             FindGameWindow(bmp);
-            testX = rect.left + leftOffset;
-            testY = rect.top + topOffset;
+            //bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\TestingRecording\test.png");
         }
 
-        // Won't save the image, just returns the bitmap
         public Bitmap CaptureApplication()
         {
+            var bmp = PrintWindow(proc.MainWindowHandle);
 
-            //User32.GetWindowRect(proc.MainWindowHandle, ref rect);
-            var bmp = new Bitmap(rightOffset - leftOffset, bottomOffset - topOffset, PixelFormat.Format32bppArgb);
-            Graphics graphics = Graphics.FromImage(bmp);
-            graphics.CopyFromScreen(rect.left + leftOffset, rect.top + topOffset, 0, 0, new Size(rightOffset - leftOffset, bottomOffset - topOffset), CopyPixelOperation.SourceCopy);
-            return bmp;
+            Rectangle gameRect = new Rectangle(leftOffset, topOffset, rightOffset - leftOffset, bottomOffset - topOffset);
+            var gameBmp = bmp.Clone(gameRect, PixelFormat.Format32bppArgb);
+
+            return gameBmp;
         }
-
-        // This returns the bitmap of just the area specified to improve speed
-        public Bitmap CaptureAreaQuickly(int x, int y, int width, int height)
-        {
-            var bmp = new Bitmap(width, height, PixelFormat.Format32bppArgb);
-            Graphics graphics = Graphics.FromImage(bmp);
-            graphics.CopyFromScreen(testX + x, testY + y, 0, 0, new Size(width, height), CopyPixelOperation.SourceCopy);
-            return bmp;
-        }
-        public Bitmap CapturePixelColor(int x, int y)
-        {
-            var bmp = new Bitmap(1, 1, PixelFormat.Format32bppArgb);
-            Graphics graphics = Graphics.FromImage(bmp);
-            graphics.CopyFromScreen(x, y, 0, 0, new Size(1, 1), CopyPixelOperation.SourceCopy);
-            return bmp;
-        }
-        // Put any bool in order to save the bitmap
-        public Bitmap CaptureApplication(bool Testing)
-        {
-            Bitmap bmp = CaptureApplication();
-
-            // NOT TESTING (technically testing, but this function is only for testing anyway
-            bmp.Save(string.Format(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\test{0}.png", i++.ToString()), ImageFormat.Png);
-            Console.WriteLine("Picture Taken");
-            return bmp;
-        }
-
-
 
         public void FindGameWindow(Bitmap bmp)
         {
@@ -115,7 +63,7 @@ namespace TaikoLogging
             // To find the game box, go from the middle top down in a column until I reach the middle box color, then when it stops being that color, that's the top of the box
             // Then do the same from the middle left, middle bottom, and middle right
             bool topMiddleBox = false;
-            for (int i = 0; i < bmp.Height; i++)
+            for (int i = 1; i < bmp.Height; i++)
             {
                 if (CompareColors(bmp.GetPixel(bmp.Width / 2, i), middleBoxColor) != topMiddleBox)
                 {
@@ -128,7 +76,7 @@ namespace TaikoLogging
                 }
             }
             bool leftMiddleBox = false;
-            for (int i = 0; i < bmp.Width; i++)
+            for (int i = 1; i < bmp.Width; i++)
             {
                 if (CompareColors(bmp.GetPixel(i, bmp.Height / 2), middleBoxColor) != leftMiddleBox)
                 {
@@ -141,7 +89,7 @@ namespace TaikoLogging
                 }
             }
             bool bottomMiddleBox = false;
-            for (int i = bmp.Height-1; i > 0; i--)
+            for (int i = bmp.Height - 2; i > 0; i--)
             {
                 if (CompareColors(bmp.GetPixel(bmp.Width / 2, i), middleBoxColor) != bottomMiddleBox)
                 {
@@ -154,7 +102,7 @@ namespace TaikoLogging
                 }
             }
             bool rightMiddleBox = false;
-            for (int i = bmp.Width-1; i > 0; i--)
+            for (int i = bmp.Width - 2; i > 0; i--)
             {
                 if (CompareColors(bmp.GetPixel(i, bmp.Height / 2), middleBoxColor) != rightMiddleBox)
                 {
@@ -198,10 +146,10 @@ namespace TaikoLogging
         public bool CheckTwitch()
         {
             //User32.GetWindowRect(proc.MainWindowHandle, ref rect);
-            var bmp = new Bitmap(rect.right - rect.left, rect.bottom - rect.top, PixelFormat.Format32bppArgb);
-            Graphics graphics = Graphics.FromImage(bmp);
-            graphics.CopyFromScreen(rect.left, rect.top, 0, 0, new Size(rect.right - rect.left, rect.bottom - rect.top), CopyPixelOperation.SourceCopy);
-
+            //var bmp = new Bitmap(rect.right - rect.left, rect.bottom - rect.top, PixelFormat.Format32bppArgb);
+            //Graphics graphics = Graphics.FromImage(bmp);
+            //graphics.CopyFromScreen(rect.left, rect.top, 0, 0, new Size(rect.right - rect.left, rect.bottom - rect.top), CopyPixelOperation.SourceCopy);
+            var bmp = CaptureApplication();
             return AnalyzeTwitch(bmp);
         }
 
@@ -221,7 +169,7 @@ namespace TaikoLogging
             // y is -101 compared to exit
             // -101 is the only number I need to know to find y
 
-            int y = bmp.Height - 1;
+            int y = bmp.Height - 2;
             for (; y >= 0; y--)
             {
                 var exitPixel = bmp.GetPixel(x, y);
@@ -250,19 +198,151 @@ namespace TaikoLogging
             return false;
         }
 
-        private class User32
+        [DllImport("user32.dll")]
+        public static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
+
+        [DllImport("user32.dll")]
+        public static extern bool PrintWindow(IntPtr hWnd, IntPtr hdcBlt, int nFlags);
+
+        public static Bitmap PrintWindow(IntPtr hwnd)
         {
-            [StructLayout(LayoutKind.Sequential)]
-            public struct Rect
+            RECT rc;
+            GetWindowRect(hwnd, out rc);
+
+            Bitmap bmp = new Bitmap(rc.Width, rc.Height, PixelFormat.Format32bppArgb);
+            Graphics gfxBmp = Graphics.FromImage(bmp);
+            IntPtr hdcBitmap = gfxBmp.GetHdc();
+
+            PrintWindow(hwnd, hdcBitmap, 0);
+
+            gfxBmp.ReleaseHdc(hdcBitmap);
+            gfxBmp.Dispose();
+
+            return bmp;
+        }
+        [StructLayout(LayoutKind.Sequential)]
+        public struct RECT
+        {
+            private int _Left;
+            private int _Top;
+            private int _Right;
+            private int _Bottom;
+
+            public RECT(RECT Rectangle) : this(Rectangle.Left, Rectangle.Top, Rectangle.Right, Rectangle.Bottom)
             {
-                public int left;
-                public int top;
-                public int right;
-                public int bottom;
+            }
+            public RECT(int Left, int Top, int Right, int Bottom)
+            {
+                _Left = Left;
+                _Top = Top;
+                _Right = Right;
+                _Bottom = Bottom;
             }
 
-            [DllImport("user32.dll")]
-            public static extern IntPtr GetWindowRect(IntPtr hWnd, ref Rect rect);
+            public int X
+            {
+                get { return _Left; }
+                set { _Left = value; }
+            }
+            public int Y
+            {
+                get { return _Top; }
+                set { _Top = value; }
+            }
+            public int Left
+            {
+                get { return _Left; }
+                set { _Left = value; }
+            }
+            public int Top
+            {
+                get { return _Top; }
+                set { _Top = value; }
+            }
+            public int Right
+            {
+                get { return _Right; }
+                set { _Right = value; }
+            }
+            public int Bottom
+            {
+                get { return _Bottom; }
+                set { _Bottom = value; }
+            }
+            public int Height
+            {
+                get { return _Bottom - _Top; }
+                set { _Bottom = value + _Top; }
+            }
+            public int Width
+            {
+                get { return _Right - _Left; }
+                set { _Right = value + _Left; }
+            }
+            public Point Location
+            {
+                get { return new Point(Left, Top); }
+                set
+                {
+                    _Left = value.X;
+                    _Top = value.Y;
+                }
+            }
+            public Size Size
+            {
+                get { return new Size(Width, Height); }
+                set
+                {
+                    _Right = value.Width + _Left;
+                    _Bottom = value.Height + _Top;
+                }
+            }
+
+            public static implicit operator Rectangle(RECT Rectangle)
+            {
+                return new Rectangle(Rectangle.Left, Rectangle.Top, Rectangle.Width, Rectangle.Height);
+            }
+            public static implicit operator RECT(Rectangle Rectangle)
+            {
+                return new RECT(Rectangle.Left, Rectangle.Top, Rectangle.Right, Rectangle.Bottom);
+            }
+            public static bool operator ==(RECT Rectangle1, RECT Rectangle2)
+            {
+                return Rectangle1.Equals(Rectangle2);
+            }
+            public static bool operator !=(RECT Rectangle1, RECT Rectangle2)
+            {
+                return !Rectangle1.Equals(Rectangle2);
+            }
+
+            public override string ToString()
+            {
+                return "{Left: " + _Left + "; " + "Top: " + _Top + "; Right: " + _Right + "; Bottom: " + _Bottom + "}";
+            }
+
+            public override int GetHashCode()
+            {
+                return ToString().GetHashCode();
+            }
+
+            public bool Equals(RECT Rectangle)
+            {
+                return Rectangle.Left == _Left && Rectangle.Top == _Top && Rectangle.Right == _Right && Rectangle.Bottom == _Bottom;
+            }
+
+            public override bool Equals(object Object)
+            {
+                if (Object is RECT)
+                {
+                    return Equals((RECT)Object);
+                }
+                else if (Object is Rectangle)
+                {
+                    return Equals(new RECT((Rectangle)Object));
+                }
+
+                return false;
+            }
         }
     }
 }

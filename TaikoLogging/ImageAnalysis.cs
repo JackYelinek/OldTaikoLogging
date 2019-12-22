@@ -146,7 +146,10 @@ namespace TaikoLogging
                 // width = 383 - 311 = 72
                 // height = 248 - 214 = 34
                 // 360 216
-                var bmp = Program.screen.CapturePixelColor(360, 216);
+
+                var bmp = Program.screen.CaptureApplication();
+                //bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\TestingRecording\" + i++ + ".png");
+                //var bmp = Program.screen.CapturePixelColor(360, 216);
                 //var tmp = Program.screen.CaptureAreaQuickly(311, 212, 72, 15);
                 //tmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\tmpRecording\" + i + ".png");
                 //tmp = Program.screen.CaptureApplication();
@@ -160,8 +163,8 @@ namespace TaikoLogging
                     );
                 analysisThread.Start();
 
-                //Console.WriteLine(DateTime.Now - prevTime);
-                //prevTime = DateTime.Now;
+                Console.WriteLine(DateTime.Now - prevTime);
+                prevTime = DateTime.Now;
             }
         }
 
@@ -181,14 +184,14 @@ namespace TaikoLogging
                 // y = 214
                 // width = 383 - 311 = 72
                 // height = 248 - 214 = 34
-                var bmp = Program.screen.CaptureAreaQuickly(311, 212, 72, 15);
-                bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\TestingRecording\" + ((i++ * numThreads) + (int)threadNumber) + ".png");
+                //var bmp = Program.screen.CaptureAreaQuickly(311, 212, 72, 15);
+                //bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\TestingRecording\" + ((i++ * numThreads) + (int)threadNumber) + ".png");
 
                 // This is probably the best way to make a thread with multiple parameters
-                Thread analysisThread = new Thread(
-                    unused => AnalyzeGood(bmp, ((i++ * numThreads) + (int)threadNumber))
-                    );
-                analysisThread.Start();
+                //Thread analysisThread = new Thread(
+                //    unused => AnalyzeGood(bmp, ((i++ * numThreads) + (int)threadNumber))
+                //    );
+                //analysisThread.Start();
 
                 //Console.WriteLine(DateTime.Now - prevTime);
                 //prevTime = DateTime.Now;
@@ -201,8 +204,9 @@ namespace TaikoLogging
         private void AnalyzeGood(Bitmap bmp, int i)
         {
             const int tolerance = 50;
-            Color bmpColor = bmp.GetPixel(0, 0);
+            //Color bmpColor = bmp.GetPixel(0, 0);
             //Color bmpColor = bmp.GetPixel(49, 4);
+            Color bmpColor = bmp.GetPixel(360, 216);
             Color goodColor = Color.FromArgb(138, 151, 25);
             Color okColor = Color.FromArgb(234,236,233);
             Color badColor = Color.FromArgb(128,97,228);
@@ -349,6 +353,10 @@ namespace TaikoLogging
 
                 titleBitmaps.Add(bitmap);
                 string songTitle = result[i].Name.Remove(result[i].Name.LastIndexOf('.'));
+                if(songTitle == "1_2 ～inside me")
+                {
+                    songTitle = "1/2 ～inside me";
+                }
                 titles.Add(songTitle);
 
             }
@@ -367,6 +375,10 @@ namespace TaikoLogging
 
                 rankedTitleBitmaps.Add(bitmap);
                 string songTitle = result[i].Name.Remove(result[i].Name.LastIndexOf('.'));
+                if (songTitle == "1_2 ～inside me")
+                {
+                    songTitle = "1/2 ～inside me";
+                }
                 rankedTitles.Add(songTitle);
             }
         }
@@ -1541,6 +1553,9 @@ namespace TaikoLogging
             {
                 folder += @"Title Bitmaps\";
             }
+
+            songTitle = Program.MakeValidFileName(songTitle);
+
             if (File.Exists(folder + songTitle + ".png") == true)
             {
                 File.Delete(folder + songTitle + ".png");

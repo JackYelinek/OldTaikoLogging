@@ -266,7 +266,7 @@ namespace TaikoLogging
                 }
             }
 
-            info.Add(DateTime.Now.ToString("MM/dd/yyyy"));
+            info.Add(DateTime.Now.ToString("MM/dd/yyyy hh:mm tt"));
             headers.Add("DateTime");
 
             //send all the information onto the sheet in the correct spots
@@ -306,26 +306,29 @@ namespace TaikoLogging
 
             if (test == false)
             {
+                var fileSongTitle = Program.MakeValidFileName(info[headers.IndexOf("Title")].ToString());
 
                 if (info[headers.IndexOf("Account")].ToString() == "Deathblood")
                 {
-                    DirectoryInfo dirInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores\Normal\" + info[headers.IndexOf("Title")]);
+                    DirectoryInfo dirInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores\Normal\" + fileSongTitle);
                     if (dirInfo.Exists == false)
                     {
                         dirInfo.Create();
                     }
                     var result = dirInfo.GetFiles();
-                    bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores\Normal\" + info[headers.IndexOf("Title")]  + "\\" + info[headers.IndexOf("Title")] + "." + info[headers.IndexOf("Difficulty")].ToString() + "." + result.Length + ".png", ImageFormat.Png);
+
+
+                    bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores\Normal\" + fileSongTitle + "\\" + fileSongTitle + "." + info[headers.IndexOf("Difficulty")].ToString() + "." + result.Length + ".png", ImageFormat.Png);
                 }
                 else if (info[headers.IndexOf("Account")].ToString() == "RinzoP")
                 {
-                    DirectoryInfo dirInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores\Messy\" + info[headers.IndexOf("Title")]);
+                    DirectoryInfo dirInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores\Messy\" + fileSongTitle);
                     if (dirInfo.Exists == false)
                     {
                         dirInfo.Create();
                     }
                     var result = dirInfo.GetFiles();
-                    bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores\Messy\" + info[headers.IndexOf("Title")] + "\\" + info[headers.IndexOf("Title")] + "." + info[headers.IndexOf("Difficulty")].ToString() + "." + result.Length + ".png", ImageFormat.Png);
+                    bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores\Messy\" + fileSongTitle + "\\" + fileSongTitle + "." + info[headers.IndexOf("Difficulty")].ToString() + "." + result.Length + ".png", ImageFormat.Png);
 
                 }
             }

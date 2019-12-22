@@ -33,10 +33,13 @@ namespace TaikoLogging
             inputThread.Start();
 
 
+            var test = MakeValidFileName("1/2 ～inside me");
+
             //PlayRecordingSheetsInterface playRecordingSheetsInterface = new PlayRecordingSheetsInterface();
-            //NewScreenGrab newScreenGrab = new NewScreenGrab();
+            //ScreenGrab newScreenGrab = new ScreenGrab();
 
-
+            //var bmp = newScreenGrab.CaptureApplication();
+            //bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\TestingRecording\CaptureApplicationTest.png");
 
             while (true)
             {
@@ -71,6 +74,12 @@ namespace TaikoLogging
                 }
                 if (PS4 == true)
                 {
+
+                    // This part is just temporarily while I'm streaming
+                    twitchOn = true;
+
+
+
                     analysis.StandardLoop();
                     //analysis.NotStandardLoop();
 
@@ -105,6 +114,15 @@ namespace TaikoLogging
 
                 commands.CheckCommands(input);
             }
+        }
+
+        public static string MakeValidFileName(string name)
+        {
+            // This isn't really a sheet function, but I didn't know where to put it that made sense
+            string invalidChars = System.Text.RegularExpressions.Regex.Escape(new string(System.IO.Path.GetInvalidFileNameChars()));
+            string invalidRegStr = string.Format(@"([{0}]*\.+$)|([{0}]+)", invalidChars);
+
+            return System.Text.RegularExpressions.Regex.Replace(name, invalidRegStr, "_");
         }
     }
 }

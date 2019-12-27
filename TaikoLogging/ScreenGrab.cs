@@ -13,11 +13,7 @@ namespace TaikoLogging
     class ScreenGrab
     {
         Process proc;
-        public int topOffset = 0;
-        public int leftOffset = 0;
-        public int bottomOffset = 0;
-        public int rightOffset = 0;
-        RECT rect = new RECT();
+        IntPtr windowHandle = (IntPtr)0;
 
         public ScreenGrab()
         {
@@ -34,98 +30,24 @@ namespace TaikoLogging
             else
             {
                 proc = processes[0];
+                windowHandle = FindWindow("Qt5QWindowIcon", "obs64");
             }
 
-            var bmp = PrintWindow(proc.MainWindowHandle);
-            FindGameWindow(bmp);
-            //bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\TestingRecording\test.png");
+            while (windowHandle == (IntPtr)0)
+            {
+                Console.WriteLine("Open the Fullscreen Preview in OBS!\npress any key to continue...");
+                Console.ReadKey();
+                windowHandle = FindWindow("Qt5QWindowIcon", "obs64");
+            }
+
+            Console.WriteLine("Screen Setup Complete!");
         }
 
         public Bitmap CaptureApplication()
         {
-            var bmp = PrintWindow(proc.MainWindowHandle);
+            var bmp = PrintWindow(windowHandle);
 
-            Rectangle gameRect = new Rectangle(leftOffset, topOffset, rightOffset - leftOffset, bottomOffset - topOffset);
-            var gameBmp = bmp.Clone(gameRect, PixelFormat.Format32bppArgb);
-
-            return gameBmp;
-        }
-
-        public void FindGameWindow(Bitmap bmp)
-        {
-            // TESTING
-            //bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\baseWindow.png");
-
-            //var outerBoxColor = Color.FromArgb(240, 240, 240);
-            var middleBoxColor = Color.FromArgb(76, 76, 76);
-
-
-            // To find the game box, go from the middle top down in a column until I reach the middle box color, then when it stops being that color, that's the top of the box
-            // Then do the same from the middle left, middle bottom, and middle right
-            bool topMiddleBox = false;
-            for (int i = 1; i < bmp.Height; i++)
-            {
-                if (CompareColors(bmp.GetPixel(bmp.Width / 2, i), middleBoxColor) != topMiddleBox)
-                {
-                    topMiddleBox = !topMiddleBox;
-                    if (topMiddleBox == false)
-                    {
-                        topOffset = i;
-                        break;
-                    }
-                }
-            }
-            bool leftMiddleBox = false;
-            for (int i = 1; i < bmp.Width; i++)
-            {
-                if (CompareColors(bmp.GetPixel(i, bmp.Height / 2), middleBoxColor) != leftMiddleBox)
-                {
-                    leftMiddleBox = !leftMiddleBox;
-                    if (leftMiddleBox == false)
-                    {
-                        leftOffset = i;
-                        break;
-                    }
-                }
-            }
-            bool bottomMiddleBox = false;
-            for (int i = bmp.Height - 2; i > 0; i--)
-            {
-                if (CompareColors(bmp.GetPixel(bmp.Width / 2, i), middleBoxColor) != bottomMiddleBox)
-                {
-                    bottomMiddleBox = !bottomMiddleBox;
-                    if (bottomMiddleBox == false)
-                    {
-                        bottomOffset = i;
-                        break;
-                    }
-                }
-            }
-            bool rightMiddleBox = false;
-            for (int i = bmp.Width - 2; i > 0; i--)
-            {
-                if (CompareColors(bmp.GetPixel(i, bmp.Height / 2), middleBoxColor) != rightMiddleBox)
-                {
-                    rightMiddleBox = !rightMiddleBox;
-                    if (rightMiddleBox == false)
-                    {
-                        rightOffset = i;
-                        break;
-                    }
-                }
-            }
-
-
-            // I'm actually gonna keep these WriteLines, they're nice to see right as it starts up that they aren't all 0s
-
-            Console.WriteLine(topOffset);
-            Console.WriteLine(leftOffset);
-            Console.WriteLine(bottomOffset);
-            Console.WriteLine(rightOffset);
-
-            // top left of the outer box should always be (16,60)
-            //Console.ReadLine();
-
+            return bmp;
         }
 
         private bool CompareColors(Color pixelColor, Color boxColor)
@@ -145,20 +67,14 @@ namespace TaikoLogging
 
         public bool CheckTwitch()
         {
-            //User32.GetWindowRect(proc.MainWindowHandle, ref rect);
-            //var bmp = new Bitmap(rect.right - rect.left, rect.bottom - rect.top, PixelFormat.Format32bppArgb);
-            //Graphics graphics = Graphics.FromImage(bmp);
-            //graphics.CopyFromScreen(rect.left, rect.top, 0, 0, new Size(rect.right - rect.left, rect.bottom - rect.top), CopyPixelOperation.SourceCopy);
-            var bmp = CaptureApplication();
+            var bmp = PrintWindow(proc.MainWindowHandle);
+
             return AnalyzeTwitch(bmp);
         }
 
         // I'm literally the worst at naming functions...
         public bool AnalyzeTwitch(Bitmap bmp)
         {
-            // TESTING
-            //bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\" + i++.ToString() + ".png");
-
             // Pixel location of "Start Streaming" button:
             // x: rect.Right - (rect.Right-1137)
             // y: bottomOffset + 726-666
@@ -190,8 +106,8 @@ namespace TaikoLogging
             var pixel = bmp.GetPixel(x, y);
             bool streaming = CompareColors(Color.FromArgb(pixel.R, pixel.G, pixel.B), Color.FromArgb(122, 121, 122));
 
-            var thing = proc.MainWindowTitle;
-            if (thing.IndexOf("- Profile: Twitch -") != -1 && streaming == true)
+            var windowTitle = proc.MainWindowTitle;
+            if (windowTitle.IndexOf("- Profile: Twitch -") != -1 && streaming == true)
             {
                 return true;
             }
@@ -203,6 +119,10 @@ namespace TaikoLogging
 
         [DllImport("user32.dll")]
         public static extern bool PrintWindow(IntPtr hWnd, IntPtr hdcBlt, int nFlags);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+
 
         public static Bitmap PrintWindow(IntPtr hwnd)
         {

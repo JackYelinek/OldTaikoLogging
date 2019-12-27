@@ -28,12 +28,11 @@ namespace TaikoLogging
 
             bool PS4 = false;
             bool emulator = false;
-
+            
             Thread inputThread = new Thread(ReadInput);
             inputThread.Start();
 
 
-            var test = MakeValidFileName("1/2 ～inside me");
 
             //PlayRecordingSheetsInterface playRecordingSheetsInterface = new PlayRecordingSheetsInterface();
             //ScreenGrab newScreenGrab = new ScreenGrab();

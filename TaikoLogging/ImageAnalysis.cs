@@ -638,6 +638,8 @@ namespace TaikoLogging
             bool isShinUchi = false;
 
             string account = CheckAccount(bmp, players);
+            info.Add(account);
+            headers.Add("Account");
 
             var mods = CheckMods(bmp, players);
             info.Add(CheckDifficulty(bmp, players));
@@ -699,8 +701,7 @@ namespace TaikoLogging
 
             bool highScore = IsHighScore(bmp);
 
-            info.Add(account);
-            headers.Add("Account");
+
 
             Program.sheet.UpdatePS4BestGoods(info, headers);
             if ( /*highScore == true && */ isShinUchi == false)

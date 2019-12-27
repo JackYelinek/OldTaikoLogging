@@ -203,6 +203,7 @@
     <Compile Include="Commands.cs" />
     <Compile Include="DebugLogging.cs" />
     <Compile Include="GoogleSheetInterface.cs" />
+    <Compile Include="HighScore.cs" />
     <Compile Include="ImageAnalysis.cs" />
     <Compile Include="EmulatorLogger.cs" />
     <Compile Include="ScreenGrab.cs" />

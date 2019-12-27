@@ -736,7 +736,8 @@ namespace TaikoLoggingTests
                 new Bitmap(folderPath + "1768.png"),
                 new Bitmap(folderPath + "1800.png"),
                 new Bitmap(folderPath + "1805.png"),
-                new Bitmap(folderPath + "1808.png")
+                new Bitmap(folderPath + "1808.png"),
+                new Bitmap(folderPath + "2298.png"),
             };
 
             List<ImageAnalysis.Difficulty> difficulties = new List<ImageAnalysis.Difficulty>();
@@ -758,6 +759,7 @@ namespace TaikoLoggingTests
             {
                 ImageAnalysis.Difficulty.Oni,
                 ImageAnalysis.Difficulty.Ura,
+                ImageAnalysis.Difficulty.Oni,
                 ImageAnalysis.Difficulty.Oni,
                 ImageAnalysis.Difficulty.Oni,
                 ImageAnalysis.Difficulty.Oni,
@@ -842,7 +844,8 @@ namespace TaikoLoggingTests
                 new Bitmap(folderPath + "1768.png"),
                 new Bitmap(folderPath + "1800.png"),
                 new Bitmap(folderPath + "1805.png"),
-                new Bitmap(folderPath + "1808.png")
+                new Bitmap(folderPath + "1808.png"),
+                new Bitmap(folderPath + "2298.png"),
             };
 
             List<int> bads = new List<int>();
@@ -871,6 +874,7 @@ namespace TaikoLoggingTests
                 13,8,
                 6,10,
                 75,92,
+                0,0,
             };
             for (int i = 0; i < bmps.Count; i++)
             {
@@ -927,7 +931,8 @@ namespace TaikoLoggingTests
                 new Bitmap(folderPath + "1768.png"),
                 new Bitmap(folderPath + "1800.png"),
                 new Bitmap(folderPath + "1805.png"),
-                new Bitmap(folderPath + "1808.png")
+                new Bitmap(folderPath + "1808.png"),
+                new Bitmap(folderPath + "2298.png"),
             };
 
             List<int> combo = new List<int>();
@@ -956,6 +961,7 @@ namespace TaikoLoggingTests
                 340,378,
                 455,263,
                 278,123,
+                1160,1160,
             };
             for (int i = 0; i < bmps.Count; i++)
             {
@@ -1012,7 +1018,8 @@ namespace TaikoLoggingTests
                 new Bitmap(folderPath + "1768.png"),
                 new Bitmap(folderPath + "1800.png"),
                 new Bitmap(folderPath + "1805.png"),
-                new Bitmap(folderPath + "1808.png")
+                new Bitmap(folderPath + "1808.png"),
+                new Bitmap(folderPath + "2298.png"),
 
             };
 
@@ -1042,6 +1049,7 @@ namespace TaikoLoggingTests
                 278,270,
                 220,97,
                 0,0,
+                612,622,
             };
             for (int i = 0; i < bmps.Count; i++)
             {
@@ -1097,7 +1105,8 @@ namespace TaikoLoggingTests
                 new Bitmap(folderPath + "1768.png"),
                 new Bitmap(folderPath + "1800.png"),
                 new Bitmap(folderPath + "1805.png"),
-                new Bitmap(folderPath + "1808.png")
+                new Bitmap(folderPath + "1808.png"),
+                new Bitmap(folderPath + "2298.png"),
             };
 
             List<int> goods = new List<int>();
@@ -1126,6 +1135,7 @@ namespace TaikoLoggingTests
                 587,616,
                 913,806,
                 1075,844,
+                1121,1087,
             };
             for (int i = 0; i < bmps.Count; i++)
             {
@@ -1182,7 +1192,8 @@ namespace TaikoLoggingTests
                 new Bitmap(folderPath + "1768.png"),
                 new Bitmap(folderPath + "1800.png"),
                 new Bitmap(folderPath + "1805.png"),
-                new Bitmap(folderPath + "1808.png")
+                new Bitmap(folderPath + "1808.png"),
+                new Bitmap(folderPath + "2298.png"),
             };
 
             List<int> oks = new List<int>();
@@ -1211,6 +1222,7 @@ namespace TaikoLoggingTests
                 86,62,
                 105,208,
                 337,551,
+                39,73,
             };
             for (int i = 0; i < bmps.Count; i++)
             {
@@ -1266,7 +1278,8 @@ namespace TaikoLoggingTests
                 new Bitmap(folderPath + "1768.png"),
                 new Bitmap(folderPath + "1800.png"),
                 new Bitmap(folderPath + "1805.png"),
-                new Bitmap(folderPath + "1808.png")
+                new Bitmap(folderPath + "1808.png"),
+                new Bitmap(folderPath + "2298.png"),
             };
 
             List<int> scores = new List<int>();
@@ -1295,7 +1308,7 @@ namespace TaikoLoggingTests
                 944450,966350,
                 962680,897100,
                 844470,758670,
-
+                1041060,1027500,
             };
             for (int i = 0; i < bmps.Count; i++)
             {

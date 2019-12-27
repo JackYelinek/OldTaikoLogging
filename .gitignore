@@ -264,3 +264,5 @@ credentials.json
 TwitchInfo.resx
 
 **/Originals/**
+/TaikoLogging/Data/Test Data/Failed Tests
+/TaikoLogging/Data/Chart Data

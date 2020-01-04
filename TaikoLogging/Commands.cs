@@ -57,7 +57,15 @@ namespace TaikoLogging
             tmpList = new List<string>();
             tmpList.Add("!newsong");
             commandWords.Add(tmpList);
+
+
+
+            commandFunctions.Add(HelpCommand);
+            tmpList = new List<string>();
+            tmpList.Add("!help");
+            commandWords.Add(tmpList);
         }
+
 
         public delegate void CommandFunction(string message);
 
@@ -74,6 +82,17 @@ namespace TaikoLogging
                     }
                 }
             }
+        }
+        private void HelpCommand(string message)
+        {
+            string responseString = "\n";
+            for (int i = 0; i < commandWords.Count; i++)
+            {
+                responseString += commandWords[i][0];
+                responseString += "\n";
+            }
+
+            Console.WriteLine(responseString);
         }
 
         private void RemoveRanked(string message)

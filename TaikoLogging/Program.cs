@@ -14,11 +14,11 @@ namespace TaikoLogging
     class Program
     {
         static public RinClient rin = new RinClient();
+        static public GoogleSheetInterface sheet = new GoogleSheetInterface();
         static public bool twitchOn;
         static public ScreenGrab screen = new ScreenGrab();
         static public ImageAnalysis analysis = new ImageAnalysis();
         static public DebugLogging logger = new DebugLogging();
-        static public GoogleSheetInterface sheet = new GoogleSheetInterface();
         static public EmulatorLogger emulatorLogger = new EmulatorLogger();
         static public Commands commands = new Commands();
 
@@ -75,7 +75,7 @@ namespace TaikoLogging
                 {
 
                     // This part is just temporarily while I'm streaming
-                    twitchOn = true;
+                    twitchOn = false;
 
 
 

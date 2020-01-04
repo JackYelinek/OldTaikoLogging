@@ -738,6 +738,8 @@ namespace TaikoLoggingTests
                 new Bitmap(folderPath + "1805.png"),
                 new Bitmap(folderPath + "1808.png"),
                 new Bitmap(folderPath + "2298.png"),
+                new Bitmap(folderPath + "2321.png"),
+
             };
 
             List<ImageAnalysis.Difficulty> difficulties = new List<ImageAnalysis.Difficulty>();
@@ -759,6 +761,7 @@ namespace TaikoLoggingTests
             {
                 ImageAnalysis.Difficulty.Oni,
                 ImageAnalysis.Difficulty.Ura,
+                ImageAnalysis.Difficulty.Oni,
                 ImageAnalysis.Difficulty.Oni,
                 ImageAnalysis.Difficulty.Oni,
                 ImageAnalysis.Difficulty.Oni,
@@ -846,6 +849,7 @@ namespace TaikoLoggingTests
                 new Bitmap(folderPath + "1805.png"),
                 new Bitmap(folderPath + "1808.png"),
                 new Bitmap(folderPath + "2298.png"),
+                new Bitmap(folderPath + "2321.png"),
             };
 
             List<int> bads = new List<int>();
@@ -875,6 +879,7 @@ namespace TaikoLoggingTests
                 6,10,
                 75,92,
                 0,0,
+                6,7,
             };
             for (int i = 0; i < bmps.Count; i++)
             {
@@ -933,6 +938,7 @@ namespace TaikoLoggingTests
                 new Bitmap(folderPath + "1805.png"),
                 new Bitmap(folderPath + "1808.png"),
                 new Bitmap(folderPath + "2298.png"),
+                new Bitmap(folderPath + "2321.png"),
             };
 
             List<int> combo = new List<int>();
@@ -962,6 +968,7 @@ namespace TaikoLoggingTests
                 455,263,
                 278,123,
                 1160,1160,
+                240,263,
             };
             for (int i = 0; i < bmps.Count; i++)
             {
@@ -1020,6 +1027,7 @@ namespace TaikoLoggingTests
                 new Bitmap(folderPath + "1805.png"),
                 new Bitmap(folderPath + "1808.png"),
                 new Bitmap(folderPath + "2298.png"),
+                new Bitmap(folderPath + "2321.png"),
 
             };
 
@@ -1050,6 +1058,7 @@ namespace TaikoLoggingTests
                 220,97,
                 0,0,
                 612,622,
+                374,328,
             };
             for (int i = 0; i < bmps.Count; i++)
             {
@@ -1107,6 +1116,7 @@ namespace TaikoLoggingTests
                 new Bitmap(folderPath + "1805.png"),
                 new Bitmap(folderPath + "1808.png"),
                 new Bitmap(folderPath + "2298.png"),
+                new Bitmap(folderPath + "2321.png"),
             };
 
             List<int> goods = new List<int>();
@@ -1136,6 +1146,7 @@ namespace TaikoLoggingTests
                 913,806,
                 1075,844,
                 1121,1087,
+                598,574,
             };
             for (int i = 0; i < bmps.Count; i++)
             {
@@ -1194,6 +1205,7 @@ namespace TaikoLoggingTests
                 new Bitmap(folderPath + "1805.png"),
                 new Bitmap(folderPath + "1808.png"),
                 new Bitmap(folderPath + "2298.png"),
+                new Bitmap(folderPath + "2321.png"),
             };
 
             List<int> oks = new List<int>();
@@ -1223,6 +1235,7 @@ namespace TaikoLoggingTests
                 105,208,
                 337,551,
                 39,73,
+                60,83,
             };
             for (int i = 0; i < bmps.Count; i++)
             {
@@ -1280,6 +1293,7 @@ namespace TaikoLoggingTests
                 new Bitmap(folderPath + "1805.png"),
                 new Bitmap(folderPath + "1808.png"),
                 new Bitmap(folderPath + "2298.png"),
+                new Bitmap(folderPath + "2321.png"),
             };
 
             List<int> scores = new List<int>();
@@ -1309,6 +1323,7 @@ namespace TaikoLoggingTests
                 962680,897100,
                 844470,758670,
                 1041060,1027500,
+                973760,957920,
             };
             for (int i = 0; i < bmps.Count; i++)
             {
@@ -1437,7 +1452,7 @@ namespace TaikoLoggingTests
             GC.Collect();
         }
 
-        [TestMethod]
+        //[TestMethod]
         public void TestOldGetTitle()
         {
             // This function isn't really needed anymore, but it's still here anyway

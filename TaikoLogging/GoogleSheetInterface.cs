@@ -88,7 +88,7 @@ namespace TaikoLogging
             info.Add((int)info[headers.IndexOf("My Score")] - (int)info[headers.IndexOf("Opp Score")]);
             headers.Add("Difference");
 
-            info.Add(DateTime.Now.ToString("MM/dd/yyyy"));
+            info.Add(DateTime.Now.ToString("MM/dd/yyyy hh:mm tt"));
             headers.Add("DateTime");
             // Might need to be Headers.Count-1, might not actually matter
             values = GetValues("Ranked Logs!A2:" + GetColumnName(Headers.Count));
@@ -488,6 +488,85 @@ namespace TaikoLogging
             }
 
         }
+        public void AddRecentPlay(List<object> info, List<string> headers)
+        {
+            var Headers = GetHeaders("'Recent Plays'");
+            // Check the sheet to see the match #
+            var values = GetValues("Recent Plays!A2");
+
+            if (headers.IndexOf("My Score") != -1)
+            {
+                headers[headers.IndexOf("My Score")] = "Score";
+            }
+            if (headers.IndexOf("My Goods") != -1)
+            {
+                headers[headers.IndexOf("My Goods")] = "GOOD";
+            }
+            if (headers.IndexOf("My OKs") != -1)
+            {
+                headers[headers.IndexOf("My OKs")] = "OK";
+            }
+            if (headers.IndexOf("My Bads") != -1)
+            {
+                headers[headers.IndexOf("My Bads")] = "BAD";
+            }
+            if (headers.IndexOf("My Combo") != -1)
+            {
+                headers[headers.IndexOf("My Combo")] = "MAX Combo";
+            }
+            if (headers.IndexOf("My Drumroll") != -1)
+            {
+                headers[headers.IndexOf("My Drumroll")] = "Drumroll";
+            }
+
+            info.Add("=VLOOKUP(A2, Oni!B:D, 3, false)");
+            headers.Add("Genre");
+
+            info.Add(DateTime.Now.ToString("MM/dd/yyyy hh:mm tt"));
+            headers.Add("DateTime");
+            // Might need to be Headers.Count-1, might not actually matter
+            values = GetValues("Recent Plays!A2:" + GetColumnName(Headers.Count));
+            List<IList<object>> sendValues = new List<IList<object>>();
+            IList<object> baseValues = new List<object>();
+            for (int i = 0; i < Headers.Count; i++)
+            {
+                bool headerFound = false;
+                for (int j = 0; j < headers.Count; j++)
+                {
+                    if (Headers[i] == headers[j])
+                    {
+                        baseValues.Add(info[j].ToString());
+                        headerFound = true;
+                        break;
+                    }
+                }
+                if (headerFound == false)
+                {
+                    baseValues.Add(null);
+                }
+            }
+            sendValues.Add(baseValues);
+            if (values != null)
+            {
+                for (int i = 0; i < values.Count; i++)
+                {
+                    sendValues.Add(values[i]);
+                }
+            }
+
+
+
+
+            string range = "'Recent Plays'!A2:" + GetColumnName(Headers.Count);
+
+            SendData(range, sendValues);
+
+            string songTitle = info[headers.IndexOf("Title")].ToString();
+            if (info[headers.IndexOf("Difficulty")].ToString() == "Ura")
+            {
+                songTitle += " Ura";
+            }
+        }
         public void GetRandomSong()
         {
             var Headers = GetHeaders("Oni");
@@ -509,8 +588,13 @@ namespace TaikoLogging
                 int songOK = int.Parse(values[i][Headers.IndexOf("OK")].ToString());
                 int goalOK = int.Parse(values[i][Headers.IndexOf("Goal OKs")].ToString());
                 int songBad = int.Parse(values[i][Headers.IndexOf("BAD")].ToString());
-                //int numNotes = int.Parse(values[i][Headers.IndexOf("GOOD")].ToString()) + songOK + int.Parse(values[i][Headers.IndexOf("BAD")].ToString());
-                int goalValue = (songOK + (songBad * 2)) - goalOK;
+                int numNotes = int.Parse(values[i][Headers.IndexOf("GOOD")].ToString()) + songOK + songBad;
+
+                //int goalValue = (songOK + (songBad * 2)) - goalOK;
+
+                //int goalValue = ((songOK + (songBad * 2)) - goalOK) / numNotes;
+                int goalValue = (int)((((songOK) - goalOK) * Math.Sqrt(songOK + (songBad * 2))) * 1000);
+
                 if (goalValue < 0)
                 {
                     goalValue = 0;
@@ -805,7 +889,7 @@ namespace TaikoLogging
 
             baseValues = new List<object>
             {
-                DateTime.Now.ToString("MM/dd/yyyy")
+                DateTime.Now.ToString("MM/dd/yyyy hh:mm tt")
             };
             sendValues = new List<IList<object>>();
             sendValues.Add(baseValues);

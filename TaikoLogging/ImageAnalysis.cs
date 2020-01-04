@@ -61,6 +61,11 @@ namespace TaikoLogging
         List<Bitmap> accountBitmaps = new List<Bitmap>();
         List<string> accounts = new List<string>();
 
+        List<string> songDifficultyOniTitles = new List<string>();
+        List<int> songDifficultiesOni = new List<int>();
+        List<string> songDifficultyUraTitles = new List<string>();
+        List<int> songDifficultiesUra = new List<int>();
+
         public bool newSongMode = false;
 
 
@@ -272,6 +277,7 @@ namespace TaikoLogging
             InitializeModBitmaps();
             InitializeWinLossBitmaps();
             InitializeAccountBitmaps();
+            InitializeSongDifficulty();
 
             Console.WriteLine("Initialization Complete");
         }
@@ -358,7 +364,6 @@ namespace TaikoLogging
                     songTitle = "1/2 ～inside me";
                 }
                 titles.Add(songTitle);
-
             }
         }
         private void InitializeRankedTitleBitmaps()
@@ -490,6 +495,24 @@ namespace TaikoLogging
                 var bitmap = new Bitmap(result[i].FullName);
                 accountBitmaps.Add(bitmap);
                 accounts.Add(result[i].Name.Remove(result[i].Name.LastIndexOf('.')));
+            }
+        }
+        private void InitializeSongDifficulty()
+        {
+            var oniSheetData = Program.sheet.GetValues("Oni!B2:E");
+
+            for (int i = 0; i < oniSheetData.Count; i++)
+            {
+                songDifficultyOniTitles.Add(oniSheetData[i][0].ToString());
+                songDifficultiesOni.Add(int.Parse(oniSheetData[i][3].ToString()));
+            }
+
+            var uraSheetData = Program.sheet.GetValues("Ura!B2:E");
+
+            for (int i = 0; i < uraSheetData.Count; i++)
+            {
+                songDifficultyUraTitles.Add(uraSheetData[i][0].ToString());
+                songDifficultiesUra.Add(int.Parse(uraSheetData[i][3].ToString()));
             }
         }
         #endregion
@@ -701,9 +724,20 @@ namespace TaikoLogging
 
             bool highScore = IsHighScore(bmp);
 
+            info.Add("Normal");
+            headers.Add("Mode");
 
+            bool ura = false;
+            if ((Difficulty)info[headers.IndexOf("Difficulty")] == Difficulty.Ura)
+            {
+                ura = true;
+            }
+
+            info.Add(GetSongDifficulty(info[headers.IndexOf("Title")].ToString(), ura));
+            headers.Add("★");
 
             Program.sheet.UpdatePS4BestGoods(info, headers);
+            Program.sheet.AddRecentPlay(info, headers);
             if ( /*highScore == true && */ isShinUchi == false)
             {
                 Program.sheet.UpdatePS4HighScore(info, headers, bmp);
@@ -787,6 +821,17 @@ namespace TaikoLogging
             info.Add(account);
             headers.Add("Account");
 
+            bool ura = false;
+            if ((Difficulty)info[headers.IndexOf("Difficulty")] == Difficulty.Ura)
+            {
+                ura = true;
+            }
+
+            info.Add(GetSongDifficulty(info[headers.IndexOf("Title")].ToString(), ura));
+            headers.Add("★");
+
+            info.Add("Ranked");
+            headers.Add("Mode");
             // Check to see if the scores are possible, they must always end with a 0
             if ((int)info[headers.IndexOf("My Score")] % 10 != 0 || (int)info[headers.IndexOf("Opp Score")] % 10 != 0)
             {
@@ -794,6 +839,7 @@ namespace TaikoLogging
             }
             Program.sheet.AddRankedEntry(info, headers, bmp);
             Program.sheet.UpdatePS4BestGoods(info, headers);
+            Program.sheet.AddRecentPlay(info, headers);
             Console.WriteLine(info[headers.IndexOf("Title")].ToString());
             Console.WriteLine("Analysis Complete\n");
 
@@ -1219,6 +1265,17 @@ namespace TaikoLogging
 
             var titleBmp = GetBitmapArea(bmp, GetWidth(bmp, relativeValues[0]), GetHeight(bmp, relativeValues[1]), GetWidth(bmp, relativeValues[2]), GetHeight(bmp, relativeValues[3]));
             return ScaleDown(titleBmp, 450, 28);
+        }
+        public int GetSongDifficulty(string title, bool ura)
+        {
+            if (ura == false)
+            {
+                return songDifficultiesOni[songDifficultyOniTitles.IndexOf(title)];
+            }
+            else
+            {
+                return songDifficultiesUra[songDifficultyUraTitles.IndexOf(title)];
+            }
         }
         public string CheckAccount(Bitmap bmp, Players players)
         {

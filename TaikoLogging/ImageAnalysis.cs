@@ -1501,8 +1501,8 @@ namespace TaikoLogging
             int width = GetWidth(bmp, 0.015625);
             int height = GetHeight(bmp, 0.04173106646);
             int y = GetHeight(bmp, 0.5455950541 + offset);
-
-            float[] relativeX = { 0.9192708333f, 0.9036458333f, 0.8897569444f, 0.8741319444f };
+                                  
+            float[] relativeX = { 0.9197916666f, 0.9041666666f, 0.8885416666f, 0.8729166666f };
 
             List<Bitmap> scoreBitmaps = new List<Bitmap>();
             for (int i = 0; i < 4; i++)

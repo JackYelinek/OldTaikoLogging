@@ -75,7 +75,7 @@ namespace TaikoLogging
                 {
 
                     // This part is just temporarily while I'm streaming
-                    twitchOn = true;
+                    //twitchOn = false;
 
 
 

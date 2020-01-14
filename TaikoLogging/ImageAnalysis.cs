@@ -61,11 +61,6 @@ namespace TaikoLogging
         List<Bitmap> accountBitmaps = new List<Bitmap>();
         List<string> accounts = new List<string>();
 
-        List<string> songDifficultyOniTitles = new List<string>();
-        List<int> songDifficultiesOni = new List<int>();
-        List<string> songDifficultyUraTitles = new List<string>();
-        List<int> songDifficultiesUra = new List<int>();
-
         public bool newSongMode = false;
 
 
@@ -277,7 +272,6 @@ namespace TaikoLogging
             InitializeModBitmaps();
             InitializeWinLossBitmaps();
             InitializeAccountBitmaps();
-            InitializeSongDifficulty();
 
             Console.WriteLine("Initialization Complete");
         }
@@ -497,24 +491,6 @@ namespace TaikoLogging
                 accounts.Add(result[i].Name.Remove(result[i].Name.LastIndexOf('.')));
             }
         }
-        private void InitializeSongDifficulty()
-        {
-            var oniSheetData = Program.sheet.GetValues("Oni!B2:E");
-
-            for (int i = 0; i < oniSheetData.Count; i++)
-            {
-                songDifficultyOniTitles.Add(oniSheetData[i][0].ToString());
-                songDifficultiesOni.Add(int.Parse(oniSheetData[i][3].ToString()));
-            }
-
-            var uraSheetData = Program.sheet.GetValues("Ura!B2:E");
-
-            for (int i = 0; i < uraSheetData.Count; i++)
-            {
-                songDifficultyUraTitles.Add(uraSheetData[i][0].ToString());
-                songDifficultiesUra.Add(int.Parse(uraSheetData[i][3].ToString()));
-            }
-        }
         #endregion
 
 
@@ -655,6 +631,7 @@ namespace TaikoLogging
                 players = Players.Single;
             }
 
+
             List<object> info = new List<object>();
             List<string> headers = new List<string>();
 
@@ -680,6 +657,7 @@ namespace TaikoLogging
             {
                 // I don't care about easy or normal for my sheet
                 // I don't really care about hard either, but I have the sheet anyway, so might as well save it if I get it
+                Console.WriteLine("Quit Analysis.\n");
                 return;
             }
 
@@ -700,6 +678,7 @@ namespace TaikoLogging
             headers.Add("Title");
             if ((string)info[headers.IndexOf("Title")] == "")
             {
+                Console.WriteLine("Quit Analysis.\n");
                 return;
             }
 
@@ -719,6 +698,7 @@ namespace TaikoLogging
 
             if ((int)info[headers.IndexOf("Score")] % 10 != 0)
             {
+                Console.WriteLine("Quit Analysis.\n");
                 return;
             }
 
@@ -732,9 +712,6 @@ namespace TaikoLogging
             {
                 ura = true;
             }
-
-            info.Add(GetSongDifficulty(info[headers.IndexOf("Title")].ToString(), ura));
-            headers.Add("★");
 
             Program.sheet.UpdatePS4BestGoods(info, headers);
             Program.sheet.AddRecentPlay(info, headers);
@@ -773,6 +750,7 @@ namespace TaikoLogging
             if (account != "Deathblood")
             {
                 // I don't care if it's ranked on my alt
+                Console.WriteLine("Quit Analysis.\n");
                 return;
             }
 
@@ -781,6 +759,7 @@ namespace TaikoLogging
             headers.Add("Title");
             if (info[headers.IndexOf("Title")].ToString() == "")
             {
+                Console.WriteLine("Quit Analysis.\n");
                 return;
             }
             info.Add(CheckDifficulty(bmp, Players.RankedTop));
@@ -816,7 +795,7 @@ namespace TaikoLogging
 
             // Result Data
             info.Add(GetRankedWinLoss(bmp));
-            headers.Add("Win/Loss");
+            headers.Add("Result");
 
             info.Add(account);
             headers.Add("Account");
@@ -827,14 +806,12 @@ namespace TaikoLogging
                 ura = true;
             }
 
-            info.Add(GetSongDifficulty(info[headers.IndexOf("Title")].ToString(), ura));
-            headers.Add("★");
-
             info.Add("Ranked");
             headers.Add("Mode");
             // Check to see if the scores are possible, they must always end with a 0
             if ((int)info[headers.IndexOf("My Score")] % 10 != 0 || (int)info[headers.IndexOf("Opp Score")] % 10 != 0)
             {
+                Console.WriteLine("Quit Analysis.\n");
                 return;
             }
             Program.sheet.AddRankedEntry(info, headers, bmp);
@@ -1265,17 +1242,6 @@ namespace TaikoLogging
 
             var titleBmp = GetBitmapArea(bmp, GetWidth(bmp, relativeValues[0]), GetHeight(bmp, relativeValues[1]), GetWidth(bmp, relativeValues[2]), GetHeight(bmp, relativeValues[3]));
             return ScaleDown(titleBmp, 450, 28);
-        }
-        public int GetSongDifficulty(string title, bool ura)
-        {
-            if (ura == false)
-            {
-                return songDifficultiesOni[songDifficultyOniTitles.IndexOf(title)];
-            }
-            else
-            {
-                return songDifficultiesUra[songDifficultyUraTitles.IndexOf(title)];
-            }
         }
         public string CheckAccount(Bitmap bmp, Players players)
         {

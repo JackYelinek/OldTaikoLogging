@@ -14,6 +14,7 @@ namespace TaikoLogging
     {
         Process proc;
         IntPtr windowHandle = (IntPtr)0;
+        IntPtr programWindowHandle = (IntPtr)0;
 
         public ScreenGrab()
         {
@@ -31,6 +32,7 @@ namespace TaikoLogging
             {
                 proc = processes[0];
                 windowHandle = FindWindow("Qt5QWindowIcon", "obs64");
+                programWindowHandle = FindWindow("Qt5QWindowIcon", "OBS");
             }
 
             while (windowHandle == (IntPtr)0)
@@ -38,6 +40,15 @@ namespace TaikoLogging
                 Console.WriteLine("Open the Fullscreen Preview in OBS!\npress any key to continue...");
                 Console.ReadKey();
                 windowHandle = FindWindow("Qt5QWindowIcon", "obs64");
+            }
+            while (programWindowHandle == (IntPtr)0)
+            {
+                Console.WriteLine("Click on the main OBS window!\npress any key to continue...");
+                Console.ReadKey();
+                if (proc.MainWindowTitle != "obs64")
+                {
+                    programWindowHandle = FindWindow("Qt5QWindowIcon", proc.MainWindowTitle);
+                }
             }
 
             Console.WriteLine("Screen Setup Complete!");
@@ -67,7 +78,7 @@ namespace TaikoLogging
 
         public bool CheckTwitch()
         {
-            var bmp = PrintWindow(proc.MainWindowHandle);
+            var bmp = PrintWindow(programWindowHandle);
 
             return AnalyzeTwitch(bmp);
         }

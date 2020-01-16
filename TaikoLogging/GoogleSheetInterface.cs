@@ -638,8 +638,17 @@ namespace TaikoLogging
                 int songOK = int.Parse(values[i][Headers.IndexOf("OK")].ToString());
                 int goalOK = int.Parse(values[i][Headers.IndexOf("Goal OKs")].ToString());
                 int songBad = int.Parse(values[i][Headers.IndexOf("BAD")].ToString());
+                int songLevel = int.Parse(values[i][Headers.IndexOf("★")].ToString());
+
                 //int numNotes = int.Parse(values[i][Headers.IndexOf("GOOD")].ToString()) + songOK + int.Parse(values[i][Headers.IndexOf("BAD")].ToString());
-                int goalValue = (songOK + (songBad * 2)) - goalOK;
+                //int goalValue = (songOK + (songBad * 2)) - goalOK;
+
+                int goalValue = ((songOK - songBad) - goalOK) / songLevel;
+                if (songLevel == 0)
+                {
+                    goalValue *= 2;
+                }
+
                 if (goalValue < 0)
                 {
                     goalValue = 0;
@@ -838,7 +847,7 @@ namespace TaikoLogging
         public void UpdateEmulatorHighScore(string title, string[] info)
         {
             // Find the song in the spreadsheet
-            string range = "Emulator" + "!B2:F";
+            string range = "Emulator" + "!B2:E";
             var request = service.Spreadsheets.Values.Get(spreadsheetId, range);
             ValueRange response = request.Execute();
             var values = response.Values;
@@ -864,7 +873,13 @@ namespace TaikoLogging
                 return;
             }
 
-            string score = values.ElementAt(songIndex).ElementAt(4).ToString();
+            string score = "0";
+
+            if (values[songIndex].Count >= 4)
+            {
+                score = values[songIndex][3].ToString();
+            }
+
             while (true)
             {
                 if (score.IndexOf(',') == -1)
@@ -886,12 +901,13 @@ namespace TaikoLogging
             //send all the information onto the sheet in the correct spots
             IList<object> baseValues = new List<object>
             {
-                info[0], info[1], info[2], info[3], info[4]
+                //score, goods,   oks,     bads,    combo, best goods,goal Oks,bpm video correct     update time
+                info[0], info[1], info[2], info[3], info[4], null,    null,   null, null, null, DateTime.Now.ToString("MM/dd/yyyy hh:mm tt")
             };
             List<IList<object>> sendValues = new List<IList<object>>();
             sendValues.Add(baseValues);
 
-            SendData("Emulator" + "!F" + (songIndex + 2).ToString() + ":J" + (songIndex + 2).ToString(), sendValues);
+            SendData("Emulator" + "!E" + (songIndex + 2).ToString() + ":O" + (songIndex + 2).ToString(), sendValues);
             //List<Google.Apis.Sheets.v4.Data.ValueRange> updateData = new List<Google.Apis.Sheets.v4.Data.ValueRange>();
             //var dataValueRange = new Google.Apis.Sheets.v4.Data.ValueRange();
             //dataValueRange.Range = "Emulator" + "!F" + (songIndex + 2).ToString() + ":J" + (songIndex + 2).ToString();
@@ -909,14 +925,7 @@ namespace TaikoLogging
             Program.rin.SendTwitchMessage("New high score! " + title + " +" + (int.Parse(info[0]) - int.Parse(score)).ToString());
 
 
-            baseValues = new List<object>
-            {
-                DateTime.Now.ToString("MM/dd/yyyy hh:mm tt")
-            };
-            sendValues = new List<IList<object>>();
-            sendValues.Add(baseValues);
 
-            SendData("Emulator" + "!O" + (songIndex + 2).ToString(), sendValues);
             //updateData = new List<Google.Apis.Sheets.v4.Data.ValueRange>();
             //dataValueRange = new Google.Apis.Sheets.v4.Data.ValueRange();
             //dataValueRange.Range = "Emulator" + "!O" + (songIndex + 2).ToString();

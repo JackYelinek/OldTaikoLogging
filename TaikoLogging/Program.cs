@@ -100,13 +100,6 @@ namespace TaikoLogging
 
         static void ReadInput()
         {
-            List<string> commandWord = new List<string>()
-            {
-                "analyze", "result",
-                "random",
-                "help",
-                "random mode"
-            };
             while(true)
             {
                 var input = Console.ReadLine();

@@ -64,8 +64,26 @@ namespace TaikoLogging
             tmpList = new List<string>();
             tmpList.Add("!help");
             commandWords.Add(tmpList);
+
+            commandFunctions.Add(AdjustTimingLeft);
+            tmpList = new List<string>();
+            tmpList.Add("!adjust left");
+            commandWords.Add(tmpList);
+            commandFunctions.Add(AdjustTimingRight);
+            tmpList = new List<string>();
+            tmpList.Add("!adjust right");
+            commandWords.Add(tmpList);
         }
 
+        private void AdjustTimingRight(string message)
+        {
+            Program.emulatorLogger.AdjustPreviousSongTiming(false);
+        }
+
+        private void AdjustTimingLeft(string message)
+        {
+            Program.emulatorLogger.AdjustPreviousSongTiming(true);
+        }
 
         public delegate void CommandFunction(string message);
 

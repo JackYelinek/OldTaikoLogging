@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 
-namespace TaikoLogging
+namespace TaikoLogging.Emulator
 {
     // poorly named class, this class is to check for updated ini files in the songs folder and send the new scores to my spreadsheet
     // any ini file will be updated any time I play a chart, so I'd need to check with my spreadsheet to see if it's a high score or not, and if it is, updated, if not, don't
@@ -27,6 +27,10 @@ namespace TaikoLogging
         {
             CheckNewScores();
             Thread.Sleep(100);
+        }
+        public void SingleLoop()
+        {
+            GetAllSongScores();
         }
         private void CheckNewScores()
         {
@@ -51,41 +55,37 @@ namespace TaikoLogging
             {
                 return;
             }
-            GetSongStats(AllEmulatorSongData[latestIndex].IniFilePath);
+            try
+            {
+                GetSongStats(AllEmulatorSongData[latestIndex].IniFilePath);
+            }
+            catch
+            {
 
+            }
             // I'm not sure why I need the title here too, but it's there I guess
             prevTitle = title;
             prevWriteTime = latestTime;
         }
 
-        //private void OldCheckNewScores()
-        //{
-        //    DirectoryInfo dirInfo = new DirectoryInfo(@"D:\Games\Taiko\TJAPlayer3-Ver.1.5.3\songs");
-        //    var results = dirInfo.GetFiles("*.tja.score.ini");
-        //    DateTime latestTime = new DateTime();
-        //    var latestIndex = -1;
-        //    for (int i = 0; i < results.Length; i++)
-        //    {
-        //        if (results[i].LastWriteTime > latestTime || latestIndex == -1)
-        //        {
-        //            latestTime = results[i].LastWriteTime;
-        //            latestIndex = i;
-        //        }
-        //    }
-        //    var title = results[latestIndex].Name.Remove(results[latestIndex].Name.IndexOf(".tja.score.ini"));
-        //    if (title == prevTitle && latestTime == prevWriteTime)
-        //    {
-        //        return;
-        //    }
-        //    try
-        //    {
-        //        GetSongStats(results[latestIndex]);
-        //    }
-        //    catch
-        //    {
+        private void GetAllSongScores()
+        {
+            for (int i = 0; i < AllEmulatorSongData.Count; i++)
+            {
+                if (File.Exists(AllEmulatorSongData[i].IniFilePath))
+                {
+                    try
+                    {
+                        GetSongStats(AllEmulatorSongData[i].IniFilePath);
+                    }
+                    catch
+                    {
 
-        //    }
-        //}
+                    }
+                }
+            }
+
+        }
 
         private void GetSongStats(string iniFilePath)
         {
@@ -99,27 +99,24 @@ namespace TaikoLogging
                     break;
                 }
             }
+
+            EmulatorPlay play = new EmulatorPlay();
             
             var splitFilePath = iniFilePath.Split('\\');
-            var title = splitFilePath[splitFilePath.Length - 1].Remove(splitFilePath[splitFilePath.Length - 1].IndexOf(".tja"));
+            play.Title = splitFilePath[splitFilePath.Length - 1].Remove(splitFilePath[splitFilePath.Length - 1].IndexOf(".tja"));
 
 
-            var score = lines[index + 1];
+            play.Score = int.Parse(lines[index + 1].Remove(0, lines[index + 1].IndexOf("=") + 1));
 
-            var goods = lines[index + 4];
-            var oks = lines[index + 5];
-            var bads = lines[index + 8];
-            var combo = lines[index + 9];
-            score = score.Remove(0, score.IndexOf("=") + 1);
-            goods = goods.Remove(0, goods.IndexOf("=") + 1);
-            oks = oks.Remove(0, oks.IndexOf("=") + 1);
-            bads = bads.Remove(0, bads.IndexOf("=") + 1);
-            combo = combo.Remove(0, combo.IndexOf("=") + 1);
-            string[] info = new string[5]
-            {
-                score, goods, oks, bads, combo
-            };
-            Program.sheet.UpdateEmulatorHighScore(title, info);
+            play.Goods = int.Parse(lines[index + 4].Remove(0, lines[index + 4].IndexOf("=") + 1));
+            play.OKs = int.Parse(lines[index + 5].Remove(0, lines[index + 5].IndexOf("=") + 1));
+            play.Bads = int.Parse(lines[index + 8].Remove(0, lines[index + 8].IndexOf("=") + 1));
+            play.Combo = int.Parse(lines[index + 9].Remove(0, lines[index + 9].IndexOf("=") + 1));
+
+            // 50
+            play.DateTime = DateTime.Parse(lines[index + 50].Remove(0, lines[index + 50].IndexOf("=") + 1));
+
+            Program.sheet.UpdateEmulatorHighScore(play);
         }
 
         private void FindSongsInSheet()
@@ -178,6 +175,16 @@ namespace TaikoLogging
             }
 
             AdjustTiming(AllEmulatorSongData[latestIndex].TjaFilePath, Left);
+            string message = "Adjusted " + AllEmulatorSongData[latestIndex].SongTitle + " from the ";
+            if (Left == true)
+            {
+                message += "left.";
+            }
+            else
+            {
+                message += "right.";
+            }
+            Console.WriteLine(message);
         }
         private void AdjustTiming(string filePath, bool Left)
         {

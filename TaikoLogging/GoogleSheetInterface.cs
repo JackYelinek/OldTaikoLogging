@@ -844,10 +844,12 @@ namespace TaikoLogging
         }
 
         #region Emulator functions
-        public void UpdateEmulatorHighScore(string title, string[] info)
+        public void UpdateEmulatorHighScore(Emulator.EmulatorPlay play)
         {
+            var Headers = GetHeaders("Emulator");
             // Find the song in the spreadsheet
-            string range = "Emulator" + "!B2:E";
+            string range = "Emulator" + "!A2:" + GetColumnName(Headers.IndexOf("Best Goods"));
+
             var request = service.Spreadsheets.Values.Get(spreadsheetId, range);
             ValueRange response = request.Execute();
             var values = response.Values;
@@ -856,7 +858,7 @@ namespace TaikoLogging
             {
                 foreach (var row in values)
                 {
-                    if (row[0].ToString() == title)
+                    if (row[Headers.IndexOf("Title")].ToString() == play.Title)
                     {
                         songIndex = values.IndexOf(row);
                     }
@@ -869,17 +871,17 @@ namespace TaikoLogging
                 // probably a good idea to set up some form of logging for this sort of thing, but meh
                 // Set up logger that works well for my updated functions, which this is not
                 //Program.logger.LogManyVariables("UpdateEmulatorHighScore: Song Not Found", )
-                Console.WriteLine("Failed to update " + title + ", " + info[0].ToString() + ", " + info[1].ToString() + ", " + info[2].ToString() + ", " + info[3].ToString() + ", " + info[4].ToString() + ", ");
+                Console.WriteLine("Failed to update " + play.Title);
+                Console.WriteLine("Couldn't find song in the spreadsheet");
                 return;
             }
 
             string score = "0";
-
-            if (values[songIndex].Count >= 4)
+            bool isHighScore = true;
+            if (values[songIndex].Count > Headers.IndexOf("Score"))
             {
-                score = values[songIndex][3].ToString();
+                score = values[songIndex][Headers.IndexOf("Score")].ToString();
             }
-
             while (true)
             {
                 if (score.IndexOf(',') == -1)
@@ -890,58 +892,120 @@ namespace TaikoLogging
             }
 
             //double check that the new score is higher
-            if (int.Parse(score) >= int.Parse(info[0]))
+            if (int.Parse(score) >= play.Score)
             {
                 // This'd mean the score on the spreadsheet is higher than the new score
-                return;
+                isHighScore = false;
             }
 
 
-
-            //send all the information onto the sheet in the correct spots
-            IList<object> baseValues = new List<object>
+            string bestGoods = "0";
+            bool isBestAccuracy = false;
+            if (values[songIndex].Count > Headers.IndexOf("Best Goods"))
             {
-                //score, goods,   oks,     bads,    combo, best goods,goal Oks,bpm video correct     update time
-                info[0], info[1], info[2], info[3], info[4], null,    null,   null, null, null, DateTime.Now.ToString("MM/dd/yyyy hh:mm tt")
-            };
+                bestGoods = values[songIndex][Headers.IndexOf("Best Goods")].ToString();
+            }
+            while (true)
+            {
+                if (bestGoods.IndexOf(',') == -1)
+                {
+                    break;
+                }
+                bestGoods = bestGoods.Remove(bestGoods.IndexOf(','), 1);
+            }
+            if (int.Parse(bestGoods) < play.Goods)
+            {
+                isBestAccuracy = true;
+            }
+
+            IList<object> baseValues = new List<object>();
+            for (int i = 0; i < Headers.Count; i++)
+            {
+                if (Headers[i] == "Score" && isHighScore == true)
+                {
+                    baseValues.Add(play.Score);
+                }
+                else if (Headers[i] == "GOOD" && isHighScore == true)
+                {
+                    baseValues.Add(play.Goods);
+                }
+                else if (Headers[i] == "OK" && isHighScore == true)
+                {
+                    baseValues.Add(play.OKs);
+                }
+                else if (Headers[i] == "BAD" && isHighScore == true)
+                {
+                    baseValues.Add(play.Bads);
+                }
+                else if (Headers[i] == "MAX Combo" && isHighScore == true)
+                {
+                    baseValues.Add(play.Combo);
+                }
+                else if (Headers[i] == "Best Goods" && isBestAccuracy == true)
+                {
+                    baseValues.Add(play.Goods);
+                }
+                else if (Headers[i] == "Update Time" && isHighScore == true)
+                {
+                    baseValues.Add(play.DateTime.ToString("MM/dd/yyyy hh:mm tt"));
+                }
+                else
+                {
+                    baseValues.Add(null);
+                }
+            }
+
             List<IList<object>> sendValues = new List<IList<object>>();
             sendValues.Add(baseValues);
 
-            SendData("Emulator" + "!E" + (songIndex + 2).ToString() + ":O" + (songIndex + 2).ToString(), sendValues);
-            //List<Google.Apis.Sheets.v4.Data.ValueRange> updateData = new List<Google.Apis.Sheets.v4.Data.ValueRange>();
-            //var dataValueRange = new Google.Apis.Sheets.v4.Data.ValueRange();
-            //dataValueRange.Range = "Emulator" + "!F" + (songIndex + 2).ToString() + ":J" + (songIndex + 2).ToString();
-            //dataValueRange.Values = sendValues;
-            //updateData.Add(dataValueRange);
-
-            //Google.Apis.Sheets.v4.Data.BatchUpdateValuesRequest requestBody = new Google.Apis.Sheets.v4.Data.BatchUpdateValuesRequest();
-            //requestBody.Data = updateData;
-            //requestBody.ValueInputOption = "USER_ENTERED";
-
-            //var updateRequest = service.Spreadsheets.Values.BatchUpdate(requestBody, spreadsheetId);
-
-            //var updateResponse = updateRequest.Execute();
-
-            Program.rin.SendTwitchMessage("New high score! " + title + " +" + (int.Parse(info[0]) - int.Parse(score)).ToString());
 
 
 
-            //updateData = new List<Google.Apis.Sheets.v4.Data.ValueRange>();
-            //dataValueRange = new Google.Apis.Sheets.v4.Data.ValueRange();
-            //dataValueRange.Range = "Emulator" + "!O" + (songIndex + 2).ToString();
-            //dataValueRange.Values = sendValues;
-            //updateData.Add(dataValueRange);
+            if (isHighScore == true || isBestAccuracy == true)
+            {
+                SendData("Emulator" + "!A" + (songIndex + 2).ToString() + ":" + GetColumnName(Headers.IndexOf("Update Time")) + (songIndex + 2).ToString(), sendValues);
+            }
 
-            //requestBody = new Google.Apis.Sheets.v4.Data.BatchUpdateValuesRequest();
-            //requestBody.Data = updateData;
-            //requestBody.ValueInputOption = "USER_ENTERED";
+            if (isHighScore == true)
+            {
+                Program.rin.SendTwitchMessage("New high score! " + play.Title + " +" + (play.Score - int.Parse(score)).ToString());
+            }
 
-            //updateRequest = service.Spreadsheets.Values.BatchUpdate(requestBody, spreadsheetId);
-
-            //updateResponse = updateRequest.Execute();
-
-
-
+            int goodsDifference = play.Goods - int.Parse(bestGoods);
+            if (isBestAccuracy == true || goodsDifference == 0)
+            {
+                string twitchMessage = string.Empty;
+                if (goodsDifference == 1)
+                {
+                    twitchMessage += "New best accuracy on " + play.Title + ", " + goodsDifference.ToString() + " more good!";
+                }
+                else if (goodsDifference == 0)
+                {
+                    twitchMessage += "Tied accuracy on " + play.Title + "!";
+                }
+                else
+                {
+                    twitchMessage += "New best accuracy on " + play.Title + ", " + goodsDifference.ToString() + " more goods!";
+                }
+                Program.rin.SendTwitchMessage(twitchMessage);
+            }
+            else
+            {
+                string twitchMessage = string.Empty;
+                if (goodsDifference == -1)
+                {
+                    twitchMessage += "1 good away from best accuracy on " + play.Title + "!";
+                }
+                else if (goodsDifference > -11)
+                {
+                    twitchMessage += (goodsDifference * -1) + " goods away from best accuracy on " + play.Title + "!";
+                }
+                else
+                {
+                    return;
+                }
+                Program.rin.SendTwitchMessage(twitchMessage);
+            }
         }
 
         public IList<IList<object>> GetListofEmulatorSongs()

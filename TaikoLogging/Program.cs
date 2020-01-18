@@ -19,7 +19,7 @@ namespace TaikoLogging
         static public ScreenGrab screen = new ScreenGrab();
         static public ImageAnalysis analysis = new ImageAnalysis();
         static public DebugLogging logger = new DebugLogging();
-        static public EmulatorLogger emulatorLogger = new EmulatorLogger();
+        static public Emulator.EmulatorLogger emulatorLogger = new Emulator.EmulatorLogger();
         static public Commands commands = new Commands();
 
         static void Main(string[] args)
@@ -92,6 +92,11 @@ namespace TaikoLogging
                 {
                     // I need a standard loop for this
                     emulatorLogger.StandardLoop();
+                    //{
+                    //    emulatorLogger.SingleLoop();
+                    //    Thread.Sleep(100000000);
+                    //    break;
+                    //}
                 }
             }
 

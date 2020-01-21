@@ -7,22 +7,25 @@ using System.Threading.Tasks;
 
 namespace TaikoLogging.Emulator
 {
-    class EmulatorSongData
+    class SongData
     {
         public string TjaFilePath { get; set; }
         // The Ini file may not exist if I didn't play the song previously
         public string IniFilePath { get; set; }
+        // This file also may not exist. It is used to keep track of previous plays
+        public string DBTjaFilePath { get; set; }
         // In Emulator, Ura is a part of the song title
         public string SongTitle { get; set; }
         public string Genre { get; set; }
         public int Level { get; set; }
         public float BPM { get; set; }
 
-        public EmulatorSongData(string filePath)
+        public SongData(string filePath)
         {
             // filePath == TjaFilePath
             TjaFilePath = filePath;
             IniFilePath = filePath + ".score.ini";
+            DBTjaFilePath = filePath.Remove(filePath.IndexOf(".tja")) + ".dbtja";
 
             var splitFilePath = filePath.Split('\\');
             SongTitle = splitFilePath[splitFilePath.Length - 1].Remove(splitFilePath[splitFilePath.Length - 1].IndexOf(".tja"));

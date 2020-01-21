@@ -205,8 +205,8 @@
   <ItemGroup>
     <Compile Include="Commands.cs" />
     <Compile Include="DebugLogging.cs" />
-    <Compile Include="Emulator\EmulatorPlay.cs" />
-    <Compile Include="Emulator\EmulatorSongData.cs" />
+    <Compile Include="Emulator\Play.cs" />
+    <Compile Include="Emulator\SongData.cs" />
     <Compile Include="GoogleSheetInterface.cs" />
     <Compile Include="HighScore.cs" />
     <Compile Include="ImageAnalysis.cs" />

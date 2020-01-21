@@ -357,6 +357,10 @@ namespace TaikoLogging
                 {
                     songTitle = "1/2 ～inside me";
                 }
+                if (songTitle == "Don't say lazy")
+                {
+                    songTitle = "Don't say \"lazy\"";
+                }
                 titles.Add(songTitle);
             }
         }
@@ -612,48 +616,41 @@ namespace TaikoLogging
 
         public void GetSingleResults(bool isSession)
         {
-            Bitmap bmp = Program.screen.CaptureApplication();
+            Play play = new Play();
+            play.Bmp = Program.screen.CaptureApplication();
             Console.WriteLine("Screen Captured");
 
-            Thread thread = new Thread(() => Clipboard.SetImage(bmp));
+            Thread thread = new Thread(() => Clipboard.SetImage(play.Bmp));
             thread.SetApartmentState(ApartmentState.STA); //Set the thread to STA
             thread.Start();
             thread.Join();
 
-            Players players;
-
             if (isSession == true)
             {
-                players = Players.RankedTop;
+                play.Players = Players.RankedTop;
             }
             else
             {
-                players = Players.Single;
+                play.Players = Players.Single;
             }
 
 
-            List<object> info = new List<object>();
-            List<string> headers = new List<string>();
-
             bool isShinUchi = false;
 
-            string account = CheckAccount(bmp, players);
-            info.Add(account);
-            headers.Add("Account");
+            play.Account = CheckAccount(play.Bmp, play.Players);
 
-            var mods = CheckMods(bmp, players);
-            info.Add(CheckDifficulty(bmp, players));
-            headers.Add("Difficulty");
-            for (int i = 0; i < mods.Count; i++)
+            play.Mods = CheckMods(play.Bmp, play.Players);
+            play.Difficulty = CheckDifficulty(play.Bmp, play.Players);
+            for (int i = 0; i < play.Mods.Count; i++)
             {
-                if (mods[i] == "Shin-uchi")
+                if (play.Mods[i] == "Shin-uchi")
                 {
                     // I don't want to save any shin-uchi scores (except BestGoods which I forgot to update this to take into account)
                     isShinUchi = true;
                 }
             }
 
-            if ((Difficulty)info[headers.IndexOf("Difficulty")] == Difficulty.Easy || (Difficulty)info[headers.IndexOf("Difficulty")] == Difficulty.Normal)
+            if (play.Difficulty == Difficulty.Easy || play.Difficulty == Difficulty.Normal)
             {
                 // I don't care about easy or normal for my sheet
                 // I don't really care about hard either, but I have the sheet anyway, so might as well save it if I get it
@@ -664,7 +661,7 @@ namespace TaikoLogging
 
             if (newSongMode == true)
             {
-                var titleBitmap = GetTitleBitmap(bmp);
+                var titleBitmap = GetTitleBitmap(play.Bmp);
                 Console.WriteLine("Please input title, or 'n' if this isn't a new song:");
                 var title = Console.ReadLine();
                 if (title != "n")
@@ -674,57 +671,43 @@ namespace TaikoLogging
             }
 
 
-            info.Add(GetTitle(bmp));
-            headers.Add("Title");
-            if ((string)info[headers.IndexOf("Title")] == "")
+            play.Title = GetTitle(play.Bmp);
+            if (play.Title == "")
             {
                 Console.WriteLine("Quit Analysis.\n");
                 return;
             }
 
-            info.Add(GetScore(bmp, players));
-            headers.Add("Score");
+            play.Score = GetScore(play.Bmp, play.Players);
 
-            info.Add(GetGoods(bmp, players));
-            headers.Add("GOOD");
-            info.Add(GetOKs(bmp, players));
-            headers.Add("OK");
-            info.Add(GetBads(bmp, players));
-            headers.Add("BAD");
-            info.Add(GetCombo(bmp, players));
-            headers.Add("MAX Combo");
-            info.Add(GetDrumroll(bmp, players));
-            headers.Add("Drumroll");
+            play.GOOD = GetGoods(play.Bmp, play.Players);
+            play.OK = GetOKs(play.Bmp, play.Players);
+            play.BAD = GetBads(play.Bmp, play.Players);
+            play.Combo = GetCombo(play.Bmp, play.Players);
+            play.Drumroll = GetDrumroll(play.Bmp, play.Players);
 
-            if ((int)info[headers.IndexOf("Score")] % 10 != 0)
+            if (play.Score % 10 != 0)
             {
                 Console.WriteLine("Quit Analysis.\n");
                 return;
             }
 
-            bool highScore = IsHighScore(bmp);
+            bool highScore = IsHighScore(play.Bmp);
 
-            info.Add("Normal");
-            headers.Add("Mode");
+            play.Mode = "Normal";
 
-            bool ura = false;
-            if ((Difficulty)info[headers.IndexOf("Difficulty")] == Difficulty.Ura)
-            {
-                ura = true;
-            }
-
-            Program.sheet.UpdatePS4BestGoods(info, headers);
-            Program.sheet.AddRecentPlay(info, headers);
+            Program.sheet.UpdatePS4BestGoods(play);
+            Program.sheet.AddRecentPlay(play);
             if ( /*highScore == true && */ isShinUchi == false)
             {
-                Program.sheet.UpdatePS4HighScore(info, headers, bmp);
+                Program.sheet.UpdatePS4HighScore(play);
 
                 //DirectoryInfo dirInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores");
                 //var result = dirInfo.GetFiles();
                 // NOT USED, NOT TESTING
                 //bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores\" + result.Length + ".png", ImageFormat.Png);
             }
-            Console.WriteLine(info[headers.IndexOf("Title")].ToString());
+            Console.WriteLine(play.Title);
             Console.WriteLine("Analysis Complete\n");
             if (randomMode == true)
             {
@@ -735,19 +718,18 @@ namespace TaikoLogging
 
         public void GetRankedResults()
         {
-            Bitmap bmp = Program.screen.CaptureApplication();
+            RankedPlay play = new RankedPlay();
+
+            play.Bmp = Program.screen.CaptureApplication();
             Console.WriteLine("Screen Captured");
 
-            Thread thread = new Thread(() => Clipboard.SetImage(bmp));
+            Thread thread = new Thread(() => Clipboard.SetImage(play.Bmp));
             thread.SetApartmentState(ApartmentState.STA); //Set the thread to STA
             thread.Start();
             thread.Join();
 
-            List<object> info = new List<object>();
-            List<string> headers = new List<string>();
-
-            string account = CheckAccount(bmp, Players.RankedTop);
-            if (account != "Deathblood")
+            play.Account = CheckAccount(play.Bmp, Players.RankedTop);
+            if (play.Account != "Deathblood")
             {
                 // I don't care if it's ranked on my alt
                 Console.WriteLine("Quit Analysis.\n");
@@ -755,69 +737,50 @@ namespace TaikoLogging
             }
 
             // Song Data
-            info.Add(GetTitle(bmp));
-            headers.Add("Title");
-            if (info[headers.IndexOf("Title")].ToString() == "")
+            play.Title = GetTitle(play.Bmp);
+            if (play.Title == "")
             {
                 Console.WriteLine("Quit Analysis.\n");
                 return;
             }
-            info.Add(CheckDifficulty(bmp, Players.RankedTop));
-            headers.Add("Difficulty");
+            play.Difficulty = CheckDifficulty(play.Bmp, Players.RankedTop);
 
             // Top Player Data
-            info.Add(GetScore(bmp, Players.RankedTop));
-            headers.Add("My Score");
-            info.Add(GetGoods(bmp, Players.RankedTop));
-            headers.Add("My Goods");
-            info.Add(GetOKs(bmp, Players.RankedTop));
-            headers.Add("My OKs");
-            info.Add(GetBads(bmp, Players.RankedTop));
-            headers.Add("My Bads");
-            info.Add(GetCombo(bmp, Players.RankedTop));
-            headers.Add("My Combo");
-            info.Add(GetDrumroll(bmp, Players.RankedTop));
-            headers.Add("My Drumroll");
+            play.Score = GetScore(play.Bmp, Players.RankedTop);
+            play.GOOD = GetGoods(play.Bmp, Players.RankedTop);
+            play.OK = GetOKs(play.Bmp, Players.RankedTop);
+            play.BAD = GetBads(play.Bmp, Players.RankedTop);
+            play.Combo = GetCombo(play.Bmp, Players.RankedTop);
+            play.Drumroll = GetDrumroll(play.Bmp, Players.RankedTop);
 
             // Bottom Player Data
-            info.Add(GetScore(bmp, Players.RankedBottom));
-            headers.Add("Opp Score");
-            info.Add(GetGoods(bmp, Players.RankedBottom));
-            headers.Add("Opp Goods");
-            info.Add(GetOKs(bmp, Players.RankedBottom));
-            headers.Add("Opp OKs");
-            info.Add(GetBads(bmp, Players.RankedBottom));
-            headers.Add("Opp Bads");
-            info.Add(GetCombo(bmp, Players.RankedBottom));
-            headers.Add("Opp Combo");
-            info.Add(GetDrumroll(bmp, Players.RankedBottom));
-            headers.Add("Opp Drumroll");
+            play.OppScore = GetScore(play.Bmp, Players.RankedBottom);
+            play.OppGOOD = GetGoods(play.Bmp, Players.RankedBottom);
+            play.OppOK = GetOKs(play.Bmp, Players.RankedBottom);
+            play.OppBAD = GetBads(play.Bmp, Players.RankedBottom);
+            play.OppCombo = GetCombo(play.Bmp, Players.RankedBottom);
+            play.OppDrumroll = GetDrumroll(play.Bmp, Players.RankedBottom);
 
             // Result Data
-            info.Add(GetRankedWinLoss(bmp));
-            headers.Add("Result");
+            play.Result = GetRankedWinLoss(play.Bmp);
 
-            info.Add(account);
-            headers.Add("Account");
-
-            bool ura = false;
-            if ((Difficulty)info[headers.IndexOf("Difficulty")] == Difficulty.Ura)
-            {
-                ura = true;
-            }
-
-            info.Add("Ranked");
-            headers.Add("Mode");
+            play.Mode = "Ranked";
             // Check to see if the scores are possible, they must always end with a 0
-            if ((int)info[headers.IndexOf("My Score")] % 10 != 0 || (int)info[headers.IndexOf("Opp Score")] % 10 != 0)
+            if (play.Score % 10 != 0 || play.OppScore % 10 != 0)
             {
+                Console.WriteLine("Score didn't end in 0");
                 Console.WriteLine("Quit Analysis.\n");
                 return;
             }
-            Program.sheet.AddRankedEntry(info, headers, bmp);
-            Program.sheet.UpdatePS4BestGoods(info, headers);
-            Program.sheet.AddRecentPlay(info, headers);
-            Console.WriteLine(info[headers.IndexOf("Title")].ToString());
+            if (play.Score == 0 || play.OppScore == 0)
+            {
+                Console.WriteLine("Score was 0 (Not gonna happen in ranked ever)");
+                Console.WriteLine("Quit Analysis.\n");
+            }
+            Program.sheet.AddRankedEntry(play);
+            Program.sheet.UpdatePS4BestGoods(play);
+            Program.sheet.AddRecentPlay(play);
+            Console.WriteLine(play.Title);
             Console.WriteLine("Analysis Complete\n");
 
         }

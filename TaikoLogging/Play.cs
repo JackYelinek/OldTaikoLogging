@@ -12,9 +12,7 @@ namespace TaikoLogging
         public Bitmap Bmp { get; set; }
 
         public string Title { get; set; }
-        public string Genre { get; set; }
         public ImageAnalysis.Difficulty Difficulty { get; set; }
-        public int Level { get; set; }
 
         public int Score { get; set; }
         public int GOOD { get; set; }
@@ -29,10 +27,11 @@ namespace TaikoLogging
         public string Mode { get; set; }
 
         public DateTime Time { get; set; }
-
+        public ImageAnalysis.Players Players { get; set; }
         public Play()
         {
-            
+            // DateTime.Now.ToString("MM/dd/yyyy hh:mm tt")
+            Time = DateTime.Now;
         }
 
 

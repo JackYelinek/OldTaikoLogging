@@ -12,7 +12,7 @@ namespace TaikoLogging.Emulator
     {
         const string MainFolderPath = @"D:\Games\Taiko\TJAPlayer3-Ver.1.5.3\songs";
 
-        List<EmulatorSongData> AllEmulatorSongData = new List<EmulatorSongData>();
+        List<SongData> AllEmulatorSongData = new List<SongData>();
 
         string prevTitle = string.Empty;
         DateTime prevWriteTime;
@@ -57,15 +57,16 @@ namespace TaikoLogging.Emulator
             }
             try
             {
-                GetSongStats(AllEmulatorSongData[latestIndex].IniFilePath);
+                GetSongStats(AllEmulatorSongData[latestIndex]);
+                prevTitle = title;
+                prevWriteTime = latestTime;
             }
             catch
             {
 
             }
             // I'm not sure why I need the title here too, but it's there I guess
-            prevTitle = title;
-            prevWriteTime = latestTime;
+
         }
 
         private void GetAllSongScores()
@@ -76,7 +77,7 @@ namespace TaikoLogging.Emulator
                 {
                     try
                     {
-                        GetSongStats(AllEmulatorSongData[i].IniFilePath);
+                        GetSongStats(AllEmulatorSongData[i]);
                     }
                     catch
                     {
@@ -87,24 +88,30 @@ namespace TaikoLogging.Emulator
 
         }
 
-        private void GetSongStats(string iniFilePath)
+        private void GetSongStats(SongData songData)
         {
-            var lines = File.ReadAllLines(iniFilePath);
-            int index = 0;
+            var lines = File.ReadAllLines(songData.IniFilePath);
+            int index = -1;
+            int lastPlayIndex = -1;
             for (int i = 0; i < lines.Length; i++)
             {
-                if (lines[i] == "[HiScore.Drums]")
+                if (lines[i] == "[HiScore.Drums]" && index == -1)
                 {
                     index = i;
+                }
+                else if (lines[i] == "[LastPlay.Drums]" && lastPlayIndex == -1)
+                {
+                    lastPlayIndex = i;
+                }
+                if (index != -1 && lastPlayIndex != -1)
+                {
                     break;
                 }
             }
 
-            EmulatorPlay play = new EmulatorPlay();
+            Play play = new Play();
             
-            var splitFilePath = iniFilePath.Split('\\');
-            play.Title = splitFilePath[splitFilePath.Length - 1].Remove(splitFilePath[splitFilePath.Length - 1].IndexOf(".tja"));
-
+            play.SongData = songData;
 
             play.Score = int.Parse(lines[index + 1].Remove(0, lines[index + 1].IndexOf("=") + 1));
 
@@ -113,43 +120,66 @@ namespace TaikoLogging.Emulator
             play.Bads = int.Parse(lines[index + 8].Remove(0, lines[index + 8].IndexOf("=") + 1));
             play.Combo = int.Parse(lines[index + 9].Remove(0, lines[index + 9].IndexOf("=") + 1));
 
-            // 50
-            play.DateTime = DateTime.Parse(lines[index + 50].Remove(0, lines[index + 50].IndexOf("=") + 1));
+
+            play.ScoreDateTime = DateTime.Parse(lines[index + 50].Remove(0, lines[index + 50].IndexOf("=") + 1));
+            play.LatestDateTime = DateTime.Parse(lines[lastPlayIndex + 50].Remove(0, lines[lastPlayIndex + 50].IndexOf("=") + 1));
+
+            play.LastGoods = int.Parse(lines[lastPlayIndex + 4].Remove(0, lines[lastPlayIndex + 4].IndexOf("=") + 1));
+            play.LastOKs = int.Parse(lines[lastPlayIndex + 5].Remove(0, lines[lastPlayIndex + 5].IndexOf("=") + 1));
+            play.LastBads = int.Parse(lines[lastPlayIndex + 8].Remove(0, lines[lastPlayIndex + 8].IndexOf("=") + 1));
+
+            play = UpdateDBFile(play);
 
             Program.sheet.UpdateEmulatorHighScore(play);
         }
 
-        private void FindSongsInSheet()
+        private Play UpdateDBFile(Play play)
         {
-            // The purpose of this function is to update the BPMs, and at the same time, check to see if every song can be found on the spreadsheet
+            // This is gonna look at a .dbtja file
+            int totalOKs = 0;
+            int totalBads = 0;
+            int plays = 0;
 
-            var listOfSheetSongs = Program.sheet.GetListofEmulatorSongs();
-
-            DirectoryInfo dirInfo = new DirectoryInfo(@"D:\Games\Taiko\TJAPlayer3-Ver.1.5.3\songs");
-            var results = dirInfo.GetFiles("*.tja");
-
-            for (int i = 0; i < results.Length; i++)
+            if (File.Exists(play.SongData.DBTjaFilePath) == true)
             {
-                bool canBeFound = false;
-                string songTitle = results[i].Name.Remove(results[i].Name.IndexOf(".tja"));
-                foreach (var row in listOfSheetSongs)
-                {
-                    if (row[0].ToString() == songTitle)
-                    {
-                        canBeFound = true;
-                        break;
-                    }
-                }
-                if (canBeFound == true)
-                {
-                    continue;
-                }
-                else
-                {
-                    Console.WriteLine("Couldn't find " + songTitle);
-                }
-            }
+                // Keep the latest play at the top of them
+                var lines = File.ReadAllLines(play.SongData.DBTjaFilePath);
 
+                string newLine = play.LastOKs.ToString() + "\t" + play.LastBads.ToString();
+
+                string[] newLines = new string[Math.Min(lines.Length + 1, 10)];
+                newLines[0] = newLine;
+
+                for (int i = 0; i < Math.Min(lines.Length, 9); i++)
+                {
+                    newLines[i + 1] = lines[i];
+                }
+                
+                
+                File.WriteAllLines(play.SongData.DBTjaFilePath, newLines);
+
+                for (int i = 0; i < newLines.Length; i++)
+                {
+                    var splitPlay = newLines[i].Split('\t');
+                    totalOKs += int.Parse(splitPlay[0]);
+                    totalBads += int.Parse(splitPlay[1]);
+                    plays++;
+                }
+
+                play.RecentOKs = (double)totalOKs / plays;
+                play.RecentBads = (double)totalBads / plays;
+
+
+            }
+            else
+            {
+                play.RecentOKs = play.LastOKs;
+                play.RecentBads = play.LastBads;
+                string line = play.LastOKs.ToString() + "\t" + play.LastBads.ToString();
+                File.WriteAllText(play.SongData.DBTjaFilePath, line);
+            }
+            Console.WriteLine("dbtja file accessed");
+            return play;
         }
 
 
@@ -285,7 +315,7 @@ namespace TaikoLogging.Emulator
                 var tjaFiles = SongFolders[i].GetFiles("*.tja");
                 for (int j = 0; j < tjaFiles.Length; j++)
                 {
-                    EmulatorSongData songData = new EmulatorSongData(tjaFiles[j].FullName);
+                    SongData songData = new SongData(tjaFiles[j].FullName);
                     AllEmulatorSongData.Add(songData);
                 }
             }

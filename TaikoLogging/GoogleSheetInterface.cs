@@ -95,7 +95,7 @@ namespace TaikoLogging
                 }
                 else if (Headers[i] == "Difficulty")
                 {
-                    baseValues.Add(play.Difficulty);
+                    baseValues.Add(play.Difficulty.ToString());
                 }
                 else if (Headers[i] == "Genre")
                 {
@@ -103,7 +103,7 @@ namespace TaikoLogging
                 }
                 else if (Headers[i] == "★")
                 {
-                    baseValues.Add(" = VLOOKUP(B2, " + play.Difficulty + "!B: E, 4, false)");
+                    baseValues.Add("=VLOOKUP(B2, " + play.Difficulty + "!B:E, 4, false)");
                 }
                 else if (Headers[i] == "Result")
                 {
@@ -573,7 +573,7 @@ namespace TaikoLogging
                 }
                 else if (Headers[i] == "Difficulty")
                 {
-                    baseValues.Add(play.Difficulty);
+                    baseValues.Add(play.Difficulty.ToString());
                 }
                 else if (Headers[i] == "Genre")
                 {
@@ -1023,7 +1023,7 @@ namespace TaikoLogging
             SendData("Emulator" + "!A" + (songIndex + 2).ToString() + ":" + GetColumnName(Headers.IndexOf("Update Time")) + (songIndex + 2).ToString(), sendValues);
             
 
-            if (play.LatestDateTime < DateTime.Now - new TimeSpan(0, 5, 0))
+            if (play.LatestDateTime > DateTime.Now - new TimeSpan(0, 5, 0))
             {
                 return;
             }

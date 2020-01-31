@@ -14,7 +14,6 @@ namespace TaikoLogging.Emulator
 
         List<SongData> AllEmulatorSongData = new List<SongData>();
 
-        string prevTitle = string.Empty;
         DateTime prevWriteTime;
 
         public EmulatorLogger()
@@ -51,22 +50,20 @@ namespace TaikoLogging.Emulator
             }
 
             var title = AllEmulatorSongData[latestIndex].SongTitle;
-            if (title == prevTitle && latestTime == prevWriteTime)
+            if (latestTime <= prevWriteTime)
             {
                 return;
             }
             try
             {
                 GetSongStats(AllEmulatorSongData[latestIndex]);
-                prevTitle = title;
                 prevWriteTime = latestTime;
+                Console.WriteLine(title + " logged");
             }
             catch
             {
 
             }
-            // I'm not sure why I need the title here too, but it's there I guess
-
         }
 
         private void GetAllSongScores()
@@ -128,7 +125,12 @@ namespace TaikoLogging.Emulator
             play.LastOKs = int.Parse(lines[lastPlayIndex + 5].Remove(0, lines[lastPlayIndex + 5].IndexOf("=") + 1));
             play.LastBads = int.Parse(lines[lastPlayIndex + 8].Remove(0, lines[lastPlayIndex + 8].IndexOf("=") + 1));
 
-            play = UpdateDBFile(play);
+            if (play.LatestDateTime > DateTime.Now - new TimeSpan(0, 5, 0))
+            {
+                // copied this if statement from the spreadsheet function below
+                // if the play is from more than 5 minutes ago, don't update the DB file
+                play = UpdateDBFile(play);
+            }
 
             Program.sheet.UpdateEmulatorHighScore(play);
         }

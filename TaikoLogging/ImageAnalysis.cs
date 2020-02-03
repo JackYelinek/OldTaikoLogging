@@ -108,7 +108,7 @@ namespace TaikoLogging
 
             // Time to start working in this function again
         }
-        public void NotStandardNotLoop()
+        public void SingleLoop()
         {
             // For something that just has to be done once, usually testing stuff or adding files or something
             TestRecordingFunction();

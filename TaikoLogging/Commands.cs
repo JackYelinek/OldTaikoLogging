@@ -10,8 +10,11 @@ namespace TaikoLogging
 {
     class Commands
     {
-        List<CommandFunction> commandFunctions = new List<CommandFunction>();
-        List<List<string>> commandWords = new List<List<string>>();
+        List<CommandFunction> ps4CommandFunctions = new List<CommandFunction>();
+        List<List<string>> ps4CommandWords = new List<List<string>>();
+
+        List<CommandFunction> emulatorCommandFunctions = new List<CommandFunction>();
+        List<List<string>> emulatorCommandWords = new List<List<string>>();
 
         public Commands()
         {
@@ -20,59 +23,61 @@ namespace TaikoLogging
 
         private void Setup()
         {
-            commandFunctions.Add(RemoveRanked);
+            ps4CommandFunctions.Add(RemoveRanked);
             List<string> tmpList = new List<string>();
             tmpList.Add("!notranked");
             tmpList.Add("!removeranked");
             tmpList.Add("!removelast");
-            commandWords.Add(tmpList);
+            ps4CommandWords.Add(tmpList);
 
             //commandFunctions.Add(AddNewSong);
             //tmpList = new List<string>();
             //tmpList.Add("!song ");
             //commandWords.Add(tmpList);
 
-            commandFunctions.Add(ToggleRandomMode);
+            ps4CommandFunctions.Add(ToggleRandomMode);
             tmpList = new List<string>();
             tmpList.Add("!random mode");
-            commandWords.Add(tmpList);
+            ps4CommandWords.Add(tmpList);
 
-            commandFunctions.Add(GetRandomSong);
+            ps4CommandFunctions.Add(GetRandomSong);
             tmpList = new List<string>();
             tmpList.Add("!random");
-            commandWords.Add(tmpList);
+            ps4CommandWords.Add(tmpList);
 
-            commandFunctions.Add(AnalyzeResults);
+            ps4CommandFunctions.Add(AnalyzeResults);
             tmpList = new List<string>();
             tmpList.Add("!analyze");
             tmpList.Add("!result");
-            commandWords.Add(tmpList);
+            ps4CommandWords.Add(tmpList);
 
-            commandFunctions.Add(CreateNewState);
+            ps4CommandFunctions.Add(CreateNewState);
             tmpList = new List<string>();
             tmpList.Add("!state ");
-            commandWords.Add(tmpList);
+            ps4CommandWords.Add(tmpList);
 
-            commandFunctions.Add(NewSongMode);
+            ps4CommandFunctions.Add(NewSongMode);
             tmpList = new List<string>();
             tmpList.Add("!newsong");
-            commandWords.Add(tmpList);
+            ps4CommandWords.Add(tmpList);
 
 
 
-            commandFunctions.Add(HelpCommand);
+            ps4CommandFunctions.Add(HelpCommand);
+            emulatorCommandFunctions.Add(HelpCommand);
             tmpList = new List<string>();
             tmpList.Add("!help");
-            commandWords.Add(tmpList);
+            ps4CommandWords.Add(tmpList);
+            emulatorCommandWords.Add(tmpList);
 
-            commandFunctions.Add(AdjustTimingLeft);
+            emulatorCommandFunctions.Add(AdjustTimingLeft);
             tmpList = new List<string>();
             tmpList.Add("!adjust left");
-            commandWords.Add(tmpList);
-            commandFunctions.Add(AdjustTimingRight);
+            emulatorCommandWords.Add(tmpList);
+            emulatorCommandFunctions.Add(AdjustTimingRight);
             tmpList = new List<string>();
             tmpList.Add("!adjust right");
-            commandWords.Add(tmpList);
+            emulatorCommandWords.Add(tmpList);
         }
 
         private void AdjustTimingRight(string message)
@@ -89,14 +94,31 @@ namespace TaikoLogging
 
         public void CheckCommands(string message)
         {
-            for (int i = 0; i < commandFunctions.Count; i++)
+            if (Program.currentGame == Program.Game.PS4)
             {
-                for (int j = 0; j < commandWords[i].Count; j++)
+                for (int i = 0; i < ps4CommandFunctions.Count; i++)
                 {
-                    if (message.IndexOf(commandWords[i][j]) == 0)
+                    for (int j = 0; j < ps4CommandWords[i].Count; j++)
                     {
-                        commandFunctions[i](message);
-                        return;
+                        if (message.IndexOf(ps4CommandWords[i][j]) == 0)
+                        {
+                            ps4CommandFunctions[i](message);
+                            return;
+                        }
+                    }
+                }
+            }
+            else if (Program.currentGame == Program.Game.Emulator)
+            {
+                for (int i = 0; i < emulatorCommandFunctions.Count; i++)
+                {
+                    for (int j = 0; j < emulatorCommandWords[i].Count; j++)
+                    {
+                        if (message.IndexOf(emulatorCommandWords[i][j]) == 0)
+                        {
+                            emulatorCommandFunctions[i](message);
+                            return;
+                        }
                     }
                 }
             }
@@ -104,11 +126,27 @@ namespace TaikoLogging
         private void HelpCommand(string message)
         {
             string responseString = "\n";
-            for (int i = 0; i < commandWords.Count; i++)
+            if (Program.currentGame == Program.Game.PS4)
             {
-                responseString += commandWords[i][0];
-                responseString += "\n";
+                for (int i = 0; i < ps4CommandWords.Count; i++)
+                {
+                    responseString += ps4CommandWords[i][0];
+                    responseString += "\n";
+                }
             }
+            else if (Program.currentGame == Program.Game.Emulator)
+            {
+                for (int i = 0; i < emulatorCommandWords.Count; i++)
+                {
+                    responseString += emulatorCommandWords[i][0];
+                    responseString += "\n";
+                }
+            }
+            else
+            {
+                responseString = "No game being played\n";
+            }
+
 
             Console.WriteLine(responseString);
         }
@@ -119,15 +157,15 @@ namespace TaikoLogging
             Program.rin.SendTwitchMessage("Last ranked match removed");
         }
 
-        bool newSongIncoming = false;
-        Bitmap newSongBitmap;
-        public void PrepareNewSong(Bitmap bmp)
-        {
-            newSongIncoming = true;
-            newSongBitmap = new Bitmap(bmp);
-            //Program.rin.SendTwitchMessage("Couldn't figure out the song, !song <song>");
-            Console.WriteLine("Couldn't figure out the song, !song <song>");
-        }
+        //bool newSongIncoming = false;
+        //Bitmap newSongBitmap;
+        //public void PrepareNewSong(Bitmap bmp)
+        //{
+        //    newSongIncoming = true;
+        //    newSongBitmap = new Bitmap(bmp);
+        //    //Program.rin.SendTwitchMessage("Couldn't figure out the song, !song <song>");
+        //    Console.WriteLine("Couldn't figure out the song, !song <song>");
+        //}
         //private void AddNewSong(string message)
         //{
         //    if (newSongIncoming == true)
@@ -148,7 +186,6 @@ namespace TaikoLogging
             string state = message.Remove(0, "!state ".Length);
 
             Program.analysis.CreateNewState(state);
-
         }
         private void ToggleRandomMode(string message)
         {

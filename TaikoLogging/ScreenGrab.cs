@@ -78,9 +78,15 @@ namespace TaikoLogging
 
         public bool CheckTwitch()
         {
-            var bmp = PrintWindow(programWindowHandle);
-
-            return AnalyzeTwitch(bmp);
+            if (programWindowHandle != (IntPtr)0)
+            {
+                var bmp = PrintWindow(programWindowHandle);
+                return AnalyzeTwitch(bmp);
+            }
+            else
+            {
+                return false;
+            }
         }
 
         // I'm literally the worst at naming functions...

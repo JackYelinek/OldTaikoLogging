@@ -14,7 +14,7 @@ namespace TaikoLogging.Emulator
 
         List<SongData> AllEmulatorSongData = new List<SongData>();
 
-        DateTime prevWriteTime;
+        DateTime previousPlayTime;
 
         public EmulatorLogger()
         {
@@ -50,15 +50,9 @@ namespace TaikoLogging.Emulator
             }
 
             var title = AllEmulatorSongData[latestIndex].SongTitle;
-            if (latestTime <= prevWriteTime)
-            {
-                return;
-            }
             try
             {
                 GetSongStats(AllEmulatorSongData[latestIndex]);
-                prevWriteTime = latestTime;
-                Console.WriteLine(title + " logged");
             }
             catch
             {
@@ -125,14 +119,17 @@ namespace TaikoLogging.Emulator
             play.LastOKs = int.Parse(lines[lastPlayIndex + 5].Remove(0, lines[lastPlayIndex + 5].IndexOf("=") + 1));
             play.LastBads = int.Parse(lines[lastPlayIndex + 8].Remove(0, lines[lastPlayIndex + 8].IndexOf("=") + 1));
 
-            if (play.LatestDateTime > DateTime.Now - new TimeSpan(0, 5, 0))
+            if (play.LatestDateTime > previousPlayTime)
             {
                 // copied this if statement from the spreadsheet function below
-                // if the play is from more than 5 minutes ago, don't update the DB file
-                play = UpdateDBFile(play);
+                if (previousPlayTime.Ticks != 0)
+                {
+                    play = UpdateDBFile(play);
+                }
+                Program.sheet.UpdateEmulatorHighScore(play);
+                Console.WriteLine(play.SongData.SongTitle + " logged\n");
+                previousPlayTime = play.LatestDateTime;
             }
-
-            Program.sheet.UpdateEmulatorHighScore(play);
         }
 
         private Play UpdateDBFile(Play play)
@@ -156,8 +153,19 @@ namespace TaikoLogging.Emulator
                 {
                     newLines[i + 1] = lines[i];
                 }
-                
-                
+
+                double oldRecentOKs = 0.0f;
+                double oldRecentBads = 0.0f;
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    var splitPlay = lines[i].Split('\t');
+                    oldRecentOKs += double.Parse(splitPlay[0]);
+                    oldRecentBads += double.Parse(splitPlay[1]);
+                }
+
+                oldRecentOKs = oldRecentOKs / lines.Length;
+                oldRecentBads = oldRecentBads / lines.Length;
+
                 File.WriteAllLines(play.SongData.DBTjaFilePath, newLines);
 
                 for (int i = 0; i < newLines.Length; i++)
@@ -170,8 +178,35 @@ namespace TaikoLogging.Emulator
 
                 play.RecentOKs = (double)totalOKs / plays;
                 play.RecentBads = (double)totalBads / plays;
-
-
+                double recentOKsDiff = play.RecentOKs - oldRecentOKs;
+                double recentBadsDiff = play.RecentBads - oldRecentBads;
+                string message = "\nRecent OKs ";
+                if (recentOKsDiff > 0)
+                {
+                    message += "+" + string.Format("{0:F2}", recentOKsDiff) + " -> " + string.Format("{0:F2}", play.RecentOKs);
+                }
+                else if (recentOKsDiff == 0)
+                {
+                    message += "+0.0" + " -> " + string.Format("{0:F2}", play.RecentOKs);
+                }
+                else // recentOKsDiff < 0
+                {
+                    message += string.Format("{0:F2}", recentOKsDiff) + " -> " + string.Format("{0:F2}", play.RecentOKs);
+                }
+                message += "\nRecent Bads ";
+                if (recentBadsDiff > 0)
+                {
+                    message += "+" + string.Format("{0:F2}", recentBadsDiff) + " -> " + string.Format("{0:F2}", play.RecentBads);
+                }
+                else if (recentBadsDiff == 0)
+                {
+                    message += "+0.0" + " -> " + string.Format("{0:F2}", play.RecentBads);
+                }
+                else // recentBadsDiff < 0
+                {
+                    message += string.Format("{0:F2}", recentBadsDiff) + " -> " + string.Format("{0:F2}", play.RecentBads);
+                }
+                Console.WriteLine(message);
             }
             else
             {
@@ -179,8 +214,11 @@ namespace TaikoLogging.Emulator
                 play.RecentBads = play.LastBads;
                 string line = play.LastOKs.ToString() + "\t" + play.LastBads.ToString();
                 File.WriteAllText(play.SongData.DBTjaFilePath, line);
+                string message = "\nRecent OKs = " + string.Format("{0:F2}", play.RecentOKs) + "\n";
+                message += "Recent Bads = " + string.Format("{0:F2}", play.RecentBads);
+                Console.WriteLine(message);
+
             }
-            Console.WriteLine("dbtja file accessed");
             return play;
         }
 

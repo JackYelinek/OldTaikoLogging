@@ -1023,7 +1023,7 @@ namespace TaikoLogging
             SendData("Emulator" + "!A" + (songIndex + 2).ToString() + ":" + GetColumnName(Headers.IndexOf("Update Time")) + (songIndex + 2).ToString(), sendValues);
             
 
-            if (play.LatestDateTime > DateTime.Now - new TimeSpan(0, 5, 0))
+            if (play.LatestDateTime < DateTime.Now - new TimeSpan(0, 5, 0))
             {
                 return;
             }

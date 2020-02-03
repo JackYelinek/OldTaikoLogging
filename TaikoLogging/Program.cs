@@ -22,17 +22,16 @@ namespace TaikoLogging
         static public Emulator.EmulatorLogger emulatorLogger = new Emulator.EmulatorLogger();
         static public Commands commands = new Commands();
 
+        public enum Game { PS4, Emulator, None };
+        // PS4 or Emulator, so I can know at any place
+        static public Game currentGame = Game.None;
+
         static void Main(string[] args)
         {
-            // TODO Set this up automatically
-
-            bool PS4 = false;
-            bool emulator = false;
-            
             Thread inputThread = new Thread(ReadInput);
             inputThread.Start();
 
-
+            GetGame();
 
             //PlayRecordingSheetsInterface playRecordingSheetsInterface = new PlayRecordingSheetsInterface();
             //ScreenGrab newScreenGrab = new ScreenGrab();
@@ -42,55 +41,26 @@ namespace TaikoLogging
 
             while (true)
             {
-                // I'm not sure if this is the best way to check for it, maybe i could just have it check every 10 loops, or 100
-                // Events would be nice to set up, but I'm not sure if I could do that, or how I'd do that
-                // This isn't a bad way of doing things without events though I think
-                // It prevents me from having to wait each time I open the program to input what it's for
-                var processes = Process.GetProcessesByName("obs64");
-                if (processes.Length == 0)
-                {
-                    PS4 = false;
-                }
-                else
-                {
-                    twitchOn = screen.CheckTwitch();
-                    // This isn't technically accurate
-                    PS4 = true;
-                }
-                processes = Process.GetProcessesByName("TJAPlayer3");
-                if (processes.Length == 0)
-                {
-                    emulator = false;
-                }
-                else
-                {
-                    // This isn't technically accurate, but it helps to make the previous if/else more accurate
-                    // Ideally, I'd check to see if obs looks like what PS4 should look like, and if it's close enough, send it to PS4
-                    // That wouldn't really work, since emulator looks like PS4 on obs
-                    // I could check to see if it starts to fail a bunch of the data checks I guess? But that would require a lot of checks, and some failed data gathering
-                    emulator = true;
-                    PS4 = false;
-                }
-                if (PS4 == true)
-                {
+                GetGame();
 
-                    // This part is just temporarily while I'm streaming
+                twitchOn = screen.CheckTwitch();
+
+                if (currentGame == Game.PS4)
+                {
+                    // This part is just temporarily if I'm streaming and the function's broken (which it currently isn't)
                     //twitchOn = false;
-
-
 
                     analysis.StandardLoop();
                     //analysis.NotStandardLoop();
 
                     //{
-                    //    analysis.NotStandardNotLoop();
+                    //    analysis.SingleLoop();
                     //    Thread.Sleep(100000000);
                     //    break;
                     //}
                 }
-                else if (emulator == true)
+                else if (currentGame == Game.Emulator)
                 {
-                    // I need a standard loop for this
                     emulatorLogger.StandardLoop();
                     //{
                     //    emulatorLogger.SingleLoop();
@@ -101,6 +71,24 @@ namespace TaikoLogging
             }
 
 
+        }
+
+        static void GetGame()
+        {
+            var obsProcesses = Process.GetProcessesByName("obs64");
+            var tjaProcesses = Process.GetProcessesByName("TJAPlayer3");
+            if (tjaProcesses.Length != 0)
+            {
+                currentGame = Game.Emulator;
+            }
+            else if (obsProcesses.Length != 0)
+            {
+                currentGame = Game.PS4;
+            }
+            else
+            {
+                currentGame = Game.None;
+            }
         }
 
         static void ReadInput()

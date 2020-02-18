@@ -696,7 +696,10 @@ namespace TaikoLogging
 
             play.Mode = "Normal";
 
+            play = UpdateDBFile(play);
+
             Program.sheet.UpdatePS4BestGoods(play);
+            Program.sheet.UpdateRecentOKs(play);
             Program.sheet.AddRecentPlay(play);
             if ( /*highScore == true && */ isShinUchi == false)
             {
@@ -776,10 +779,16 @@ namespace TaikoLogging
             {
                 Console.WriteLine("Score was 0 (Not gonna happen in ranked ever)");
                 Console.WriteLine("Quit Analysis.\n");
+                return;
             }
+            var tmpPlay = UpdateDBFile(play);
+            play.RecentOKs = tmpPlay.RecentOKs;
+            play.RecentBads = tmpPlay.RecentBads;
+
             Program.sheet.AddRankedEntry(play);
             Program.sheet.UpdatePS4BestGoods(play);
             Program.sheet.AddRecentPlay(play);
+            Program.sheet.UpdateRecentOKs(play);
             Console.WriteLine(play.Title);
             Console.WriteLine("Analysis Complete\n");
 
@@ -1527,6 +1536,100 @@ namespace TaikoLogging
         //        }
         //    }
         //}
+
+        private Play UpdateDBFile(Play play)
+        {
+            // This is gonna look at a .dbtja file
+            int totalOKs = 0;
+            int totalBads = 0;
+            int plays = 0;
+
+            const string DBTjaFolderPath = @"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\DBTJA Data\";
+
+            string filePath = DBTjaFolderPath + Program.MakeValidFileName(play.Title) + "." + play.Difficulty.ToString() + ".dbtja";
+
+            if (File.Exists(filePath) == true)
+            {
+                // Keep the latest play at the top of them
+                var lines = File.ReadAllLines(filePath);
+
+                string newLine = play.OK.ToString() + "\t" + play.BAD.ToString();
+
+                string[] newLines = new string[Math.Min(lines.Length + 1, 10)];
+                newLines[0] = newLine;
+
+                for (int i = 0; i < Math.Min(lines.Length, 9); i++)
+                {
+                    newLines[i + 1] = lines[i];
+                }
+
+                double oldRecentOKs = 0.0f;
+                double oldRecentBads = 0.0f;
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    var splitPlay = lines[i].Split('\t');
+                    oldRecentOKs += double.Parse(splitPlay[0]);
+                    oldRecentBads += double.Parse(splitPlay[1]);
+                }
+
+                oldRecentOKs = oldRecentOKs / lines.Length;
+                oldRecentBads = oldRecentBads / lines.Length;
+
+                File.WriteAllLines(filePath, newLines);
+
+                for (int i = 0; i < newLines.Length; i++)
+                {
+                    var splitPlay = newLines[i].Split('\t');
+                    totalOKs += int.Parse(splitPlay[0]);
+                    totalBads += int.Parse(splitPlay[1]);
+                    plays++;
+                }
+
+                play.RecentOKs = (double)totalOKs / plays;
+                play.RecentBads = (double)totalBads / plays;
+                double recentOKsDiff = play.RecentOKs - oldRecentOKs;
+                double recentBadsDiff = play.RecentBads - oldRecentBads;
+                string message = "\nRecent OKs ";
+                if (recentOKsDiff > 0)
+                {
+                    message += "+" + string.Format("{0:F2}", recentOKsDiff) + " -> " + string.Format("{0:F2}", play.RecentOKs);
+                }
+                else if (recentOKsDiff == 0)
+                {
+                    message += "+0.0" + " -> " + string.Format("{0:F2}", play.RecentOKs);
+                }
+                else // recentOKsDiff < 0
+                {
+                    message += string.Format("{0:F2}", recentOKsDiff) + " -> " + string.Format("{0:F2}", play.RecentOKs);
+                }
+                message += "\nRecent Bads ";
+                if (recentBadsDiff > 0)
+                {
+                    message += "+" + string.Format("{0:F2}", recentBadsDiff) + " -> " + string.Format("{0:F2}", play.RecentBads);
+                }
+                else if (recentBadsDiff == 0)
+                {
+                    message += "+0.0" + " -> " + string.Format("{0:F2}", play.RecentBads);
+                }
+                else // recentBadsDiff < 0
+                {
+                    message += string.Format("{0:F2}", recentBadsDiff) + " -> " + string.Format("{0:F2}", play.RecentBads);
+                }
+                Console.WriteLine(message);
+            }
+            else
+            {
+                play.RecentOKs = play.OK;
+                play.RecentBads = play.BAD;
+                string line = play.OK.ToString() + "\t" + play.BAD.ToString();
+                File.WriteAllText(filePath, line);
+                string message = "\nRecent OKs = " + string.Format("{0:F2}", play.RecentOKs) + "\n";
+                message += "Recent Bads = " + string.Format("{0:F2}", play.RecentBads);
+                Console.WriteLine(message);
+
+            }
+            return play;
+        }
         public void AddNewSongTitleBitmap(Bitmap bmp, string songTitle)
         {
             ClearTitleBitmaps();

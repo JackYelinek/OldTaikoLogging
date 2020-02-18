@@ -22,6 +22,9 @@ namespace TaikoLogging
         public int Combo { get; set; }
         public int Drumroll { get; set; }
 
+        public double RecentOKs { get; set; }
+        public double RecentBads { get; set; }
+
         public List<string> Mods { get; set; }
         public string Account { get; set; }
         public string Mode { get; set; }

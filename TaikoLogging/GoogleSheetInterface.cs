@@ -442,9 +442,7 @@ namespace TaikoLogging
             }
             range += GetColumnName(Headers.IndexOf("Title")) + "2:" + GetColumnName(Headers.IndexOf("Best Goods"));
 
-            var request = service.Spreadsheets.Values.Get(spreadsheetId, range);
-            ValueRange response = request.Execute();
-            var values = response.Values;
+            var values = GetValues(range);
             int songIndex = -1;
             if (values != null && values.Count > 0)
             {
@@ -554,10 +552,66 @@ namespace TaikoLogging
 
 
         }
+
+        public void UpdateRecentOKs(Play play)
+        {
+            var Headers = GetHeaders("'Oni'");
+            string range = string.Empty;
+            // Find the song in the spreadsheet
+            if (play.Account == "RinzoP")
+            {
+                range += "Messy " + play.Difficulty + "!";
+            }
+            else
+            {
+                range += play.Difficulty + "!";
+            }
+            range += "B2:B";
+
+            var values = GetValues(range);
+
+            int songIndex = -1;
+            if (values != null && values.Count > 0)
+            {
+                foreach (var row in values)
+                {
+                    if (row[0].ToString() == play.Title)
+                    {
+                        songIndex = values.IndexOf(row);
+                    }
+                }
+            }
+
+            if (songIndex == -1)
+            {
+                // something got fucked up
+                // probably a good idea to set up some form of logging for this sort of thing, but meh
+                // Broken and I don't feel like fixing it cuz I don't use it
+                //Program.logger.LogManyVariables("UpdatePS4BestGoods: Song Not Found", headers, info);
+                return;
+            }
+            IList<object> baseValues = new List<object>
+            {
+                play.RecentOKs, play.RecentBads
+            };
+            List<IList<object>> sendValues = new List<IList<object>>();
+            sendValues.Add(baseValues);
+
+            if (play.Account == "Deathblood")
+            {
+                range = play.Difficulty + "!";
+            }
+            else
+            {
+                range = "Messy " + play.Difficulty + "!";
+            }
+
+            range += GetColumnName(Headers.IndexOf("Recent OKs")) + (songIndex + 2).ToString() + ":" + GetColumnName(Headers.IndexOf("Recent Bads"));
+            SendData(range, sendValues);
+        }
         public void AddRecentPlay(Play play)
         {
             var Headers = GetHeaders("'Recent Plays'");
-            // Check the sheet to see the match #
             var values = GetValues("Recent Plays!A2");
 
 

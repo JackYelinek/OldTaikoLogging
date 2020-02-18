@@ -69,8 +69,6 @@ namespace TaikoLogging
                     //}
                 }
             }
-
-
         }
 
         static void GetGame()

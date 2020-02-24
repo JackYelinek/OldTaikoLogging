@@ -1546,7 +1546,13 @@ namespace TaikoLogging
 
             const string DBTjaFolderPath = @"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\DBTJA Data\";
 
-            string filePath = DBTjaFolderPath + Program.MakeValidFileName(play.Title) + "." + play.Difficulty.ToString() + ".dbtja";
+            string filePath = DBTjaFolderPath + Program.MakeValidFileName(play.Title) + "." + play.Difficulty.ToString();// + ".dbtja";
+
+            if (play.Account == "RinzoP")
+            {
+                filePath += ".Messy";
+            }
+            filePath += ".dbtja";
 
             if (File.Exists(filePath) == true)
             {

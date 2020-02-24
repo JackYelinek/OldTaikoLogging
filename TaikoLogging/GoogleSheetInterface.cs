@@ -710,12 +710,23 @@ namespace TaikoLogging
 
                 int songLevel = int.Parse(values[i][Headers.IndexOf("★")].ToString());
 
-                int numNotes = int.Parse(values[i][Headers.IndexOf("GOOD")].ToString()) + songOK + songBad;
+                //int numNotes = int.Parse(values[i][Headers.IndexOf("GOOD")].ToString()) + songOK + songBad;
+                TimeSpan timeSinceLastPlayed;
+                if (values[i].Count > Headers.IndexOf("DateTime"))
+                {
+                    timeSinceLastPlayed = DateTime.Now - DateTime.Parse((string)values[i][Headers.IndexOf("DateTime")]);
+                }
+                else
+                {
+                    timeSinceLastPlayed = DateTime.Now - new DateTime(0);
+                }
+
 
                 //int goalValue = (songOK + (songBad * 2)) - goalOK;
 
                 //int goalValue = ((songOK + (songBad * 2)) - goalOK) / numNotes;
-                int goalValue = ((songOK - songBad) - goalOK) / songLevel;
+                //int goalValue = ((songOK - songBad) - goalOK) / songLevel;
+                int goalValue = (((songOK - songBad) - goalOK) / songLevel) * ((int)timeSinceLastPlayed.TotalSeconds / 1000);
                 if (songLevel == 0)
                 {
                     goalValue *= 2;
@@ -744,10 +755,22 @@ namespace TaikoLogging
                 int songBad = int.Parse(values[i][Headers.IndexOf("BAD")].ToString());
                 int songLevel = int.Parse(values[i][Headers.IndexOf("★")].ToString());
 
+                TimeSpan timeSinceLastPlayed;
+                if (values[i].Count > Headers.IndexOf("DateTime"))
+                {
+                    timeSinceLastPlayed = DateTime.Now - DateTime.Parse((string)values[i][Headers.IndexOf("DateTime")]);
+                }
+                else
+                {
+                    timeSinceLastPlayed = DateTime.Now - new DateTime(0);
+                }
+
                 //int numNotes = int.Parse(values[i][Headers.IndexOf("GOOD")].ToString()) + songOK + int.Parse(values[i][Headers.IndexOf("BAD")].ToString());
                 //int goalValue = (songOK + (songBad * 2)) - goalOK;
+                //int goalValue = ((songOK - songBad) - goalOK) / songLevel;
 
-                int goalValue = ((songOK - songBad) - goalOK) / songLevel;
+                int goalValue = (((songOK - songBad) - goalOK) / songLevel) * ((int)timeSinceLastPlayed.TotalSeconds / 1000);
+
                 if (songLevel == 0)
                 {
                     goalValue *= 2;
@@ -965,6 +988,7 @@ namespace TaikoLogging
                     if (row[Headers.IndexOf("Title")].ToString() == play.SongData.SongTitle)
                     {
                         songIndex = values.IndexOf(row);
+                        break;
                     }
                 }
             }

@@ -41,6 +41,10 @@ namespace TaikoLogging
                 Console.ReadKey();
                 windowHandle = FindWindow("Qt5QWindowIcon", "obs64");
             }
+            if (proc.MainWindowTitle != "obs64")
+            {
+                programWindowHandle = FindWindow("Qt5QWindowIcon", proc.MainWindowTitle);
+            }
             while (programWindowHandle == (IntPtr)0)
             {
                 Console.WriteLine("Click on the main OBS window!\npress any key to continue...");

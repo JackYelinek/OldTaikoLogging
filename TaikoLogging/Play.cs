@@ -19,11 +19,15 @@ namespace TaikoLogging
         public int OK { get; set; }
         public int BAD { get; set; }
 
+        // I believe accuracy will be a %, which would end up being from 0 - 1, so any time I want it visualized, I need to do *100, limit to 2 decimal places, and add a % to the end
+        public float Accuracy { get; set; }
+
         public int Combo { get; set; }
         public int Drumroll { get; set; }
 
-        public double RecentOKs { get; set; }
-        public double RecentBads { get; set; }
+        //public double RecentOKs { get; set; }
+        //public double RecentBads { get; set; }
+        public float RecentAcc { get; set; }
 
         public List<string> Mods { get; set; }
         public string Account { get; set; }

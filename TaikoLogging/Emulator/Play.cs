@@ -20,6 +20,8 @@ namespace TaikoLogging.Emulator
         public double RecentOKs { get; set; }
         public double RecentBads { get; set; }
 
+        public float Accuracy { get; set; }
+
         public DateTime ScoreDateTime { get; set; }
         public DateTime LatestDateTime { get; set; }
 

@@ -235,6 +235,215 @@ namespace TaikoLogging
 
             SendData("Ranked Logs!A2:" + GetColumnName(Headers.Count), sendValues);
         }
+        public void UpdatePS4Single(Play play)
+        {
+            var Headers = GetHeaders("PS4");
+            string range = "PS4";
+
+            if (play.Account == "RinzoP")
+            {
+                range += " Messy";
+            }
+
+            range += "!A2:" + GetColumnName(Headers.Count);
+
+            var values = GetValues(range);
+
+            // This part should really be a function on its own, I use it in nearly every function here
+            int songIndex = -1;
+            if (values != null && values.Count > 0)
+            {
+                foreach (var row in values)
+                {
+                    if (row[Headers.IndexOf("Title")].ToString() == play.Title)
+                    {
+                        songIndex = values.IndexOf(row);
+                        break;
+                    }
+                }
+            }
+            if (songIndex == -1)
+            {
+                // something got fucked up
+                // probably a good idea to set up some form of logging for this sort of thing, but meh
+                //I don't even look at the logger, not gonna bother fixing this
+                //Program.logger.LogManyVariables("UpdatePS4HighScore: Song Not Found", headers, info);
+                Console.WriteLine("Couldn't find the song in the spreadsheet");
+                return;
+            }
+
+            string oldScore;
+            if (values[songIndex].Count < Headers.IndexOf("Score"))
+            {
+                oldScore = "0";
+            }
+            else
+            {
+                oldScore = values[songIndex][Headers.IndexOf("Score")].ToString().Replace(",", "");
+            }
+
+            bool newHighScore = false;
+            if (int.Parse(oldScore) < play.Score)
+            {
+                newHighScore = true;
+            }
+
+            string oldBestAcc;
+            if (values[songIndex].Count < Headers.IndexOf("Best Acc"))
+            {
+                oldBestAcc = "0";
+            }
+            else
+            {
+                oldBestAcc = values[songIndex][Headers.IndexOf("Best Acc")].ToString().Replace("%", "");
+            }
+
+            float AccPerOK = (1f / (play.GOOD + play.OK + play.BAD) / 2f) * 100;
+
+            bool newBestAcc = false;
+            bool almostBestAcc = false;
+            if (float.Parse(oldBestAcc) < play.Accuracy)
+            {
+                newBestAcc = true;
+            }
+            else if (((float.Parse(oldBestAcc) - play.Accuracy) / AccPerOK) <= 10) // This .01 value can be adjusted, I don't really know what's close or not when it comes to straight %
+            {
+                almostBestAcc = true;
+            }
+
+
+            //send all the information onto the sheet in the correct spots
+            IList<object> baseValues = new List<object>();
+            for (int i = 0; i < Headers.Count; i++)
+            {
+                if (Headers[i] == "Score" && newHighScore == true)
+                {
+                    baseValues.Add(play.Score);
+                }
+                else if (Headers[i] == "Acc" && newHighScore == true)
+                {
+                    baseValues.Add(string.Format("{0:F2}%", play.Accuracy));
+                }
+                else if (Headers[i] == "GOOD" && newHighScore == true)
+                {
+                    baseValues.Add(play.GOOD);
+                }
+                else if (Headers[i] == "OK" && newHighScore == true)
+                {
+                    baseValues.Add(play.OK);
+                }
+                else if (Headers[i] == "BAD" && newHighScore == true)
+                {
+                    baseValues.Add(play.BAD);
+                }
+                else if (Headers[i] == "Combo" && newHighScore == true)
+                {
+                    baseValues.Add(play.Combo);
+                }
+                else if (Headers[i] == "Drumroll" && newHighScore == true)
+                {
+                    baseValues.Add(play.Drumroll);
+                }
+                else if (Headers[i] == "HighScore DateTime" && newHighScore == true)
+                {
+                    baseValues.Add(play.Time.ToString("MM/dd/yyyy hh:mm tt"));
+                }
+                else if (Headers[i] == "Latest Play DateTime")
+                {
+                    baseValues.Add(play.Time.ToString("MM/dd/yyyy hh:mm tt"));
+                }
+                else if (Headers[i] == "Recent Acc")
+                {
+                    baseValues.Add(string.Format("{0:F2}%", play.RecentAcc));
+                }
+                else if (Headers[i] == "Best Acc" && newBestAcc == true)
+                {
+                    baseValues.Add(string.Format("{0:F2}%", play.Accuracy));
+                }
+                else
+                {
+                    baseValues.Add(null);
+                }
+            }
+
+            List<IList<object>> sendValues = new List<IList<object>>();
+            sendValues.Add(baseValues);
+
+            range = "PS4";
+            if (play.Account == "RinzoP")
+            {
+                range += " Messy";
+            }
+            range += "!A" + (songIndex + 2) + ":" + GetColumnName(Headers.Count) + (songIndex + 2);
+            SendData(range, sendValues);
+
+
+            // Send twitch messages
+            if (newHighScore)
+            {
+                string songTitle = play.Title;
+                if (play.Account == "RinzoP")
+                {
+                    songTitle += " Messy";
+                }
+                if (int.Parse(oldScore) == play.Score)
+                {
+                    Program.rin.SendTwitchMessage("Tied high score! " + songTitle + " = " + (play.Score - int.Parse(oldScore)).ToString());
+                }
+                else
+                {
+                    Program.rin.SendTwitchMessage("New high score! " + songTitle + " +" + (play.Score - int.Parse(oldScore)).ToString());
+                }
+            }
+            if (newBestAcc)
+            {
+                string songTitle = play.Title;
+                if (play.Account == "RinzoP")
+                {
+                    songTitle += " Messy";
+                }
+                string twitchMessage = "New best accuracy on " + songTitle + ". +" + string.Format("{0:F2}%", play.Accuracy - (float.Parse(oldBestAcc)));
+                twitchMessage += ", equivalent to " + Math.Round((play.Accuracy - float.Parse(oldBestAcc)) / AccPerOK) + " less OKs";
+                Program.rin.SendTwitchMessage(twitchMessage);
+            }
+            else if (almostBestAcc)
+            {
+                string songTitle = play.Title;
+                if (play.Account == "RinzoP")
+                {
+                    songTitle += " Messy";
+                }
+                if (int.Parse(oldBestAcc) == play.Accuracy && play.Accuracy != 1)
+                {
+                    Program.rin.SendTwitchMessage("Tied best accuracy on " + songTitle + " with " + string.Format("{0:F2}%", play.Accuracy) + "!");
+                }
+                else // bestAcc was close, but not tied
+                {
+                    string twitchMessage = "Almost best accuracy on " + songTitle + ". " + string.Format("{0:F2}%", (float.Parse(oldBestAcc) - play.Accuracy));
+                    twitchMessage += ", equivalent to " + (Math.Round((play.Accuracy - float.Parse(oldBestAcc)) / AccPerOK) * -1) + " more OKs";
+                    Program.rin.SendTwitchMessage(twitchMessage);
+                }
+            }
+
+            // Save images
+
+            if (newHighScore)
+            {
+                var fileSongTitle = Program.MakeValidFileName(play.Title);
+                DirectoryInfo dirInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores\" + play.Mode + @"\" + fileSongTitle);
+                if (dirInfo.Exists == false)
+                {
+                    dirInfo.Create();
+                }
+                var result = dirInfo.GetFiles();
+
+
+                play.Bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores\" + play.Mode + @"\" + fileSongTitle + "\\" + fileSongTitle + "." + play.Difficulty + "." + result.Length + ".png", ImageFormat.Png);
+
+            }
+
+
+        }
         public void UpdatePS4HighScore(Play play)
         {
             var Headers = GetHeaders(play.Difficulty.ToString());
@@ -343,7 +552,7 @@ namespace TaikoLogging
                 {
                     baseValues.Add(play.BAD);
                 }
-                else if (Headers[i] == "MAX Combo")
+                else if (Headers[i] == "Combo")
                 {
                     baseValues.Add(play.Combo);
                 }
@@ -400,7 +609,6 @@ namespace TaikoLogging
                 }
                 var result = dirInfo.GetFiles();
                 play.Bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores\Messy\" + fileSongTitle + "\\" + fileSongTitle + "." + play.Difficulty + "." + result.Length + ".png", ImageFormat.Png);
-
             }
 
 
@@ -592,7 +800,7 @@ namespace TaikoLogging
             }
             IList<object> baseValues = new List<object>
             {
-                play.RecentOKs, play.RecentBads
+                //play.RecentOKs, play.RecentBads
             };
             List<IList<object>> sendValues = new List<IList<object>>();
             sendValues.Add(baseValues);

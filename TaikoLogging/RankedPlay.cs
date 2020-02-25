@@ -13,6 +13,9 @@ namespace TaikoLogging
         public string Result { get; set; }
 
         public int OppScore { get; set; }
+
+        public float OppAcc { get; set; }
+
         public int OppGOOD { get; set; }
         public int OppOK { get; set; }
         public int OppBAD { get; set; }

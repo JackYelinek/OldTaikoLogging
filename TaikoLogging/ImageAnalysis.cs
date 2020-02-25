@@ -650,11 +650,11 @@ namespace TaikoLogging
                 }
             }
 
-            if (play.Difficulty == Difficulty.Easy || play.Difficulty == Difficulty.Normal)
+            if (play.Difficulty == Difficulty.Easy || play.Difficulty == Difficulty.Normal || play.Difficulty == Difficulty.Hard)
             {
                 // I don't care about easy or normal for my sheet
                 // I don't really care about hard either, but I have the sheet anyway, so might as well save it if I get it
-                Console.WriteLine("Quit Analysis.\n");
+                Console.WriteLine("Quit Analysis. (Not Oni/Ura Difficulty)\n");
                 return;
             }
 
@@ -678,6 +678,11 @@ namespace TaikoLogging
                 return;
             }
 
+            if (play.Difficulty == Difficulty.Ura)
+            {
+                play.Title += " (裏)";
+            }
+
             play.Score = GetScore(play.Bmp, play.Players);
 
             play.GOOD = GetGoods(play.Bmp, play.Players);
@@ -685,6 +690,8 @@ namespace TaikoLogging
             play.BAD = GetBads(play.Bmp, play.Players);
             play.Combo = GetCombo(play.Bmp, play.Players);
             play.Drumroll = GetDrumroll(play.Bmp, play.Players);
+
+            play.Accuracy = ((play.GOOD + (play.OK / 2f)) / (play.GOOD + play.OK + play.BAD)) * 100;
 
             if (play.Score % 10 != 0)
             {
@@ -695,16 +702,24 @@ namespace TaikoLogging
             bool highScore = IsHighScore(play.Bmp);
 
             play.Mode = "Normal";
+            for (int i = 0; i < play.Mods.Count; i++)
+            {
+                if (play.Mods[i] == "Messy")
+                {
+                    play.Mode = "Messy";
+                }
+            }
 
             play = UpdateDBFile(play);
 
-            Program.sheet.UpdatePS4BestGoods(play);
-            Program.sheet.UpdateRecentOKs(play);
-            Program.sheet.AddRecentPlay(play);
+            //Program.sheet.UpdatePS4BestGoods(play);
+            //Program.sheet.UpdateRecentOKs(play);
+            // TODO: Update AddRecentPlay
+            //Program.sheet.AddRecentPlay(play);
             if ( /*highScore == true && */ isShinUchi == false)
             {
-                Program.sheet.UpdatePS4HighScore(play);
-
+                //Program.sheet.UpdatePS4HighScore(play);
+                Program.sheet.UpdatePS4Single(play);
                 //DirectoryInfo dirInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores");
                 //var result = dirInfo.GetFiles();
                 // NOT USED, NOT TESTING
@@ -748,6 +763,11 @@ namespace TaikoLogging
             }
             play.Difficulty = CheckDifficulty(play.Bmp, Players.RankedTop);
 
+            if (play.Difficulty == Difficulty.Ura)
+            {
+                play.Title += " (裏)";
+            }
+
             // Top Player Data
             play.Score = GetScore(play.Bmp, Players.RankedTop);
             play.GOOD = GetGoods(play.Bmp, Players.RankedTop);
@@ -756,6 +776,8 @@ namespace TaikoLogging
             play.Combo = GetCombo(play.Bmp, Players.RankedTop);
             play.Drumroll = GetDrumroll(play.Bmp, Players.RankedTop);
 
+            play.Accuracy = ((play.GOOD + (play.OK / 2f)) / (play.GOOD + play.OK + play.BAD)) * 100;
+
             // Bottom Player Data
             play.OppScore = GetScore(play.Bmp, Players.RankedBottom);
             play.OppGOOD = GetGoods(play.Bmp, Players.RankedBottom);
@@ -763,6 +785,8 @@ namespace TaikoLogging
             play.OppBAD = GetBads(play.Bmp, Players.RankedBottom);
             play.OppCombo = GetCombo(play.Bmp, Players.RankedBottom);
             play.OppDrumroll = GetDrumroll(play.Bmp, Players.RankedBottom);
+
+            play.OppAcc =  (play.OppGOOD + (play.OppOK / 2)) / (play.OppGOOD + play.OppOK + play.OppBAD);
 
             // Result Data
             play.Result = GetRankedWinLoss(play.Bmp);
@@ -782,8 +806,7 @@ namespace TaikoLogging
                 return;
             }
             var tmpPlay = UpdateDBFile(play);
-            play.RecentOKs = tmpPlay.RecentOKs;
-            play.RecentBads = tmpPlay.RecentBads;
+            play.RecentAcc = tmpPlay.RecentAcc;
 
             Program.sheet.AddRankedEntry(play);
             Program.sheet.UpdatePS4BestGoods(play);
@@ -1540,13 +1563,12 @@ namespace TaikoLogging
         private Play UpdateDBFile(Play play)
         {
             // This is gonna look at a .dbtja file
-            int totalOKs = 0;
-            int totalBads = 0;
+            float totalAcc = 0;
             int plays = 0;
 
             const string DBTjaFolderPath = @"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\DBTJA Data\";
 
-            string filePath = DBTjaFolderPath + Program.MakeValidFileName(play.Title) + "." + play.Difficulty.ToString();// + ".dbtja";
+            string filePath = DBTjaFolderPath + Program.MakeValidFileName(play.Title);// + ".dbtja";
 
             if (play.Account == "RinzoP")
             {
@@ -1559,7 +1581,7 @@ namespace TaikoLogging
                 // Keep the latest play at the top of them
                 var lines = File.ReadAllLines(filePath);
 
-                string newLine = play.OK.ToString() + "\t" + play.BAD.ToString();
+                string newLine = play.Accuracy.ToString();
 
                 string[] newLines = new string[Math.Min(lines.Length + 1, 10)];
                 newLines[0] = newLine;
@@ -1569,70 +1591,46 @@ namespace TaikoLogging
                     newLines[i + 1] = lines[i];
                 }
 
-                double oldRecentOKs = 0.0f;
-                double oldRecentBads = 0.0f;
+                float oldRecentAcc = 0.0f;
                 for (int i = 0; i < lines.Length; i++)
                 {
-                    var splitPlay = lines[i].Split('\t');
-                    oldRecentOKs += double.Parse(splitPlay[0]);
-                    oldRecentBads += double.Parse(splitPlay[1]);
+                    oldRecentAcc += float.Parse(lines[i]);
                 }
 
-                oldRecentOKs = oldRecentOKs / lines.Length;
-                oldRecentBads = oldRecentBads / lines.Length;
+                oldRecentAcc /= lines.Length;
 
                 File.WriteAllLines(filePath, newLines);
 
                 for (int i = 0; i < newLines.Length; i++)
                 {
-                    var splitPlay = newLines[i].Split('\t');
-                    totalOKs += int.Parse(splitPlay[0]);
-                    totalBads += int.Parse(splitPlay[1]);
+                    totalAcc += float.Parse(newLines[i]);
                     plays++;
                 }
 
-                play.RecentOKs = (double)totalOKs / plays;
-                play.RecentBads = (double)totalBads / plays;
-                double recentOKsDiff = play.RecentOKs - oldRecentOKs;
-                double recentBadsDiff = play.RecentBads - oldRecentBads;
-                string message = "\nRecent OKs ";
-                if (recentOKsDiff > 0)
+                play.RecentAcc = (float)totalAcc / plays;
+                double recentAccDiff = play.RecentAcc - oldRecentAcc;
+                string message = "\nRecent Accuracy ";
+                if (recentAccDiff > 0)
                 {
-                    message += "+" + string.Format("{0:F2}", recentOKsDiff) + " -> " + string.Format("{0:F2}", play.RecentOKs);
+                    message += "+" + string.Format("{0:F2}%", recentAccDiff) + " -> " + string.Format("{0:F2}%", play.RecentAcc);
                 }
-                else if (recentOKsDiff == 0)
+                else if (recentAccDiff == 0)
                 {
-                    message += "+0.0" + " -> " + string.Format("{0:F2}", play.RecentOKs);
+                    message += "+0.0" + " -> " + string.Format("{0:F2}", play.RecentAcc);
                 }
-                else // recentOKsDiff < 0
+                else // recentAccDiff < 0
                 {
-                    message += string.Format("{0:F2}", recentOKsDiff) + " -> " + string.Format("{0:F2}", play.RecentOKs);
-                }
-                message += "\nRecent Bads ";
-                if (recentBadsDiff > 0)
-                {
-                    message += "+" + string.Format("{0:F2}", recentBadsDiff) + " -> " + string.Format("{0:F2}", play.RecentBads);
-                }
-                else if (recentBadsDiff == 0)
-                {
-                    message += "+0.0" + " -> " + string.Format("{0:F2}", play.RecentBads);
-                }
-                else // recentBadsDiff < 0
-                {
-                    message += string.Format("{0:F2}", recentBadsDiff) + " -> " + string.Format("{0:F2}", play.RecentBads);
+                    message += string.Format("{0:F2}%", recentAccDiff) + " -> " + string.Format("{0:F2}%", play.RecentAcc);
                 }
                 Console.WriteLine(message);
             }
             else
             {
-                play.RecentOKs = play.OK;
-                play.RecentBads = play.BAD;
-                string line = play.OK.ToString() + "\t" + play.BAD.ToString();
+                play.RecentAcc = play.Accuracy;
+                string line = play.Accuracy.ToString();
                 File.WriteAllText(filePath, line);
-                string message = "\nRecent OKs = " + string.Format("{0:F2}", play.RecentOKs) + "\n";
-                message += "Recent Bads = " + string.Format("{0:F2}", play.RecentBads);
+                string message = "\nRecent Accuracy = " + string.Format("{0:F2}%", play.RecentAcc) + "\n";
                 Console.WriteLine(message);
-
             }
             return play;
         }

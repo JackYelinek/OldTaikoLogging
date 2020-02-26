@@ -25,9 +25,11 @@ namespace TaikoLogging.Emulator
         public DateTime ScoreDateTime { get; set; }
         public DateTime LatestDateTime { get; set; }
 
+        public ImageAnalysis.Mode Mode { get; set; }
+
         public Play()
         {
-
+            Mode = ImageAnalysis.Mode.Emulator;
         }
     }
 }

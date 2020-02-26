@@ -28,10 +28,11 @@ namespace TaikoLogging
         //public double RecentOKs { get; set; }
         //public double RecentBads { get; set; }
         public float RecentAcc { get; set; }
+        public float RecentAccChange { get; set; }
 
         public List<string> Mods { get; set; }
         public string Account { get; set; }
-        public string Mode { get; set; }
+        public ImageAnalysis.Mode Mode { get; set; }
 
         public DateTime Time { get; set; }
         public ImageAnalysis.Players Players { get; set; }
@@ -39,6 +40,7 @@ namespace TaikoLogging
         {
             // DateTime.Now.ToString("MM/dd/yyyy hh:mm tt")
             Time = DateTime.Now;
+            Mods = new List<string>();
         }
 
 

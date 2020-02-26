@@ -25,6 +25,8 @@ namespace TaikoLogging
         State previousState;
         State currentState;
 
+        public enum Mode { PS4Single, PS4Ranked, PS4Messy, Emulator, SwitchSingle, SwitchRanked};
+
         public enum Players { Single, RankedTop, RankedBottom };
 
         List<Bitmap> stateBitmaps = new List<Bitmap>();
@@ -682,6 +684,7 @@ namespace TaikoLogging
             {
                 play.Title += " (裏)";
             }
+            Console.WriteLine(play.Title);
 
             play.Score = GetScore(play.Bmp, play.Players);
 
@@ -701,21 +704,18 @@ namespace TaikoLogging
 
             bool highScore = IsHighScore(play.Bmp);
 
-            play.Mode = "Normal";
+            play.Mode = Mode.PS4Single;
             for (int i = 0; i < play.Mods.Count; i++)
             {
                 if (play.Mods[i] == "Messy")
                 {
-                    play.Mode = "Messy";
+                    play.Mode = Mode.PS4Messy;
                 }
             }
 
             play = UpdateDBFile(play);
 
-            //Program.sheet.UpdatePS4BestGoods(play);
-            //Program.sheet.UpdateRecentOKs(play);
-            // TODO: Update AddRecentPlay
-            //Program.sheet.AddRecentPlay(play);
+            Program.sheet.AddRecentPlay(play);
             if ( /*highScore == true && */ isShinUchi == false)
             {
                 //Program.sheet.UpdatePS4HighScore(play);
@@ -725,7 +725,6 @@ namespace TaikoLogging
                 // NOT USED, NOT TESTING
                 //bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\HighScores\" + result.Length + ".png", ImageFormat.Png);
             }
-            Console.WriteLine(play.Title);
             Console.WriteLine("Analysis Complete\n");
             if (randomMode == true)
             {
@@ -750,7 +749,7 @@ namespace TaikoLogging
             if (play.Account != "Deathblood")
             {
                 // I don't care if it's ranked on my alt
-                Console.WriteLine("Quit Analysis.\n");
+                Console.WriteLine("Quit Analysis. (Wrong Account Found)\n");
                 return;
             }
 
@@ -758,7 +757,7 @@ namespace TaikoLogging
             play.Title = GetTitle(play.Bmp);
             if (play.Title == "")
             {
-                Console.WriteLine("Quit Analysis.\n");
+                Console.WriteLine("Quit Analysis. (Can't read title)\n");
                 return;
             }
             play.Difficulty = CheckDifficulty(play.Bmp, Players.RankedTop);
@@ -767,6 +766,8 @@ namespace TaikoLogging
             {
                 play.Title += " (裏)";
             }
+
+            Console.WriteLine(play.Title);
 
             // Top Player Data
             play.Score = GetScore(play.Bmp, Players.RankedTop);
@@ -786,12 +787,12 @@ namespace TaikoLogging
             play.OppCombo = GetCombo(play.Bmp, Players.RankedBottom);
             play.OppDrumroll = GetDrumroll(play.Bmp, Players.RankedBottom);
 
-            play.OppAcc =  (play.OppGOOD + (play.OppOK / 2)) / (play.OppGOOD + play.OppOK + play.OppBAD);
+            play.OppAcc = ((play.OppGOOD + (play.OppOK / 2f)) / (play.OppGOOD + play.OppOK + play.OppBAD)) * 100;
 
             // Result Data
             play.Result = GetRankedWinLoss(play.Bmp);
 
-            play.Mode = "Ranked";
+            play.Mode = Mode.PS4Ranked;
             // Check to see if the scores are possible, they must always end with a 0
             if (play.Score % 10 != 0 || play.OppScore % 10 != 0)
             {
@@ -809,12 +810,9 @@ namespace TaikoLogging
             play.RecentAcc = tmpPlay.RecentAcc;
 
             Program.sheet.AddRankedEntry(play);
-            Program.sheet.UpdatePS4BestGoods(play);
             Program.sheet.AddRecentPlay(play);
-            Program.sheet.UpdateRecentOKs(play);
-            Console.WriteLine(play.Title);
             Console.WriteLine("Analysis Complete\n");
-
+            return;
         }
 
         public void FixRankedLogs()
@@ -1570,7 +1568,7 @@ namespace TaikoLogging
 
             string filePath = DBTjaFolderPath + Program.MakeValidFileName(play.Title);// + ".dbtja";
 
-            if (play.Account == "RinzoP")
+            if (play.Account == "RinzoP" || play.Mods.IndexOf("Messy") != -1)
             {
                 filePath += ".Messy";
             }
@@ -1608,25 +1606,26 @@ namespace TaikoLogging
                 }
 
                 play.RecentAcc = (float)totalAcc / plays;
-                double recentAccDiff = play.RecentAcc - oldRecentAcc;
+                play.RecentAccChange = play.RecentAcc - oldRecentAcc;
                 string message = "\nRecent Accuracy ";
-                if (recentAccDiff > 0)
+                if (play.RecentAccChange > 0)
                 {
-                    message += "+" + string.Format("{0:F2}%", recentAccDiff) + " -> " + string.Format("{0:F2}%", play.RecentAcc);
+                    message += "+" + string.Format("{0:F2}%", play.RecentAccChange) + " -> " + string.Format("{0:F2}%", play.RecentAcc);
                 }
-                else if (recentAccDiff == 0)
+                else if (play.RecentAccChange == 0)
                 {
                     message += "+0.0" + " -> " + string.Format("{0:F2}", play.RecentAcc);
                 }
                 else // recentAccDiff < 0
                 {
-                    message += string.Format("{0:F2}%", recentAccDiff) + " -> " + string.Format("{0:F2}%", play.RecentAcc);
+                    message += string.Format("{0:F2}%", play.RecentAccChange) + " -> " + string.Format("{0:F2}%", play.RecentAcc);
                 }
                 Console.WriteLine(message);
             }
             else
             {
                 play.RecentAcc = play.Accuracy;
+                play.RecentAccChange = play.RecentAcc;
                 string line = play.Accuracy.ToString();
                 File.WriteAllText(filePath, line);
                 string message = "\nRecent Accuracy = " + string.Format("{0:F2}%", play.RecentAcc) + "\n";

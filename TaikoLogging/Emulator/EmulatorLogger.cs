@@ -106,18 +106,23 @@ namespace TaikoLogging.Emulator
 
             play.Score = int.Parse(lines[index + 1].Remove(0, lines[index + 1].IndexOf("=") + 1));
 
-            play.Goods = int.Parse(lines[index + 4].Remove(0, lines[index + 4].IndexOf("=") + 1));
-            play.OKs = int.Parse(lines[index + 5].Remove(0, lines[index + 5].IndexOf("=") + 1));
-            play.Bads = int.Parse(lines[index + 8].Remove(0, lines[index + 8].IndexOf("=") + 1));
+            play.GOOD = int.Parse(lines[index + 4].Remove(0, lines[index + 4].IndexOf("=") + 1));
+            play.OK = int.Parse(lines[index + 5].Remove(0, lines[index + 5].IndexOf("=") + 1));
+            play.BAD = int.Parse(lines[index + 8].Remove(0, lines[index + 8].IndexOf("=") + 1));
             play.Combo = int.Parse(lines[index + 9].Remove(0, lines[index + 9].IndexOf("=") + 1));
 
+            play.Accuracy = ((play.GOOD + (play.OK / 2f)) / (play.GOOD + play.OK + play.BAD)) * 100;
 
             play.ScoreDateTime = DateTime.Parse(lines[index + 50].Remove(0, lines[index + 50].IndexOf("=") + 1));
             play.LatestDateTime = DateTime.Parse(lines[lastPlayIndex + 50].Remove(0, lines[lastPlayIndex + 50].IndexOf("=") + 1));
 
+            play.LastScore = int.Parse(lines[lastPlayIndex + 1].Remove(0, lines[lastPlayIndex + 1].IndexOf("=") + 1));
             play.LastGoods = int.Parse(lines[lastPlayIndex + 4].Remove(0, lines[lastPlayIndex + 4].IndexOf("=") + 1));
             play.LastOKs = int.Parse(lines[lastPlayIndex + 5].Remove(0, lines[lastPlayIndex + 5].IndexOf("=") + 1));
             play.LastBads = int.Parse(lines[lastPlayIndex + 8].Remove(0, lines[lastPlayIndex + 8].IndexOf("=") + 1));
+            play.LastCombo = int.Parse(lines[lastPlayIndex + 9].Remove(0, lines[lastPlayIndex + 9].IndexOf("=") + 1));
+
+            play.LastAcc = ((play.LastGoods + (play.LastOKs / 2f)) / (play.LastGoods + play.LastOKs + play.LastBads)) * 100;
 
             if (play.LatestDateTime > previousPlayTime)
             {
@@ -125,9 +130,10 @@ namespace TaikoLogging.Emulator
                 if (previousPlayTime.Ticks != 0)
                 {
                     play = UpdateDBFile(play);
+                    Program.sheet.AddRecentEmulatorPlay(play);
                 }
                 Program.sheet.UpdateEmulatorHighScore(play);
-                Console.WriteLine(play.SongData.SongTitle + " logged\n");
+                Console.WriteLine(play.SongData.SongTitle + " logged\t" + string.Format("{0:F2}%\n", play.LastAcc));
                 previousPlayTime = play.LatestDateTime;
             }
         }
@@ -135,8 +141,7 @@ namespace TaikoLogging.Emulator
         private Play UpdateDBFile(Play play)
         {
             // This is gonna look at a .dbtja file
-            int totalOKs = 0;
-            int totalBads = 0;
+            float totalAcc = 0;
             int plays = 0;
 
             if (File.Exists(play.SongData.DBTjaFilePath) == true)
@@ -144,7 +149,7 @@ namespace TaikoLogging.Emulator
                 // Keep the latest play at the top of them
                 var lines = File.ReadAllLines(play.SongData.DBTjaFilePath);
 
-                string newLine = play.LastOKs.ToString() + "\t" + play.LastBads.ToString();
+                string newLine = play.LastAcc.ToString();
 
                 string[] newLines = new string[Math.Min(lines.Length + 1, 10)];
                 newLines[0] = newLine;
@@ -154,70 +159,47 @@ namespace TaikoLogging.Emulator
                     newLines[i + 1] = lines[i];
                 }
 
-                double oldRecentOKs = 0.0f;
-                double oldRecentBads = 0.0f;
+                float oldRecentAcc = 0.0f;
                 for (int i = 0; i < lines.Length; i++)
                 {
-                    var splitPlay = lines[i].Split('\t');
-                    oldRecentOKs += double.Parse(splitPlay[0]);
-                    oldRecentBads += double.Parse(splitPlay[1]);
+                    oldRecentAcc += float.Parse(lines[i]);
                 }
 
-                oldRecentOKs = oldRecentOKs / lines.Length;
-                oldRecentBads = oldRecentBads / lines.Length;
+                oldRecentAcc /= lines.Length;
 
                 File.WriteAllLines(play.SongData.DBTjaFilePath, newLines);
 
                 for (int i = 0; i < newLines.Length; i++)
                 {
-                    var splitPlay = newLines[i].Split('\t');
-                    totalOKs += int.Parse(splitPlay[0]);
-                    totalBads += int.Parse(splitPlay[1]);
+                    totalAcc += float.Parse(newLines[i]);
                     plays++;
                 }
 
-                play.RecentOKs = (double)totalOKs / plays;
-                play.RecentBads = (double)totalBads / plays;
-                double recentOKsDiff = play.RecentOKs - oldRecentOKs;
-                double recentBadsDiff = play.RecentBads - oldRecentBads;
-                string message = "\nRecent OKs ";
-                if (recentOKsDiff > 0)
+                play.RecentAcc = (float)totalAcc / plays;
+                play.RecentAccChange = play.RecentAcc - oldRecentAcc;
+                string message = "\nRecent Accuracy ";
+                if (play.RecentAccChange > 0)
                 {
-                    message += "+" + string.Format("{0:F2}", recentOKsDiff) + " -> " + string.Format("{0:F2}", play.RecentOKs);
+                    message += "+" + string.Format("{0:F2}%", play.RecentAccChange) + " -> " + string.Format("{0:F2}%", play.RecentAcc);
                 }
-                else if (recentOKsDiff == 0)
+                else if (play.RecentAccChange == 0)
                 {
-                    message += "+0.0" + " -> " + string.Format("{0:F2}", play.RecentOKs);
+                    message += "+0.0" + " -> " + string.Format("{0:F2}", play.RecentAcc);
                 }
-                else // recentOKsDiff < 0
+                else // recentAccDiff < 0
                 {
-                    message += string.Format("{0:F2}", recentOKsDiff) + " -> " + string.Format("{0:F2}", play.RecentOKs);
-                }
-                message += "\nRecent Bads ";
-                if (recentBadsDiff > 0)
-                {
-                    message += "+" + string.Format("{0:F2}", recentBadsDiff) + " -> " + string.Format("{0:F2}", play.RecentBads);
-                }
-                else if (recentBadsDiff == 0)
-                {
-                    message += "+0.0" + " -> " + string.Format("{0:F2}", play.RecentBads);
-                }
-                else // recentBadsDiff < 0
-                {
-                    message += string.Format("{0:F2}", recentBadsDiff) + " -> " + string.Format("{0:F2}", play.RecentBads);
+                    message += string.Format("{0:F2}%", play.RecentAccChange) + " -> " + string.Format("{0:F2}%", play.RecentAcc);
                 }
                 Console.WriteLine(message);
             }
             else
             {
-                play.RecentOKs = play.LastOKs;
-                play.RecentBads = play.LastBads;
-                string line = play.LastOKs.ToString() + "\t" + play.LastBads.ToString();
+                play.RecentAcc = play.LastAcc;
+                play.RecentAccChange = play.RecentAcc;
+                string line = play.LastAcc.ToString();
                 File.WriteAllText(play.SongData.DBTjaFilePath, line);
-                string message = "\nRecent OKs = " + string.Format("{0:F2}", play.RecentOKs) + "\n";
-                message += "Recent Bads = " + string.Format("{0:F2}", play.RecentBads);
+                string message = "\nRecent Accuracy = " + string.Format("{0:F2}%", play.RecentAcc) + "\n";
                 Console.WriteLine(message);
-
             }
             return play;
         }

@@ -810,77 +810,78 @@ namespace TaikoLogging
             play.RecentAcc = tmpPlay.RecentAcc;
 
             Program.sheet.AddRankedEntry(play);
+            Program.sheet.UpdatePS4Single(play);
             Program.sheet.AddRecentPlay(play);
             Console.WriteLine("Analysis Complete\n");
             return;
         }
 
-        public void FixRankedLogs()
-        {
-            DirectoryInfo dirInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\Image Data\Ranked Logs");
-            var results = dirInfo.GetFiles();
+        //public void FixRankedLogs()
+        //{
+        //    DirectoryInfo dirInfo = new DirectoryInfo(@"D:\My Stuff\My Programs\Taiko\Image Data\Ranked Logs");
+        //    var results = dirInfo.GetFiles();
 
-            for (int i = 0; i < results.Length; i++)
-            {
-                if (int.Parse(results[i].Name.Remove(results[i].Name.IndexOf('.'))) < 1640)
-                {
-                    continue;
-                }
-                using (Bitmap bmp = new Bitmap(results[i].FullName))
-                {
-                    int matchNumber = int.Parse(results[i].Name.Remove(results[i].Name.IndexOf('.')));
+        //    for (int i = 0; i < results.Length; i++)
+        //    {
+        //        if (int.Parse(results[i].Name.Remove(results[i].Name.IndexOf('.'))) < 1640)
+        //        {
+        //            continue;
+        //        }
+        //        using (Bitmap bmp = new Bitmap(results[i].FullName))
+        //        {
+        //            int matchNumber = int.Parse(results[i].Name.Remove(results[i].Name.IndexOf('.')));
 
-                    List<object> info = new List<object>();
-                    List<string> headers = new List<string>();
+        //            List<object> info = new List<object>();
+        //            List<string> headers = new List<string>();
 
-                    info.Add(GetTitle(bmp));
-                    headers.Add("Title");
-                    if (info[headers.IndexOf("Title")].ToString() == "")
-                    {
-                        return;
-                    }
-                    info.Add(CheckDifficulty(bmp, Players.RankedTop));
-                    headers.Add("Difficulty");
+        //            info.Add(GetTitle(bmp));
+        //            headers.Add("Title");
+        //            if (info[headers.IndexOf("Title")].ToString() == "")
+        //            {
+        //                return;
+        //            }
+        //            info.Add(CheckDifficulty(bmp, Players.RankedTop));
+        //            headers.Add("Difficulty");
 
-                    // Top Player Data
-                    info.Add(GetScore(bmp, Players.RankedTop));
-                    headers.Add("My Score");
-                    info.Add(GetGoods(bmp, Players.RankedTop));
-                    headers.Add("My Goods");
-                    info.Add(GetOKs(bmp, Players.RankedTop));
-                    headers.Add("My OKs");
-                    info.Add(GetBads(bmp, Players.RankedTop));
-                    headers.Add("My Bads");
-                    info.Add(GetCombo(bmp, Players.RankedTop));
-                    headers.Add("My Combo");
-                    info.Add(GetDrumroll(bmp, Players.RankedTop));
-                    headers.Add("My Drumroll");
+        //            // Top Player Data
+        //            info.Add(GetScore(bmp, Players.RankedTop));
+        //            headers.Add("My Score");
+        //            info.Add(GetGoods(bmp, Players.RankedTop));
+        //            headers.Add("My Goods");
+        //            info.Add(GetOKs(bmp, Players.RankedTop));
+        //            headers.Add("My OKs");
+        //            info.Add(GetBads(bmp, Players.RankedTop));
+        //            headers.Add("My Bads");
+        //            info.Add(GetCombo(bmp, Players.RankedTop));
+        //            headers.Add("My Combo");
+        //            info.Add(GetDrumroll(bmp, Players.RankedTop));
+        //            headers.Add("My Drumroll");
 
-                    // Bottom Player Data
-                    info.Add(GetScore(bmp, Players.RankedBottom));
-                    headers.Add("Opp Score");
-                    info.Add(GetGoods(bmp, Players.RankedBottom));
-                    headers.Add("Opp Goods");
-                    info.Add(GetOKs(bmp, Players.RankedBottom));
-                    headers.Add("Opp OKs");
-                    info.Add(GetBads(bmp, Players.RankedBottom));
-                    headers.Add("Opp Bads");
-                    info.Add(GetCombo(bmp, Players.RankedBottom));
-                    headers.Add("Opp Combo");
-                    info.Add(GetDrumroll(bmp, Players.RankedBottom));
-                    headers.Add("Opp Drumroll");
+        //            // Bottom Player Data
+        //            info.Add(GetScore(bmp, Players.RankedBottom));
+        //            headers.Add("Opp Score");
+        //            info.Add(GetGoods(bmp, Players.RankedBottom));
+        //            headers.Add("Opp Goods");
+        //            info.Add(GetOKs(bmp, Players.RankedBottom));
+        //            headers.Add("Opp OKs");
+        //            info.Add(GetBads(bmp, Players.RankedBottom));
+        //            headers.Add("Opp Bads");
+        //            info.Add(GetCombo(bmp, Players.RankedBottom));
+        //            headers.Add("Opp Combo");
+        //            info.Add(GetDrumroll(bmp, Players.RankedBottom));
+        //            headers.Add("Opp Drumroll");
 
-                    // Result Data
-                    info.Add(GetRankedWinLoss(bmp));
-                    headers.Add("Win/Loss");
+        //            // Result Data
+        //            info.Add(GetRankedWinLoss(bmp));
+        //            headers.Add("Win/Loss");
 
-                    Program.sheet.FixRankedLogsData(info, headers, matchNumber);
+        //            Program.sheet.FixRankedLogsData(info, headers, matchNumber);
 
-                }
-            }
+        //        }
+        //    }
 
 
-        }
+        //}
 
 
 

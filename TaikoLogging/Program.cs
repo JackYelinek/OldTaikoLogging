@@ -22,9 +22,12 @@ namespace TaikoLogging
         static public Emulator.EmulatorLogger emulatorLogger = new Emulator.EmulatorLogger();
         static public Commands commands = new Commands();
 
-        public enum Game { PS4, Emulator, None };
+        public enum Game { PS4, Emulator, None, OldVideo };
         // PS4 or Emulator, so I can know at any place
         static public Game currentGame = Game.None;
+
+        static public DateTime programStartTime = DateTime.Now;
+        static public DateTime videoStartTime = DateTime.Parse("2017-11-02 13:23:01");
 
         static void Main(string[] args)
         {
@@ -45,6 +48,12 @@ namespace TaikoLogging
 
                 twitchOn = screen.CheckTwitch();
 
+                //bool testing = false;
+                //if (testing == true)
+                //{
+                //    analysis.NotStandardLoop();
+                //}
+
                 if (currentGame == Game.PS4)
                 {
                     // This part is just temporarily if I'm streaming and the function's broken (which it currently isn't)
@@ -58,6 +67,11 @@ namespace TaikoLogging
                     //    Thread.Sleep(100000000);
                     //    break;
                     //}
+                }
+                else if (currentGame == Game.OldVideo)
+                {
+                    twitchOn = false;
+                    analysis.OldVideoLoop();
                 }
                 else if (currentGame == Game.Emulator)
                 {
@@ -75,9 +89,14 @@ namespace TaikoLogging
         {
             var obsProcesses = Process.GetProcessesByName("obs64");
             var tjaProcesses = Process.GetProcessesByName("TJAPlayer3");
+            var vlcProcesses = Process.GetProcessesByName("VLC");
             if (tjaProcesses.Length != 0)
             {
                 currentGame = Game.Emulator;
+            }
+            else if (vlcProcesses.Length != 0)
+            {
+                currentGame = Game.OldVideo;
             }
             else if (obsProcesses.Length != 0)
             {

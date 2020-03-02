@@ -104,10 +104,41 @@ namespace TaikoLogging
             System.GC.Collect();
         }
 
+        public void OldVideoLoop()
+        {
+            using (Bitmap bmp = Program.screen.CaptureApplication())
+            {
+                CheckState(bmp);
+                if (currentState == State.PS4CaptureGallery)
+                {
+                    inCaptureGallery = true;
+                }
+                if (currentState == State.PS4MainMenu)
+                {
+                    inCaptureGallery = false;
+                }
+                //if (previousState != currentState)
+                //{
+                //    //Console.WriteLine(currentState);
+                //    bmp.Save(@"D:\My Stuff\My Programs\Taiko\Image Data\Test Data\TestingStates\" + j++ + "." + currentState + ".png");
+                //}
+                if (previousState != currentState && inCaptureGallery == false)
+                {
+                    if (currentState == State.SingleResults || currentState == State.SingleSessionResults || currentState == State.RankedResults)
+                    {
+                        Thread.Sleep(3500);
+                        AnalyzeResults();
+                    }
+                }
+            }
+            System.GC.Collect();
+        }
+
         public void NotStandardLoop()
         {
             // For something that'd be looped, but isn't the real deal, just testing stuff usually
-
+            Program.sheet.GetRandomSong();
+            Console.ReadKey();
             // Time to start working in this function again
         }
         public void SingleLoop()
@@ -652,7 +683,7 @@ namespace TaikoLogging
                 }
             }
 
-            if (play.Difficulty == Difficulty.Easy || play.Difficulty == Difficulty.Normal || play.Difficulty == Difficulty.Hard)
+            if (play.Difficulty == Difficulty.Easy || play.Difficulty == Difficulty.Normal)
             {
                 // I don't care about easy or normal for my sheet
                 // I don't really care about hard either, but I have the sheet anyway, so might as well save it if I get it
@@ -684,6 +715,10 @@ namespace TaikoLogging
             {
                 play.Title += " (裏)";
             }
+            else if (play.Difficulty == Difficulty.Hard)
+            {
+                play.Title += " Hard";
+            }
             Console.WriteLine(play.Title);
 
             play.Score = GetScore(play.Bmp, play.Players);
@@ -711,6 +746,13 @@ namespace TaikoLogging
                 {
                     play.Mode = Mode.PS4Messy;
                 }
+            }
+
+
+            if (Program.currentGame == Program.Game.OldVideo)
+            {
+                Program.sheet.AddOldVideoPlay(play);
+                return;
             }
 
             play = UpdateDBFile(play);
@@ -766,6 +808,10 @@ namespace TaikoLogging
             {
                 play.Title += " (裏)";
             }
+            else if (play.Difficulty == Difficulty.Hard)
+            {
+                play.Title += " Hard";
+            }
 
             Console.WriteLine(play.Title);
 
@@ -804,6 +850,13 @@ namespace TaikoLogging
             {
                 Console.WriteLine("Score was 0 (Not gonna happen in ranked ever)");
                 Console.WriteLine("Quit Analysis.\n");
+                return;
+            }
+
+
+            if (Program.currentGame == Program.Game.OldVideo)
+            {
+                Program.sheet.AddOldVideoPlay(play);
                 return;
             }
             var tmpPlay = UpdateDBFile(play);
@@ -1636,6 +1689,11 @@ namespace TaikoLogging
         }
         public void AddNewSongTitleBitmap(Bitmap bmp, string songTitle)
         {
+            if (Program.currentGame == Program.Game.OldVideo)
+            {
+                return;
+            }
+
             ClearTitleBitmaps();
             ClearRankedTitleBitmaps();
             string folder = @"D:\My Stuff\My Programs\Taiko\TaikoLogging\TaikoLogging\Data\";

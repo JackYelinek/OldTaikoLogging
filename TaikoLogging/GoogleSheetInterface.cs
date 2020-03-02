@@ -299,11 +299,11 @@ namespace TaikoLogging
 
             bool newBestAcc = false;
             bool almostBestAcc = false;
-            if (float.Parse(oldBestAcc) < play.Accuracy)
+            if (float.Parse(oldBestAcc) < Math.Round(play.Accuracy * 100f) / 100f)
             {
                 newBestAcc = true;
             }
-            else if (((float.Parse(oldBestAcc) - play.Accuracy) / AccPerOK) <= 10)
+            else if (((float.Parse(oldBestAcc) - Math.Round(play.Accuracy * 100f) / 100f) / AccPerOK) <= 10 && float.Parse(oldBestAcc) != 100)
             {
                 almostBestAcc = true;
             }
@@ -413,7 +413,7 @@ namespace TaikoLogging
                 {
                     songTitle += " Messy";
                 }
-                if (float.Parse(oldBestAcc) == play.Accuracy && play.Accuracy != 100)
+                if (float.Parse(oldBestAcc) == Math.Round(play.Accuracy * 100f) / 100f)
                 {
                     Program.rin.SendTwitchMessage("Tied best accuracy on " + songTitle + " with " + string.Format("{0:F2}%", play.Accuracy) + "!");
                 }
@@ -902,6 +902,85 @@ namespace TaikoLogging
 
             SendData(range, sendValues);
         }
+        public void AddOldVideoPlay(Play play)
+        {
+            var Headers = GetHeaders("'Old Plays'");
+            var values = GetValues("Old Plays!A2");
+
+            play.Time = Program.videoStartTime + (DateTime.Now - Program.programStartTime);
+
+
+            // Might need to be Headers.Count-1, might not actually matter
+            values = GetValues("Old Plays!A2:" + GetColumnName(Headers.Count));
+            List<IList<object>> sendValues = new List<IList<object>>();
+            IList<object> baseValues = new List<object>();
+            for (int i = 0; i < Headers.Count; i++)
+            {
+                if (Headers[i] == "Title")
+                {
+                    baseValues.Add(play.Title);
+                }
+                else if (Headers[i] == "Genre")
+                {
+                    baseValues.Add("=VLOOKUP(A2, PS4!B:D, 3, false)");
+                }
+                else if (Headers[i] == "★")
+                {
+                    baseValues.Add("=VLOOKUP(A2, PS4!B:E, 4, false)");
+                }
+                else if (Headers[i] == "Mode")
+                {
+                    baseValues.Add(play.Mode.ToString());
+                }
+                else if (Headers[i] == "Score")
+                {
+                    baseValues.Add(play.Score);
+                }
+                else if (Headers[i] == "Acc")
+                {
+                    baseValues.Add(string.Format("{0:F2}%", play.Accuracy));
+                }
+                else if (Headers[i] == "GOOD")
+                {
+                    baseValues.Add(play.GOOD);
+                }
+                else if (Headers[i] == "OK")
+                {
+                    baseValues.Add(play.OK);
+                }
+                else if (Headers[i] == "BAD")
+                {
+                    baseValues.Add(play.BAD);
+                }
+                else if (Headers[i] == "Combo")
+                {
+                    baseValues.Add(play.Combo);
+                }
+                else if (Headers[i] == "Drumroll")
+                {
+                    baseValues.Add(play.Drumroll);
+                }
+                else if (Headers[i] == "DateTime")
+                {
+                    baseValues.Add(play.Time.ToString("MM/dd/yyyy hh:mm tt"));
+                }
+            }
+            sendValues.Add(baseValues);
+            if (values != null)
+            {
+                for (int i = 0; i < values.Count; i++)
+                {
+                    sendValues.Add(values[i]);
+                }
+            }
+
+
+
+
+            string range = "'Old Plays'!A2:" + GetColumnName(Headers.Count);
+
+            SendData(range, sendValues);
+        }
         public void GetRandomSong()
         {
             var Headers = GetHeaders("PS4");
@@ -909,12 +988,14 @@ namespace TaikoLogging
             List<string> songs = new List<string>();
 
             List<int> goalValues = new List<int>();
-            List<float> songAccs = new List<float>();
-            List<float> goalAccs = new List<float>();
-
+            List<int> songAccs = new List<int>();
+            List<int> recentAccs = new List<int>();
+            List<int> goalAccs = new List<int>();
+            List<int> allDaysSinceLastPlayed = new List<int>();
 
             string range = "PS4!A2:" + GetColumnName(Headers.Count);
             var values = GetValues(range);
+            DateTime dateTime = DateTime.Now;
 
             for (int i = 0; i < values.Count; i++)
             {
@@ -930,50 +1011,47 @@ namespace TaikoLogging
                 int.TryParse(values[i][Headers.IndexOf("Goal Acc")].ToString().Replace(".", "").Replace("%", ""), out goalAcc);
                 int.TryParse(values[i][Headers.IndexOf("Best Acc")].ToString().Replace(".", "").Replace("%", ""), out bestAcc);
 
-                if (songAcc == 10000)
+
+                TimeSpan timeSinceLastPlayed;
+                if (values[i].Count > Headers.IndexOf("Latest Play DateTime"))
                 {
+                    if (values[i][Headers.IndexOf("Latest Play DateTime")].ToString() != "")
+                    {
+                        timeSinceLastPlayed = dateTime - DateTime.Parse((string)values[i][Headers.IndexOf("Latest Play DateTime")]);
+                    }
+                    else
+                    {
+                        timeSinceLastPlayed = dateTime - new DateTime(0);
+                    }
+                }
+                else
+                {
+                    timeSinceLastPlayed = dateTime - new DateTime(0);
+                }
+
+
+
+                songAccs.Add(songAcc);
+                goalAccs.Add(goalAcc);
+                recentAccs.Add(recentAcc);
+                allDaysSinceLastPlayed.Add(timeSinceLastPlayed.Days);
+            }
+
+            for (int i = 0; i < songs.Count; i++)
+            {
+                if (songAccs[i] == 10000)
+                {
+                    goalValues.Add(0);
                     continue;
                 }
 
-                int goalValue = 0;
+                if (recentAccs[i] != 0 && goalAccs[i] != 0)
+                {
+                    goalValues.Add((goalAccs[i] - recentAccs[i]) * allDaysSinceLastPlayed[i]);
+                    continue;
+                }
 
-                // This is super lazy, but I am too
-                // RecentAcc is the only one that could fail right now anyway I think
-                //try { songAcc = (int)(float.Parse(values[i][Headers.IndexOf("Acc")].ToString()) * 100); }
-                //catch { }
-                //try { recentAcc = (int)(float.Parse(values[i][Headers.IndexOf("Recent Acc")].ToString()) * 100); }
-                //catch { }
-                //try { goalAcc = (int)(float.Parse(values[i][Headers.IndexOf("Goal Acc")].ToString()) * 100); }
-                //catch { }
-                //try { bestAcc = (int)(float.Parse(values[i][Headers.IndexOf("Best Acc")].ToString()) * 100); }
-                //catch { }
-
-                goalValue = goalAcc - songAcc;
-
-
-                int songLevel = int.Parse(values[i][Headers.IndexOf("★")].ToString());
-
-                //int numNotes = int.Parse(values[i][Headers.IndexOf("GOOD")].ToString()) + songOK + songBad;
-                //TimeSpan timeSinceLastPlayed;
-                //if (values[i].Count > Headers.IndexOf("Latest Play DateTime"))
-                //{
-                //    if (values[i][Headers.IndexOf("Latest Play DateTime")].ToString() != "")
-                //    {
-                //        timeSinceLastPlayed = DateTime.Now - DateTime.Parse((string)values[i][Headers.IndexOf("Latest Play DateTime")]);
-                //    }
-                //    else
-                //    {
-                //        timeSinceLastPlayed = DateTime.Now - new DateTime(0);
-                //    }
-                //}
-                //else
-                //{
-                //    timeSinceLastPlayed = DateTime.Now - new DateTime(0);
-                //}
-
-                goalValues.Add(goalValue);
-                songAccs.Add(songAcc);
-                goalAccs.Add(goalAcc);
+                goalValues.Add(((goalAccs[i] - songAccs[i]) * allDaysSinceLastPlayed[i])/10);
             }
 
             
@@ -1003,12 +1081,12 @@ namespace TaikoLogging
                     float actualSongAcc = 0f;
                     if (songAccs[i] != 0)
                     {
-                        actualSongAcc = songAccs[i] / 100;
+                        actualSongAcc = songAccs[i] / 100f;
                     }
                     float actualGoalAcc = 0f;
                     if (goalAccs[i] != 0)
                     {
-                        actualGoalAcc = goalAccs[i] / 100;
+                        actualGoalAcc = goalAccs[i] / 100f;
                     }
 
                     message += ", " + string.Format("{0:F2}% Acc", actualSongAcc);
@@ -1198,11 +1276,11 @@ namespace TaikoLogging
 
             bool newBestAcc = false;
             bool almostBestAcc = false;
-            if (float.Parse(oldBestAcc) < play.LastAcc)
+            if (float.Parse(oldBestAcc) < Math.Round(play.LastAcc * 100f) / 100f)
             {
                 newBestAcc = true;
             }
-            else if (((float.Parse(oldBestAcc) - play.LastAcc) / AccPerOK) <= 10)
+            else if (((float.Parse(oldBestAcc) - Math.Round(play.LastAcc * 100f) / 100f) / AccPerOK) <= 10 && float.Parse(oldBestAcc) != 100)
             {
                 almostBestAcc = true;
             }
@@ -1297,7 +1375,7 @@ namespace TaikoLogging
             else if (almostBestAcc)
             {
                 string songTitle = play.SongData.SongTitle;
-                if (float.Parse(oldBestAcc) == Math.Round(play.LastAcc * 100f) / 100F && play.LastAcc != 100)
+                if (float.Parse(oldBestAcc) == Math.Round(play.LastAcc * 100f) / 100f)
                 {
                     Program.rin.SendTwitchMessage("Tied best accuracy on " + songTitle + " with " + string.Format("{0:F2}%", play.LastAcc) + "!");
                 }
